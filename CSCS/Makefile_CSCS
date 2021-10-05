@@ -1,0 +1,69 @@
+#
+# Purpose: Makefile for compile the MPI based asynchronous Gibbs sampler
+# Author : E. Orliac
+# Date   : 22.01.2019
+#
+
+EXE      ?= hydra
+
+CXX       = CC
+
+#CXXFLAGS  = -O0
+CXXFLAGS   = -Ofast
+#CXXFLAGS  = -O1
+CXXFLAGS  += -g
+CXXFLAGS  += -std=c++17
+#CXXFLAGS  += -xCORE-AVX512 -qopt-zmm-usage=high
+#CXXFLAGS  += -xCORE-AVX2
+#CXXFLAGS  += -xCORE-AVX2, -axCORE-AVX512 -qopt-zmm-usage=high
+#CXXFLAGS  += -D EIGEN_DONT_VECTORIZE
+CXXFLAGS  += -qopenmp
+#CXXFLAGS  += -qopt-report=2
+#CXXFLAGS  += -qopt-report-phase=loop,vec
+#CXXFLAGS  += -qopt-report-file=stdout
+
+#EO: set this back when switching to production
+#    This will allow to fully use vectorization on both fidis and gacrux
+#CXXFLAGS += -xCORE-AVX2, -axCORE-AVX512
+##CXXFLAGS += -xCORE-AVX512 -qopt-zmm-usage=high
+
+#EO: enable the following for a strict comparison with Eigen
+#CXXFLAGS += -fp-model precise 
+#CXXFLAGS += -fp-model source
+
+INCLUDE   = -I$(HOME)/inc/Eigen-3.3.7
+INCLUDE  += -I$(HOME)/inc/Boost-1.71.0
+#INCLUDE  = -I$(EIGEN_ROOT)/include/eigen3
+#INCLUDE += -I$(BOOST_ROOT)/include
+
+LIBS     = -lz 
+#LIBS    += -lomp
+#LIBS    += -lstdc++fs
+#LIBS    += -lboost_system 
+#LIBS    += -lboost_filesystem
+
+
+SOURCES = main.cpp data.cpp BayesRRm.cpp BayesRRm_mt.cpp gadgets.cpp distributions_boost.cpp options.cpp samplewriter.cpp compression.cpp
+
+OBJECTS := $(patsubst %.cpp,%.o,$(SOURCES))
+
+DEPENDS := $(patsubst %.cpp,%.d,$(SOURCES))
+
+WARNING := -Wall -Wextra
+
+RM := /usr/bin/rm
+
+.PHONY: all clean
+
+all: $(EXE)
+
+clean:
+	$(RM) $(OBJECTS) $(DEPENDS) $(EXE)
+
+$(EXE): $(OBJECTS)
+	$(CXX) $(WARNING) $(CXXFLAGS) $(INCLUDE) $(LIBS) $^ -o $@ $(LIBS)
+
+-include $(DEPENDS)
+
+%.o: %.cpp Makefile
+	$(CXX) $(WARNING) $(CXXFLAGS) $(INCLUDE) $(LIBS) -MMD -MP -c $< -o $@ $(LIBS)
