@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# SBATCH --account=ext-unil-ctgg
+#SBATCH --mem=0
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --ntasks-per-socket=4
+#SBATCH --cpus-per-task=4
+#SBATCH --time 0-00:05:00
+#SBATCH --partition debug
+
+module purge
+module load intel intel-mpi eigen boost
+module list
+
+export OMP_NUM_THREADS=4
+
+env | grep SLURM
+
+srun --cpu-bind=v hostname

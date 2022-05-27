@@ -1,0 +1,65 @@
+#!/bin/sh
+
+set -e
+
+if [ $# -ne 1 ]; then
+    echo "Fatal. Exactly one argument is expected: a nickname for the architecture."
+    echo "       Example:"
+    echo "       ./configure my_arch"
+    echo "       which will look for Make.my_arch in ./setup"
+    exit 1
+fi
+
+root_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+echo root_path = $root_path
+
+arg_arch="$1"
+
+bld_path=${root_path}/build_${1}
+echo bld_path = $bld_path
+if test ! -d $bld_path; then
+    mkdir -v $bld_path;
+fi
+
+setup_file=${root_path}/setup/Make.${arg_arch}
+echo setup_file = $setup_file
+
+CXX=$(grep -E "^CXX\s*=" $setup_file | tr -d ' ' | cut -d '=' -f 2)
+
+# See row Adopt the File System TS for C++17
+# at https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#iso.2014.filesystemts
+# and https://en.cppreference.com/w/cpp/compiler_support
+
+LIBFS=""
+if (test $CXX = "g++"); then
+    MAJ=$($CXX -dumpversion | cut -d '.' -f 1)
+    if [ "$MAJ" -lt "8" ]; then
+        echo Fatal. GCC version not supported `$CXX -dumpversion`. Minimum major version required is 8.
+        exit 1
+    elif [ "$MAJ" -eq 8 ]; then
+        LIBFS=-lstdc++fs
+    fi
+else
+    echo what the hell
+fi
+
+if test ! -f $setup_file ; then
+  echo
+  echo Please create the configuration file $setup_file
+  echo
+  exit 1
+fi
+
+mkfile=${root_path}/Makefile
+echo mkfile = $mkfile
+
+if test -f $mkfile ; then
+  rm $mkfile
+fi
+
+sed -e "s:EDIT_BUILDDIR:${bld_path}:" ${root_path}/Makefile.ext \
+    | sed -e "s:EDIT_ARCH:${arg_arch}:" \
+    | sed -e "s:EDIT_ROOTDIR:${root_path}:" \
+    | sed -e "s:EDIT_SOURCEDIR:${root_path}/src:" \
+    | sed -e "s:EDIT_LIBFS:${LIBFS}:" > $mkfile
+

@@ -1,0 +1,19 @@
+BOOST_INC = $(BOOST_ROOT)/include
+BOOST_LIB =
+
+GMRM_INCLUDES = -I$(BOOST_INC)
+GMRM_LIBS     =
+
+#EO: to enable manual vectorization (via intrinsics)
+#GMRM_OPTS	= -DMANVECT
+
+GMRM_DEFS	= $(GMRM_OPTS) $(GMRM_INCLUDES)
+
+MPICXX		= mpicxx
+CXX			= g++
+
+CXXFLAGS     = $(GMRM_DEFS) -Ofast -std=c++17 -fopenmp
+CXXFLAGS    += -march=native
+#CXXFLAGS    += -g
+#CXXFLAGS    += -W #-Wall
+
