@@ -17,4 +17,4 @@ Currently supported input options to cpp version of the code:
 | `EM-err-thr` | relative error threshold within expectation maximization |
 | `EM-max-iter` | maximal number of iterations of expectation maximization procedure |
 | `stop-criteria-thr` | relative error threshold within expectation maximization |
-| `model` | regression model that describes a relationship between effect sizes and phenotypes (currently supported 'linear' and 'bin_class') |
+| `model` | regression model that describes a relationship between effect sizes and phenotypes ('linear' or 'bin_class') |
