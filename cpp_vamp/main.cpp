@@ -70,11 +70,11 @@ int main()
     
     std::vector<double> vars{0, N*3.0246351e-07, N*1.2863391e-03};
     std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
-    //vars_init = vars;
+    vars_init = vars;
 
     std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
     std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
-    //probs_init = probs;
+    probs_init = probs;
 
 
     //std::vector<double> probs{8e-01, 2e-01};
@@ -110,10 +110,12 @@ int main()
         if (rank == 0)
             std::cout << vars[i] << ' ';
     }
-    std::cout << std::endl;
+    if (rank ==0)
+        std::cout << std::endl;
 
-    if (rank == 0)
+    if (rank == 0){
         std::cout << "beta true stdev = " << calc_stdev(beta_true) << std::endl;
+    }
     
 
     double SNR = 1;
@@ -128,9 +130,11 @@ int main()
     for (int i = 0; i < N; i++){
         noise[i] = gauss_beta_gen(generator);
     }      
-    if (rank == 0)
+    if (rank == 0){
         for (int ran = 1; ran < nranks; ran++)
             MPI_Send(noise.data(), N, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+        std::cout << "noise prec = " << 1.0 / pow(calc_stdev(noise), 2) << std::endl;
+    }
 
     double *noise_val = (double*) _mm_malloc(size_t(N) * sizeof(double), 32);
     if (rank != 0)
@@ -162,12 +166,14 @@ int main()
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     double gam1 = 1e-6; //, gamw = 2.112692482840060;
-    int max_iter = 8;
-    double rho = 0.98;
+    int max_iter = 12;
+    double rho = 0.9;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
     std::string out_name = "x1_hat_height_main"; 
+    std::string model = "linear";
+    gamw = 1;
     
-    vamp emvamp(N, M, Mt, gam1, gamw, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name);
+    vamp emvamp(N, M, Mt, gam1, gamw, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
     std::vector<double> x_est = emvamp.infere(&dataset);
     
 

@@ -11,7 +11,7 @@
 #include "utilities.hpp"
 
 //constructor for class data
-vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name) :
+vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model) :
     N(N),
     M(M),
     Mt(Mt),
@@ -27,11 +27,13 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     out_dir(out_dir),
     out_name(out_name),
     true_signal(true_signal),
+    model(model),
     rank(rank)  {
     x1_hat = std::vector<double> (M, 0.0);
     x2_hat = std::vector<double> (M, 0.0);
     r1 = std::vector<double> (M, 0.0);
     r2 = std::vector<double> (M, 0.0);
+    p1 = std::vector<double> (N, 0.0);
 
     Options opt;
     EM_max_iter = opt.get_EM_max_iter();
@@ -54,12 +56,14 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     out_dir(opt.get_out_dir()),
     out_name(opt.get_out_name()),
     true_signal(true_signal),
+    model(opt.get_model()),
     rank(rank)  {
     N = opt.get_N();
     Mt = opt.get_Mt();
     max_iter = opt.get_iterations();
     x1_hat = std::vector<double> (M, 0.0);
     x2_hat = std::vector<double> (M, 0.0);
+    p1 = std::vector<double> (N, 0.0);
     r1 = std::vector<double> (M, 0.0);
     r2 = std::vector<double> (M, 0.0);
     EM_max_iter = opt.get_EM_max_iter();
@@ -77,8 +81,169 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
 //    return (*dataset).Ax(est.data());
 //}
 
-
 std::vector<double> vamp::infere( data* dataset ){
+
+    if (!strcmp(model.c_str(), "linear"))
+        return infere_linear(dataset);
+    else if (!strcmp(model.c_str(), "bin_class"))
+        return infere_bin_class(dataset);
+    else
+        throw "invalid model specification!";
+
+    return std::vector<double> (M, 0.0);
+}
+
+std::vector<double> vamp::infere_bin_class( data* dataset ){
+
+
+    double tol = 1e-11;
+
+    std::vector<double> x1_hat_d(M, 0.0);
+    std::vector<double> x1_hat_d_prev(M, 0.0);
+    std::vector<double> r1_prev(M, 0.0);
+    std::vector<double> x1_hat_prev(M, 0.0);
+    tau1 = gam1; // hardcoding initial variability
+
+    for (int it = 1; it <= max_iter; it++)
+    {    
+
+        //************************
+        //      Denoising x
+        //************************
+
+        if (rank == 0)
+                std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl << "->DENOISING" << std::endl;
+
+        x1_hat_prev = x1_hat;
+
+        // updating parameters of prior distribution
+        probs_before = probs;
+        vars_before = vars;
+        updatePrior();
+
+        for (int i = 0; i < M; i++ )
+            x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
+
+        std::string filepath_out = out_dir + out_name + "_bin_class_" + "_it_" + std::to_string(it) + "_rank_" + std::to_string(rank) + ".txt"; 
+        if (rank == 0)
+            std::cout << "filepath_out is " << filepath_out << std::endl;
+
+        store_vec_to_file(filepath_out, x1_hat);
+
+        x1_hat_d_prev = x1_hat_d;
+        double sum_d = 0;
+        for (int i = 0; i < M; i++)
+        {
+            // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
+            x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i]; 
+            sum_d += x1_hat_d[i];
+        }
+
+        double alpha1;
+        MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        //std::cout << "alpha1 after MPI_Allreduce() = "<< alpha1 << std::endl;
+        alpha1 /= Mt;
+        if (rank == 0)
+            std::cout << "alpha1 = " << alpha1 << std::endl;
+        eta1 = gam1 / alpha1;
+        gam_before = gam2;
+        gam2 = std::min( std::max( eta1 - gam1, gamma_min ), gamma_max );
+        if (rank == 0){
+            std::cout << "eta1 = " << eta1 << std::endl;
+            std::cout << "gam2 = " << gam2 << std::endl;
+        }
+        for (int i = 0; i < M; i++)
+            r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
+
+
+
+        //************************
+        //      Denoising z
+        //************************
+                
+        std::vector<double> y = (*dataset).get_phen();
+        // updating probit_var
+        if (rank == 0){
+            probit_var = update_probit_var(probit_var, y);
+            for (int ran = 1; ran < nranks; ran++)
+                MPI_Send(&probit_var, 1, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+        }
+        else
+            MPI_Recv(&probit_var, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+
+        // denoising part
+        for (int i=0; i<N; i++)
+            z1_hat[i] = g1_bin_class(p1[i], tau1, y[i]);
+
+
+        double beta1 = 0;
+        for (int i=0; i<N; i++)
+            beta1 += g1d_bin_class(p1[i], tau1, y[i]);
+        beta1 /= N;
+        
+        for (int i=0; i<N; i++)
+            p2[i] = (z1_hat[i] - beta1*p1[i]) / (1-beta1);
+        tau2 = tau1 * (1-beta1) / beta1;
+
+
+
+        //************************
+        // LMMSE estimation of x
+        //************************
+
+        std::vector<double> v = (*dataset).ATx(p2.data());
+
+        for (int i = 0; i < M; i++)
+            v[i] = tau2 * v[i] + gam2 * r2[i];
+
+        // running conjugate gradient solver to compute LMMSE
+        double start_CG = MPI_Wtime();
+        x2_hat = CG_solver(v, tau2, dataset);
+        double end_CG = MPI_Wtime();
+        
+        if (rank == 0)
+            std::cout << "CG took "  << end_CG - start_CG << " seconds." << std::endl;
+
+        double alpha2 = g2d_onsager(gam2, tau2, dataset);
+
+        for (int i=0; i<M; i++)
+            r1[i] = (x2_hat[i] - alpha2*r2[i]) / (1-alpha2);
+
+        gam1 = gam2 * (1-alpha2) / alpha2;
+
+
+        
+        //************************
+        // LMMSE estimation of x
+        //************************
+        
+        z2_hat = (*dataset).Ax(x2_hat.data());
+        double beta2 = N / M * (1-alpha2);
+
+        for (int i=0; i<M; i++)
+            p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
+        tau1 = tau2 * (1 - beta2) / beta2;
+       
+
+        // stopping criteria
+        std::vector<double> x1_hat_diff(M, 0.0);
+        for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
+            x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
+
+        if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
+            if (rank == 0)
+                std::cout << "stopping criteria fulfilled" << std::endl;
+            break;
+        }
+    }
+    
+    return x1_hat;
+
+}
+
+
+std::vector<double> vamp::infere_linear( data* dataset ){
 
     double tol = 1e-11;
 
@@ -97,11 +262,13 @@ std::vector<double> vamp::infere( data* dataset ){
         double start_denoising = MPI_Wtime();
 
         if (rank == 0)
-            std::cout << std::endl << "iteration = "<< it << std::endl << "->DENOISING" << std::endl;
+            std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl << "->DENOISING" << std::endl;
 
         x1_hat_prev = x1_hat;
 
         // updating parameters of prior distribution
+        probs_before = probs;
+        vars_before = vars;
         updatePrior();
 
         for (int i = 0; i < M; i++ )
@@ -159,6 +326,12 @@ std::vector<double> vamp::infere( data* dataset ){
             sum_d += x1_hat_d[i];
         }
 
+        if (calc_state_evo == 1){
+            std::tuple<double, double, double> state_evo_par2 = state_evo(1, gam1, gam_before, probs_before, vars_before, dataset);
+            if (rank == 0)
+                std::cout << "gam2_bar = " << std::get<2>(state_evo_par2) << std::endl; 
+        }
+
         //std::cout << "sum_d = " << sum_d << std::endl;
         double alpha1;
         MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -167,6 +340,7 @@ std::vector<double> vamp::infere( data* dataset ){
         if (rank == 0)
             std::cout << "alpha1 = " << alpha1 << std::endl;
         eta1 = gam1 / alpha1;
+        gam_before = gam2;
         gam2 = std::min( std::max( eta1 - gam1, gamma_min ), gamma_max );
         if (rank == 0){
             std::cout << "eta1 = " << eta1 << std::endl;
@@ -185,6 +359,11 @@ std::vector<double> vamp::infere( data* dataset ){
             std::cout << "denoising step took " << end_denoising - start_denoising << " seconds." << std::endl;
 
 
+        //x1_hat = true_signal; // just for noise precision learning tests
+        //for (int i0 = 0; i0 < M; i0++)
+        //    x1_hat[i0] = sqrt(N) * x1_hat[i0];
+
+
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // %%%%%%%%%% LMMSE step %%%%%%%%%%%%%%
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -192,7 +371,7 @@ std::vector<double> vamp::infere( data* dataset ){
         double start_lmmse_step = MPI_Wtime();
 
         if (rank == 0)
-            std::cout << "->LMMSE" << std::endl;
+            std::cout << "______________________" << std::endl<< "->LMMSE" << std::endl;
 
         //gamw = 1 / ( 1 - inner_prod(z1, z1, 0) );
 
@@ -204,14 +383,21 @@ std::vector<double> vamp::infere( data* dataset ){
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
-        x2_hat = CG_solver(v, dataset);
+        x2_hat = CG_solver(v, gamw, dataset);
         double end_CG = MPI_Wtime();
 
         if (rank == 0)
             std::cout << "CG took "  << end_CG - start_CG << " seconds." << std::endl;
 
+        /*
+        if (calc_state_evo == 1){
+            std::tuple<double, double, double> state_evo_par1 = state_evo(2, gam2, gam_before, probs_before, vars_before, dataset);
+            std::cout << "gam1_bar = " << get<2>(state_evo_par1) << std::endl; 
+        }
+        */
+
         double start_onsager = MPI_Wtime();
-        double alpha2 = g2d_onsager(gam2, dataset);
+        double alpha2 = g2d_onsager(gam2, gamw, dataset);
         double end_onsager = MPI_Wtime();
 
         if (rank == 0)
@@ -220,6 +406,7 @@ std::vector<double> vamp::infere( data* dataset ){
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
         eta2 = gam2 / alpha2;
+        gam_before = gam1;
         gam1 = rho * std::min( std::max( eta2 - gam2, gamma_min ), gamma_max ) + (1 - rho) * gam1; 
         if (rank == 0)
             std::cout << "gam1 = " << gam1 << std::endl;
@@ -242,7 +429,7 @@ std::vector<double> vamp::infere( data* dataset ){
         // stopping criteria
         std::vector<double> x1_hat_diff(M, 0.0);
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
-            x1_hat_diff[i0] = x1_hat[i0] - x1_hat_diff[i0];
+            x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
 
         if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
             if (rank == 0)
@@ -327,7 +514,7 @@ double vamp::g1d(double y, double gam1) {
         return val;
 }
 
-double vamp::g2d_onsager(double gam2, data* dataset) { 
+double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared between linear and binary classification model
     
     std::random_device rd;
     std::bernoulli_distribution bern(0.5);
@@ -335,9 +522,7 @@ double vamp::g2d_onsager(double gam2, data* dataset) {
     bern_vec = std::vector<double> (M, 0.0);
     for (int i = 0; i < M; i++)
         bern_vec[i] = 2*bern(rd) - 1;
-    //std::cout << "u[0] = " << u[0] << std::endl;
-    //std::vector<double> temp = lmmse_mult(u, dataset);
-    std::vector<double> invQ_bern_vec = CG_solver(bern_vec, dataset);
+    std::vector<double> invQ_bern_vec = CG_solver(bern_vec, tau, dataset);
     double onsager = gam2 * inner_prod(bern_vec, invQ_bern_vec, 1) / Mt; 
     return onsager;
     
@@ -354,7 +539,7 @@ void vamp::updateNoisePrec(data* dataset){
             u[i] = 2*bern(rd) - 1;
         for (int ran = 1; ran < nranks; ran++)
             MPI_Send(u.data(), phen_size, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
-            std::cout << "nranks = " << nranks << std::endl;
+            //std::cout << "nranks = " << nranks << std::endl;
     } else if (rank != 0){
         MPI_Recv(u.data(), phen_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
@@ -366,12 +551,12 @@ void vamp::updateNoisePrec(data* dataset){
         temp[i] -= y[i];
     
     double temp_norm2 = l2_norm2(temp, 0); 
-    double trace_corr = inner_prod(CG_solver(v, dataset), v, 1); // check this! ad
+    double trace_corr = inner_prod(CG_solver(v, gamw, dataset), v, 1); // check this! ad
     //std::vector<double> z2 = (*dataset).Ax(x2_hat.data());
     if (rank == 0){
         std::cout << "l2_norm2(temp) / N = " << temp_norm2 / N << std::endl;
         std::cout << "trace_correction / N = " << trace_corr / N << std::endl;
-        std::cout << "var(y) = " << inner_prod(y, y, 0) / N << std::endl;
+        //std::cout << "var(y) = " << inner_prod(y, y, 0) / N << std::endl;
         //std::cout << "alternative gamw = " << 1 / ( 1 - inner_prod(z1, z1, 0) ) << std::endl;
     }
     gamw = (double) N / (temp_norm2 + trace_corr);
@@ -495,7 +680,7 @@ void vamp::updatePrior() {
         //        std::cout << "final number of prior EM iterations = " << EM_max_iter << std::endl;
 }
 
-std::vector<double> vamp::lmmse_mult(std::vector<double> v, data* dataset){
+std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset){ // multiplying with (tau*A^TAv + gam2*v)
 
     std::vector<double> res(M, 0.0);
     size_t phen_size = 4 * (*dataset).get_mbytes();
@@ -506,7 +691,8 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, data* dataset){
     res = (*dataset).ATx( res_temp.data() );
     //std::cout << "before loop!" << std::endl;
     for (int i = 0; i < M; i++){
-        res[i] *= gamw;
+        //res[i] *= gamw;
+        res[i] *= tau;
         res[i] += gam2 * v[i];
         if (std::isnan(res[i] && i < 5000)){
         std::cout << "index at position "<< i << " is nan." << std::endl; 
@@ -517,7 +703,7 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, data* dataset){
     return res;
 }
 
-std::vector<double> vamp::CG_solver(std::vector<double> v, data* dataset){
+std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dataset){
 
     // we start with approximation x0 = 0
     std::vector<double> mu(M, 0.0);
@@ -530,10 +716,10 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, data* dataset){
     for (int i = 0; i < CG_max_iter; i++){
         //std::cout << "[CG_solver] i = " << i << ", rank = " << rank << std::endl;
         double start_lmmse = MPI_Wtime();
-        d = lmmse_mult(p, dataset);
+        d = lmmse_mult(p, tau, dataset);
         double end_lmmse = MPI_Wtime();
-        if (rank == 0 && (i % 10 == 0) )
-            std::cout << "[CG_solver] time for lmmse = " << end_lmmse - start_lmmse << std::endl;
+        //if (rank == 0 && (i % 10 == 0) )
+            //std::cout << "[CG_solver] time for lmmse = " << end_lmmse - start_lmmse << std::endl;
         //std::vector<double> p_temp(M, 0.0);
         alpha = l2_norm2(r, 1) / inner_prod(d, p, 1);
         
@@ -579,8 +765,8 @@ void vamp::err_measures(data *dataset, int ind){
             std::cout << "correlation x1_hat = " << corr << std::endl;  
         double l2_norm2_x1_hat = l2_norm2(x1_hat, 1);
         double l2_norm2_true_signal = l2_norm2(true_signal, 1);
-        if (rank == 0)
-            std::cout << "l2_norm2(x1_hat) = " << l2_norm2_x1_hat << ", l2_norm2(true_signal) = " << l2_norm2_true_signal << std::endl;
+        //if (rank == 0)
+        //    std::cout << "l2_norm2(x1_hat) / N = " << l2_norm2_x1_hat / N << ", l2_norm2(true_signal) = " << l2_norm2_true_signal << std::endl;
     }
     else if (ind == 2){
         double corr_2 = inner_prod(x2_hat, true_signal, 1) / sqrt( l2_norm2(x2_hat, 1) * l2_norm2(true_signal, 1) );
@@ -588,8 +774,8 @@ void vamp::err_measures(data *dataset, int ind){
             std::cout << "correlation x2_hat = " << corr_2 << std::endl;
         double l2_norm2_x2_hat = l2_norm2(x2_hat, 1);
         double l2_norm2_true_signal = l2_norm2(true_signal, 1);
-        if (rank == 0)
-            std::cout << "l2_norm2(x2_hat) = " << l2_norm2_x2_hat << ", l2_norm2(true_signal) = " << l2_norm2_true_signal << std::endl;
+        //if (rank == 0)
+        //    std::cout << "l2_norm2(x2_hat) / N = " << l2_norm2_x2_hat / N << ", l2_norm2(true_signal) = " << l2_norm2_true_signal << std::endl;
     }
     
 
@@ -668,13 +854,25 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     // calculating KL divergence between two multivariate gaussians
     double DKL2 = 0;
     // Chebishev approximation of a log(det) component
-    DKL2 += ( 2*eta2 - (2 + log(2)) ) * Mt;
+    //DKL2 += ( 2*eta2 - (2 + log(2)) ) * Mt;
+    // Taylor approximation of a log(det) component
+    DKL2 += - Mt*log(gamw * (*dataset).get_sigma_max() * (*dataset).get_sigma_max() + gam2);
+    for (int i = 0; i < M; i++)
+        u[i] = 2*bern(rd) - 1;
+    std::vector<double> temp_poly_apr = u;
+    double sign = 1;
+    for (int i=1; i<=poly_deg_apr_vamp_obj; i++){
+        temp_poly_apr = lmmse_mult(temp_poly_apr, gamw, dataset); // this function (vamp_obj_func) is hardcoded for the linear model
+        for (int i1=0; i1<M; i1++)
+            temp_poly_apr[i1] -= 1;
+        DKL2 += sign * inner_prod(temp_poly_apr, u, 1) / (gamw * (*dataset).get_sigma_max() * (*dataset).get_sigma_max() + gam2) / i;
+        sign *= -1;
+    } 
     
     // trace component
     //std::vector<double> u = std::vector<double> (M, 0.0);
     //for (int i = 0; i < M; i++)
     //    u[i] = 2*bern(rd) - 1;
-    //std::vector<double> temp = lmmse_mult(u, dataset);
     std::vector<double> temp = (*dataset).Ax(invQu.data());
     std::vector<double> temp2 = (*dataset).ATx(temp.data());
     for (int i=0; i<temp2.size(); i++)
@@ -689,7 +887,7 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
 
     //for (int i = 0; i < M; i++)
         //u[i] = 2*bern(rd) - 1;
-    //DKL2 -= inner_prod(u, CG_solver(u, dataset), 1);
+    //DKL2 -= inner_prod(u, CG_solver(u, gamw, dataset), 1);
     //DKL2 -= Mt / eta2;
 
     // KL divergence between two gaussian mixtures
@@ -736,7 +934,7 @@ std::tuple<double, double, double> vamp::state_evo(int ind, double gam_prev, dou
     }
     else if (ind == 2){
 
-        alpha_bar = gam_prev * g2d_onsager(gam_prev, dataset);
+        alpha_bar = g2d_onsager(gam_prev, gamw, dataset); // * gam_prev ;
 
         eta_bar = gam_prev / alpha_bar;
 
@@ -744,4 +942,75 @@ std::tuple<double, double, double> vamp::state_evo(int ind, double gam_prev, dou
     }
 
     return {alpha_bar, eta_bar, gam_bar};
+}
+
+
+double vamp::g1_bin_class(double p, double tau1, double y){
+
+    double c = p / sqrt(probit_var + 1/tau1);
+    double temp = p + exp(-0.5 * c * c) / tau1 / sqrt(2*M_PI) / sqrt(probit_var + 1/tau1) / (0.5 * erfc(-c * M_SQRT1_2));
+    if (y==1)
+        return temp;
+    else if (y==0)
+        return p-temp;
+    return 0;
+}
+
+
+double vamp::g1d_bin_class(double p, double tau1, double y){
+    
+    double c = p / sqrt(probit_var + 1/tau1);
+    double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
+    double phic = 0.5 * erfc(-c * M_SQRT1_2);
+    double temp = 1 -  Nc / (1 + tau1*probit_var) / phic * (c + Nc / phic);
+    if (y==1)
+        return temp;
+    else if (y==0)
+        return (1/tau1 + p*p) - temp;
+    return 0;
+}
+
+double vamp::probit_var_EM_deriv(double v, std::vector<double> y){ // we'll do the update just before z1
+
+    double sqrt_v = sqrt(v);
+    double new_v;
+    for (int i=0; i<N; i++){
+        double c = z1_hat[i] / sqrt_v;
+        double phic = 0.5 * erfc(-c * M_SQRT1_2);
+        if (y[i] == 1)
+            new_v += exp(-c*c/2) / sqrt(2*M_PI) / phic * z1_hat[i];
+        else if (y[i] == 0)
+            new_v += - exp(-c*c/2) / sqrt(2*M_PI) / (1-phic) * z1_hat[i];  
+    }
+    double new_v_MPIsync;
+    MPI_Allreduce(&new_v, &new_v_MPIsync, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    return new_v_MPIsync / Mt;
+}
+
+double vamp::update_probit_var(double v, std::vector<double> y){
+
+    double new_v=v, var_min=1/tau2, var_max=1e8; //z ~ N(p2, I/tau2)
+
+    // bisection method for finding the root of 'probit_var_EM_deriv' function
+    if (probit_var_EM_deriv(var_min,y)<0){
+        // solution must be <= var_min
+        new_v = var_min;
+    }
+    else if (probit_var_EM_deriv(var_max,y)>0){
+        // solution must be >= var_max
+        new_v = var_max;
+    }
+    else{
+        // refine midpoint on a log scale
+        new_v = exp(0.5*(log(var_min) + log(var_max)));
+        for (int it=0; it<20; it++){   
+            if (probit_var_EM_deriv(new_v,y)>0)
+                var_min = new_v;
+            else
+                var_max = new_v;
+        new_v = exp(0.5*(log(var_min) + log(var_max)));
+        }
+    }
+
+    return new_v;
 }

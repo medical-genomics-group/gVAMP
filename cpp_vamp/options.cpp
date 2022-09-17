@@ -125,6 +125,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             out_name = argv[++i];
             ss << "--out-name " << out_name << "\n";
         }
+        else if (!strcmp(argv[i], "--model")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            model = argv[++i];
+            ss << "--model " << model << "\n";
+        }
         /*else if (!strcmp(argv[i], "--predict")) {
             predict_ = true;
             ss << "--predict " << predict_ << "\n";

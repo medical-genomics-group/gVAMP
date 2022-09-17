@@ -21,6 +21,7 @@ public:
     //std::string get_group_mixture_file() const { return group_mixture_file; }
     std::string get_out_dir() const { return out_dir; }
     std::string get_out_name() const { return out_name; }
+    std::string get_model() const { return model; }
     double get_stop_criteria_thr() const { return stop_criteria_thr; }
     double get_EM_err_thr() const { return EM_err_thr; }
     double get_rho() const { return rho; }
@@ -52,6 +53,7 @@ private:
     //std::string group_mixture_file = "";
     std::string out_dir = "";
     std::string out_name = "";
+    std::string model = "linear";
     double stop_criteria_thr = 1e-6;
     double EM_err_thr = 1e-6;
     unsigned int EM_max_iter = 1e5;

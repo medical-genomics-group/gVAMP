@@ -136,22 +136,23 @@ int main(int argc, char** argv)
         for (int i0 = 0; i0 < x_est_scaled.size(); i0++)
             x_est_scaled[i0] = x_est[i0] * sqrt( (double) N_test / (double) N );
 
-        std::cout << "std x_est_scaled = " << calc_stdev(x_est_scaled) << std::endl;
+        //if (rank == 0)
+        //    std::cout << "std x_est_scaled = " << calc_stdev(x_est_scaled) << std::endl;
 
         std::vector<double> z = dataset_test.Ax(x_est_scaled.data());
 
         // mean and std of z
         double stdev_z = calc_stdev(z);
-        if (rank == 0)
-            std::cout << "z stdev^2 = " << stdev_z * stdev_z << std::endl;
+        //if (rank == 0)
+        //    std::cout << "z stdev^2 = " << stdev_z * stdev_z << std::endl;
 
-        if (rank == 0)
-        std::cout << "z[0] = " << z[0] << ", rank = "<< rank << std::endl;
+        //if (rank == 0)
+        //std::cout << "z[0] = " << z[0] << ", rank = "<< rank << std::endl;
         for (int i0 = 0; i0 < z.size(); i0++ ){
             z[i0] = intercept + scale * z[i0];
         }
-        if (rank == 0)
-            std::cout << "after z[0] = " << z[0] << ", rank = " << rank << std::endl;
+        //if (rank == 0)
+        //    std::cout << "after z[0] = " << z[0] << ", rank = " << rank << std::endl;
 
         std::vector<double> y_test = dataset_test.get_phen();
 

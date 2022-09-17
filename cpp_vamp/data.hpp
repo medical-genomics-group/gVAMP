@@ -32,6 +32,7 @@ private:
     double* msig     = nullptr;
     unsigned char* bed_data = nullptr;
     size_t mbytes;
+    double sigma_max = 1e8;
     double intercept = 0;
     double scale = 1; 
 
@@ -42,6 +43,7 @@ public:
     // int get_phen_size(){ return phen_data.size(); };
     double get_intercept() { return intercept; };
     double get_scale() { return scale; };
+    double get_sigma_max() { return sigma_max; };
     size_t get_mbytes(){ return mbytes; };
     void set_phen( std::vector<double> new_data ) { phen_data = new_data; };
     std::vector<unsigned char>& get_mask4() { return mask4; }

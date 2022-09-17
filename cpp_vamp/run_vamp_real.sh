@@ -6,10 +6,10 @@
 #SBATCH --mem 0
 # SBATCH --mem-per-cpu 5gb
 #SBATCH --time 1-15:01:00
-#SBATCH --output=emvamp_height_rho098_gamwL_PL_truesignalOn_testset_it10_CG10_01092022.log
+#SBATCH --output=emvamp_height_rho09_gamwL_PL_truesignalOn_testset_it30_CG10_13092022.log
 # SBATCH --constraint=beta
-#SBATCH --exclude=bjoern55
-# SBATCH --constraint=avx512
+#SBATCH --exclude=bjoern55,bjoern37,bjoern38,bjoern40
+#SBATCH --constraint=avx2
 
 # source /etc/profile.d/modules.sh
 
@@ -43,10 +43,11 @@ time mpirun -np 5 ./main_real.exe --bed-file /nfs/scistore13/robingrp/human_data
                                 --N 438361 \
                                 --Mt 326165 \
                                 --out-dir /nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/ \
-                                --out-name x1_hat_height_gamwL_PL_1_9_22 \
-                                --iterations 10 \
+                                --out-name x1_hat_height_gamwL_CG_10_PL_rho_09_13_9_22 \
+                                --iterations 30 \
                                 --num-mix-comp 3 \
                                 --CG-max-iter 10 \
+                                --model linear \
                                 --probs 0.70412,0.26945,0.02643 \
                                 --vars 0,0.001251585388785e-5,0.606523422454662e-5 \
-                                --rho 0.98
+                                --rho 0.90
