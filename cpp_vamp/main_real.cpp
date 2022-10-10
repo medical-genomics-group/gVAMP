@@ -65,12 +65,14 @@ int main(int argc, char** argv)
     // reading signal estimate from gmrm software
     const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
 
-    int run_on_test_set = 1;
+    int run_on_test_set = 0;
 
     if (run_on_test_set == 0){ // we distinguish between calculation of R2 on the test set or not (both version load the output from gmrm)
         
         const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
-        std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S);
+        std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S); //for smaller dataset
+        beta_true = std::vector<double> (M, 0.0);
+
         
         std::string phenfp = (opt.get_phen_files())[0];
         data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank);

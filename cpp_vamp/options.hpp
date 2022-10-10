@@ -57,7 +57,7 @@ private:
     double stop_criteria_thr = 1e-6;
     double EM_err_thr = 1e-6;
     unsigned int EM_max_iter = 1e5;
-    unsigned int CG_max_iter = 10;
+    unsigned int CG_max_iter = 50;
     unsigned int Mt;
     unsigned int N;
     unsigned int num_mix_comp;

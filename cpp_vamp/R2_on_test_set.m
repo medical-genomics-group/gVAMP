@@ -4,17 +4,19 @@ clear all;
 lib_loc='/nfs/scistore13/robingrp/human_data/adepope_preprocessing/AMP_library';
 addpath( lib_loc )  
 
-nranks = 5
+nranks = 20
 
 R2s = [];
 
-for i1 = 1:10
+out_dir="/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
+
+for i1 = 1:20
         
     sig_est = [];
 
     for i0 = 0:(nranks-1)
 
-        str =  strcat("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/x1_hat_height_gamwL_CG_25_PL_rho_09_13_9_22_it_",  num2str(i1), "_rank_", num2str(i0));
+        str =  strcat(out_dir, "x1_hat_ukb_train_HT_gamwL_CG_10_PL_rho_30_07_10_22_prunned_080_it_",  num2str(i1), "_rank_", num2str(i0));
 
         val = table2array( readtable(str) );
 
@@ -26,13 +28,15 @@ for i1 = 1:10
 
     % reading genomic data
 
-    bed_name = '/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/ukb22828_UKB_EST_v3_ldp08_test_HT';
+    % bed_name = '/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/ukb22828_UKB_EST_v3_ldp08_test_HT';
+
+    bed_name = '/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_all_prunned_008_test';
 
     N_test = 15000;
 
     N = 438361;
 
-    Mt = 326165;
+    Mt = numel(sig_est);
 
     genomat = PlinkRead_binary2(N_test, 1:Mt, bed_name);
 

@@ -1,18 +1,22 @@
 #!/bin/bash
 
-#SBATCH --ntasks 5
-#SBATCH --cpus-per-task 6
+#SBATCH --ntasks 20
+#SBATCH --cpus-per-task 10
 #SBATCH --mem 0
 # SBATCH --mem-per-cpu 5gb
-#SBATCH --time 1-15:01:00
+#SBATCH --time 01-06:00:00
 #SBATCH --exclude=bjoern55,bjoern37,bjoern38,bjoern40
 #SBATCH --constraint=avx2
+# SBATCH --constraint=delta
 
 
 ## how to run?
-# phen_name=ukb_ht_noNA
-# bed_name=ukb22828_UKB_EST_v3_ldp005_maf01
-# sbatch --output=run_gmrm__${bed_name}__${phen_name}  --wait run_gmrm.sh $bed_name $phen_name 326165 438361
+# phen_name=ukb_train_HT
+# bed_name=ukb22828_UKB_EST_v3_all_prunned_080
+# sbatch --output=run_vamp__${bed_name}__${phen_name}_31_09_2022_rho_03_CG_30 run_vamp.sh $bed_name $phen_name 458747 8430446 
+# sbatch --output=run_vamp__${bed_name}__${phen_name}_07_10_2022_rho_03_CG_30 run_vamp.sh
+
+# source /etc/profile.d/modules.sh
 
 module load gcc openmpi boost
 
@@ -20,18 +24,36 @@ module list
 
 export OMP_NUM_THREADS=6
 
-mpic++ main_real.cpp vamp.cpp utilities.cpp data.cpp options.cpp -march=native -DMANVECT -Ofast -g -fopenmp -lstdc++fs -D_GLIBCXX_DEBUG -o  main_real.exe
+loc=nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP
 
-time mpirun -np 5 ./main_real.exe --bed-file /nfs/scistore13/robingrp/human_data/geno/ldp08/$1.bed \
-                                --phen-files /nfs/scistore13/robingrp/human_data/geno/ldp08/$2.phen \
-                                --N $3 \
-                                --Mt $4 \
-                                --out-dir /nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/output/ \
-                                --out-name x1_hat_$2_gamwL_CG_10_PL_rho_09_13_9_22 \
-                                --iterations 30 \
-                                --num-mix-comp 3 \
-                                --CG-max-iter 10 \
+mpic++ /$loc/main_real.cpp /$loc/vamp.cpp /$loc/utilities.cpp /$loc/data.cpp /$loc/options.cpp -march=native -DMANVECT -Ofast -g -fopenmp -lstdc++fs -D_GLIBCXX_DEBUG -o  /$loc/main_real.exe
+
+prthr=080
+i1=ukb22828_UKB_EST_v3_all_prunned_${prthr}
+# i1=ukb22828_c21_UKB_EST_v3
+i2=ukb_train_HT
+i3=458747
+# i4=8430446 
+# i4=115233
+i4=2731356  # thr = 0.8
+rho=30
+
+# --bed-file /nfs/scistore13/robingrp/human_data/geno/chr/$i1.bed
+time mpirun -np 20 /$loc/main_real.exe --bed-file /nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/$i1.bed \
+                                --phen-files /nfs/scistore13/robingrp/human_data/pheno/continuous/$i2.phen \
+                                --N $i3 \
+                                --Mt $i4 \
+                                --out-dir /nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/output/vamp_signal_est/ \
+                                --out-name x1_hat_${i2}_gamwL_CG_30_PL_rho_${rho}_07_10_22_prunned_${prthr} \
+                                --iterations 20 \
+                                --num-mix-comp 5 \
+                                --CG-max-iter 30 \
                                 --model linear \
-                                --probs 0.70412,0.26945,0.02643 \
-                                --vars 0,0.001251585388785e-5,0.606523422454662e-5 \
-                                --rho 0.90
+                                --vars 0.00000,0.00001,0.01,0.1,1 \
+                                --probs 0.990559568574484,0.009392809717180,0.000047274997321,0.000000078786398,0.000000267924616 \
+                                --rho 0.${rho}
+
+#                                 --probs 0.70412,0.26945,0.02643 \
+#                                 --vars 0,0.001251585388785e-5,0.606523422454662e-5 \
+#                                 --probs 0.85,0.025,0.025,0.05,0.03,0.01,0.01 \
+#                                 --vars 0,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5 \

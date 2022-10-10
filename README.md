@@ -1,4 +1,34 @@
-Currently supported input options to cpp version of the code:
+## Table of contents
+* [General info](#general-info)
+* [Setup and supported options](#setup)
+* [References](#references)
+
+## General info
+This repository contains a software implementation of Vector Approximate Message Passing algorithm suitable for doing inference in Genome-Wide Association Studies (GWAS).  
+
+
+## Setup and supported options
+
+An example of a slurm script that can be used to compile and run the software:
+
+```
+
+module purge
+
+module load gcc openmpi boost
+
+module list 
+
+loc={a path to cpp_vamp folder}
+
+
+mpic++ /$loc/main_real.cpp /$loc/vamp.cpp /$loc/utilities.cpp /$loc/data.cpp /$loc/options.cpp -march=native -DMANVECT -Ofast -g -fopenmp -lstdc++fs -D_GLIBCXX_DEBUG -o  /$loc/main_real.exe
+
+mpirun -np {number of MPI workers} /$loc/main_real.exe [input options]
+
+```
+
+Currently supported input options to C++ version of the code:
 
 | Input option | Description |
 | --- | --- |
@@ -18,3 +48,6 @@ Currently supported input options to cpp version of the code:
 | `EM-max-iter` | maximal number of iterations of expectation maximization procedure |
 | `stop-criteria-thr` | relative error threshold within expectation maximization |
 | `model` | regression model that describes a relationship between effect sizes and phenotypes ('linear' or 'bin_class') |
+
+## References
+[1] 

@@ -74,7 +74,7 @@ int main()
 
     std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
     std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
-    probs_init = probs;
+    //probs_init = probs;
 
 
     //std::vector<double> probs{8e-01, 2e-01};

@@ -7,6 +7,7 @@
 #include <random>
 #include <omp.h>
 #include <fstream>
+#include "na_lut.hpp"
 #include "vamp.hpp"
 #include "utilities.hpp"
 
@@ -39,6 +40,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     EM_max_iter = opt.get_EM_max_iter();
     EM_err_thr = opt.get_EM_err_thr();
     CG_max_iter = opt.get_CG_max_iter();
+    std::cout<< "CG_max_iter = " << CG_max_iter << std::endl;
     stop_criteria_thr = opt.get_stop_criteria_thr();
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 }
@@ -162,6 +164,12 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         //************************
                 
         std::vector<double> y = (*dataset).get_phen();
+        std::vector<unsigned char> mask4 = (*dataset).get_mask4();
+        for (int j=0;j<(*dataset).get_mbytes();j++)
+            for(int k=0;k<4;k++)
+                if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
+                    y[4*j + k] = 0;
+
         // updating probit_var
         if (rank == 0){
             probit_var = update_probit_var(probit_var, y);
@@ -231,11 +239,13 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
 
+        /*
         if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
             if (rank == 0)
                 std::cout << "stopping criteria fulfilled" << std::endl;
-            break;
+            //break;
         }
+        */
     }
     
     return x1_hat;
@@ -348,7 +358,8 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         }
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
-        //std::cout << "r2[1] = "<< r2[1] << std::endl;
+        //if (rank ==0)
+        //    std::cout << "r2[1] = "<< r2[1] << std::endl;
         //std::cout << "norm(r2)^2 = " << l2_norm2(r2, 1) << std::endl;
     
         err_measures(dataset, 1);
@@ -376,6 +387,11 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         //gamw = 1 / ( 1 - inner_prod(z1, z1, 0) );
 
         std::vector<double> y = (*dataset).get_phen();
+        std::vector<unsigned char> mask4 = (*dataset).get_mask4();
+        for (int j=0;j<(*dataset).get_mbytes();j++)
+            for(int k=0;k<4;k++)
+                if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
+                    y[4*j + k] = 0;
         std::vector<double> v = (*dataset).ATx(y.data());
 
         for (int i = 0; i < M; i++)
@@ -431,11 +447,13 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
 
+        /*
         if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
             if (rank == 0)
                 std::cout << "stopping criteria fulfilled" << std::endl;
             break;
         }
+        */
             
 
         if (rank == 0)
@@ -547,6 +565,14 @@ void vamp::updateNoisePrec(data* dataset){
     std::vector<double> v = (*dataset).ATx(u.data());
     std::vector<double> temp = (*dataset).Ax(x2_hat.data());
     std::vector<double> y = (*dataset).get_phen();
+
+    //filtering for NAs
+    std::vector<unsigned char> mask4 = (*dataset).get_mask4();
+    for (int j=0;j<(*dataset).get_mbytes();j++)
+        for(int k=0;k<4;k++)
+            if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
+                y[4*j + k] = 0;
+
     for (int i = 0; i < N; i++)  // because length(y) = N
         temp[i] -= y[i];
     
@@ -626,7 +652,7 @@ void vamp::updatePrior() {
                 //std::cout << "lambda = " << lambda << std::endl;
         
             for (int i = 0; i < M; i++){
-                for (int j = 0; j < (beta[1]).size(); j++ ){
+                for (int j = 0; j < (beta[0]).size(); j++ ){
                     gammas[i][j] = beta[i][j] * ( pow(gammas[i][j], 2) + v[j] );
                 }
             }
@@ -637,6 +663,7 @@ void vamp::updatePrior() {
             MPI_Allreduce(&sum_of_pin, &sum_of_pin_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             sum_of_pin = sum_of_pin_total;
 
+            //std::cout << "size of beta[0] = " << (beta[0]).size() << std::endl;
             for (int j = 0; j < (beta[0]).size(); j++){ // of length (L-1)
                 double res = 0, res_gammas = 0;
                 for (int i = 0; i < M; i++){
@@ -649,6 +676,8 @@ void vamp::updatePrior() {
                 MPI_Allreduce(&res_gammas, &res_gammas_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
                 MPI_Allreduce(&res, &res_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
+                //if (rank==0 && it%10 == 1)
+                //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << std::endl;
                 vars[j+1] = res_gammas_total / res_total;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
@@ -781,17 +810,30 @@ void vamp::err_measures(data *dataset, int ind){
 
     // l2 signal error
     std::vector<double> temp(M, 0.0);
+    double l2_norm2_xhat;
     if (ind == 1){
         for (int i = 0; i< M; i++)
             temp[i] = sqrt(scale) * x1_hat[i] - true_signal[i];
+        l2_norm2_xhat = l2_norm2(x1_hat, 1);
     }
     else if (ind == 2){
         for (int i = 0; i< M; i++)
             temp[i] = sqrt(scale) * x2_hat[i] - true_signal[i];
+        l2_norm2_xhat = l2_norm2(x2_hat, 1);
     }
-    
-    //std::cout << "[err_measures] temp[1] = " << temp[1] << std::endl; 
-    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
+
+    /*
+    int nan_found = 0;
+    for (int i=0;i<M;i++)
+        if (std::isnan(temp[i]))
+            nan_found=1;
+    if (nan_found==1)
+        std::cout << "nan_found in temp position in rank " << rank << std::endl; 
+    */
+
+    //if (rank == 0)
+    //    std::cout << "[err_measures] l2_norm2_xhat = " << l2_norm2_xhat << std::endl; 
+    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
     if (rank == 0)
         std::cout << "l2 signal error = " << l2_signal_err << std::endl;
     
@@ -800,6 +842,22 @@ void vamp::err_measures(data *dataset, int ind){
     std::vector<double> tempNest(phen_size, 0.0);
     std::vector<double> tempNtrue(phen_size, 0.0);
     std::vector<double> y = (*dataset).get_phen();
+
+    //filtering pheno vector for NAs
+    std::vector<unsigned char> mask4 = (*dataset).get_mask4();
+    for (int j=0;j<(*dataset).get_mbytes();j++)
+        for(int k=0;k<4;k++)
+            if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
+                y[4*j + k] = 0;
+
+    if (rank == 0){
+        std::cout << "N = " << N << std::endl;
+        std::cout << "y.size() = " << y.size()<< std::endl;
+        for (int j=1;j<N; j++)
+            if(y[j] == std::numeric_limits<double>::max() && j <=200){
+                std::cout << j << " position is std::numeric_limits<double>::max(), j =" << j / 4 << ", k = " << j%4 << ", luk = " << na_lut[mask4[j/4] * 4 + (j%4)] << std::endl; 
+            }
+    }
     std::vector<double> Axest;
     if (ind == 1)
         //Axest = (*dataset).Ax( x1_hat.data() );
@@ -809,9 +867,23 @@ void vamp::err_measures(data *dataset, int ind){
     //std::vector<double> Axtrue = (*dataset).Ax( true_signal.data() );
 
     for (int i = 0; i < N; i++){ // N because length(y) = N even though length(Axest) = 4*mbytes
-        tempNest[i] = -Axest[i] + y[i]; 
+        tempNest[i] = -Axest[i] + y[i];
     }
 
+    /*
+    for (int i=0;i<phen_size;i++)
+        if (std::isnan(tempNest[i]))
+            nan_found=1;
+    if (nan_found==1)
+        std::cout << "nan_found in tempNest in rank " << rank << std::endl; 
+    if (rank == 0){
+        std::cout << "Axest[0] = " << Axest[0] << std::endl;
+        std::cout << "Axest[phen_size-1] = " << Axest[phen_size-1] << std::endl;
+        std::cout << "tempNest[0] = " << tempNest[0] << std::endl;
+        std::cout << "tempNest[phen_size-1] = " << tempNest[phen_size-1] << std::endl;
+        std::cout << "l2_norm2(y, 0) = " << l2_norm2(y, 0) << std::endl;
+        std::cout << "l2_norm2(tempNest, 0) = " << l2_norm2(tempNest, 0) << std::endl;
+    }*/
     double l2_pred_err = sqrt(l2_norm2(tempNest, 0) / l2_norm2(y, 0));
     if (rank == 0)
         std::cout << "l2 prediction error = " << l2_pred_err << std::endl;
@@ -881,7 +953,14 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
 
     // quadratic form component
     //std::vector<double> z2 = (*dataset).Ax(x2_hat.data());
-    DKL2 += (-2) * gamw * inner_prod( (*dataset).get_phen(), z1, 0);
+    std::vector<double> y = (*dataset).get_phen();
+    //filtering pheno vector for NAs
+    std::vector<unsigned char> mask4 = (*dataset).get_mask4();
+    for (int j=0;j<(*dataset).get_mbytes();j++)
+        for(int k=0;k<4;k++)
+            if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
+                y[4*j + k] = 0;
+    DKL2 += (-2) * gamw * inner_prod(y, z1, 0);
     DKL2 += gamw * inner_prod(x1_hat, (*dataset).ATx(z1.data()), 1);
     DKL2 += (-1) * Mt / 2 * log(gamw);
 
