@@ -29,7 +29,7 @@ time mpirun -np 4 ./main_benchmark.exe --bed-file /nfs/scistore13/robingrp/human
                                        --out-name x1_hat_height_benchmark \
                                        --iterations 5 \
                                        --num-mix-comp 3 \
-                                       --probs 0.70412,0.26945,0.02643 \
+                                       --probs 0.990,0.007,0.003 \
                                        --vars 0,0.001251585388785e-5,0.606523422454662e-5 \
                                        --rho 0.98
 

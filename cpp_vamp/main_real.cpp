@@ -65,13 +65,10 @@ int main(int argc, char** argv)
     // reading signal estimate from gmrm software
     const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
 
-    int run_on_test_set = 0;
-
-    if (run_on_test_set == 0){ // we distinguish between calculation of R2 on the test set or not (both version load the output from gmrm)
+    if (opt.get_run_mode() == "infere"){ // we distinguish between calculation of R2 on the test set and the inference (all versions load the output from gmrm)
         
-        const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
-        std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S); //for smaller dataset
-        beta_true = std::vector<double> (M, 0.0);
+        //const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
+        //std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S); //for smaller dataset
 
         
         std::string phenfp = (opt.get_phen_files())[0];
@@ -88,18 +85,58 @@ int main(int argc, char** argv)
 
         double gam1 = 1e-6; //, gamw = 2.112692482840060;
         double gamw = 2;
+        std::vector<double> beta_true = std::vector<double> (M, 0.0);
         vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
         std::vector<double> x_est = emvamp.infere(&dataset);
     
     }
-    else if (run_on_test_set == 1)
+    else if (opt.get_run_mode() == "test") // just analyzing the result on the test data
+    {   
+        // reading test set
+        //const std::string bedfp_HTtest = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_all_prunned_080_test.bed";
+        //const std::string pheno_HTtest = "/nfs/scistore13/robingrp/human_data/pheno/continuous/ukb_test_HT.phen";
+        const std::string bedfp_test = opt.get_bed_file_test();
+        const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
+
+        //int N_test = 15000;
+        int N_test = opt.get_N_test();
+        int Mt_test = opt.get_Mt_test();
+        std::vector<double> MS = divide_work(Mt);
+        int M_test = MS[0];
+        int S_test = MS[1];
+
+        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S, rank);
+        dataset_test.read_phen();
+        dataset_test.read_genotype_data();
+        dataset_test.compute_markers_statistics();
+        
+        std::vector<double> y_test = dataset_test.get_phen();
+
+        std::vector<double> x_est = read_vec_from_file(opt.get_estimate_file() + "_rank_" + std::to_string(rank) + ".txt", M, 0);
+        for (int i0 = 0; i0 < x_est.size(); i0++){
+            x_est[i0] = x_est[i0] * sqrt( (double) N_test );
+        }
+
+        std::vector<double> z_test = dataset_test.Ax(x_est.data());
+
+        double l2_pred_err2 = 0;
+        for (int i0 = 0; i0 < N_test; i0++){
+            l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
+        }        
+
+        double stdev = calc_stdev(y_test);
+        if (rank == 0){
+            std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
+            std::cout << "test l2 pred err = " << l2_pred_err2 << std::endl;
+            std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+        }
+    }
+    else if (opt.get_run_mode() == "both")
     {
-
-        std::cout << "mode: verifying on test set" << std::endl;
-
-        const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
-        std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S);
+        //const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
+        //std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S);
   
+        std::vector<double> beta_true = std::vector<double> (M, 0.0);
         std::string phenfp = (opt.get_phen_files())[0]; // currently only one phenotype file is supported
         data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank);
         dataset.read_phen();
@@ -121,58 +158,44 @@ int main(int argc, char** argv)
         int final_it = opt.get_iterations();
 
         // reading test set
-        const std::string bedfp_HTtest = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/ukb22828_UKB_EST_v3_ldp08_test_HT.bed";
-        const std::string pheno_HTtest = "/nfs/scistore13/robingrp/human_data/pheno/continuous/ukb_test_HT.phen";
+        const std::string bedfp_test = opt.get_bed_file_test();
+        const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
 
-        int N_test = 15000;
-        int Mt_test = Mt;
-        int M_test = M;
+        int N_test = opt.get_N_test();
+        int Mt_test = opt.get_Mt_test();
+        std::vector<double> MS = divide_work(Mt);
+        int M_test = MS[0];
+        int S_test = MS[1];
 
-        data dataset_test(pheno_HTtest, bedfp_HTtest, N_test, M_test, Mt_test, S, rank);
+        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S, rank);
         dataset_test.read_phen();
         dataset_test.read_genotype_data();
         dataset_test.compute_markers_statistics();
 
-        
-        std::vector<double> x_est_scaled = x_est;
-        for (int i0 = 0; i0 < x_est_scaled.size(); i0++)
-            x_est_scaled[i0] = x_est[i0] * sqrt( (double) N_test / (double) N );
+        for (int i0 = 0; i0 < x_est.size(); i0++)
+            x_est[i0] = x_est[i0] * sqrt( (double) N_test );
 
-        //if (rank == 0)
-        //    std::cout << "std x_est_scaled = " << calc_stdev(x_est_scaled) << std::endl;
-
-        std::vector<double> z = dataset_test.Ax(x_est_scaled.data());
-
-        // mean and std of z
-        double stdev_z = calc_stdev(z);
-        //if (rank == 0)
-        //    std::cout << "z stdev^2 = " << stdev_z * stdev_z << std::endl;
+        std::vector<double> z_test = dataset_test.Ax(x_est.data());
 
         //if (rank == 0)
         //std::cout << "z[0] = " << z[0] << ", rank = "<< rank << std::endl;
-        for (int i0 = 0; i0 < z.size(); i0++ ){
-            z[i0] = intercept + scale * z[i0];
+        for (int i0 = 0; i0 < z_test.size(); i0++ ){
+            z_test[i0] = intercept + scale * z_test[i0];
         }
-        //if (rank == 0)
-        //    std::cout << "after z[0] = " << z[0] << ", rank = " << rank << std::endl;
 
         std::vector<double> y_test = dataset_test.get_phen();
 
         double l2_pred_err2 = 0;
         for (int i0 = 0; i0 < N_test; i0++){
-            l2_pred_err2 += (y_test[i0] - z[i0]) * (y_test[i0] - z[i0]);
+            l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
         }
 
         double stdev = calc_stdev(y_test);
-        if (rank == 0)
-            std::cout << "y stdev^2 = " << stdev * stdev << std::endl;
-        
-
         if (rank == 0){
+            std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
             std::cout << "test l2 pred err = " << l2_pred_err2 << std::endl;
             std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
         }
-
     }
 
     MPI_Finalize();

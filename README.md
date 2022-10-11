@@ -32,9 +32,14 @@ Currently supported input options to C++ version of the code:
 
 | Input option | Description |
 | --- | --- |
-| `bed-file` | filepath to .bed file include the .bed extension |
+| `run-mode' | 'infere' / 'test' / 'both' |
+| `bed-file` | filepath to .bed file including the .bed extension |
+| `bed-file-test` | filepath to .bed file reserved for testing purposes |
 | `phen-files` | path to file containing phenotype of interest (only 1 phenotype supportet at the moment) |
+| `phen-files-test` | path to phenotype file reserved for testing purposes |
 | `N` | number of individuals included in the inference process |
+| `N-test` | number of individuals included in a testing dataset |
+| `Mt-test` | total number of markers included in a testing dataset |
 | `Mt` | total number of markers included in the infrence process |
 | `out-dir` | output directory for the signal estimates |
 | `out-name` | name of the output file |

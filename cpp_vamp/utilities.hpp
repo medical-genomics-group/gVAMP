@@ -34,6 +34,8 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
 
 double calc_stdev(std::vector<double> vec);
 
+std::vector<double> divide_work(int Mt);
+
 //EO: this to allow reduction on avx256 pd4 datatype with OpenMP
 #ifdef _OPENMP
 #pragma omp declare reduction \

@@ -32,6 +32,21 @@ void Options::read_command_line_options(int argc, char** argv) {
             bed_file = argv[++i];
             ss << "--bed-file " << bed_file << "\n";
         }
+        else if (!strcmp(argv[i], "--bed-file-test")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            bed_file_test = argv[++i];
+            ss << "--bed-file-test " << bed_file_test << "\n";
+        }
+        else if (!strcmp(argv[i], "--estimate-file")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            estimate_file = argv[++i];
+            ss << "--estimate-file " << estimate_file << "\n";
+        }
+        else if (!strcmp(argv[i], "--run-mode")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            estimate_file = argv[++i];
+            ss << "--run-mode " << run_mode << "\n";
+        }
         /*
         else if (!strcmp(argv[i], "--dim-file")) {
             if (i == argc - 1) fail_if_last(argv, i);
@@ -51,6 +66,23 @@ void Options::read_command_line_options(int argc, char** argv) {
                 if (phen_file.is_open()) {
                     phen_file.close();
                     phen_files.push_back(filepath);
+                } else {
+                    std::cout << "FATAL: file " << filepath << " not found\n";
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+        else if (!strcmp(argv[i], "--phen-files-test")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            std::string cslist = argv[++i];
+            ss << "--phen-files-test " << cslist << "\n";
+            std::stringstream sslist(cslist);
+            std::string filepath;
+            while (getline(sslist, filepath, ',')) {
+                std::ifstream phen_file_test(filepath);
+                if (phen_file_test.is_open()) {
+                    phen_file_test.close();
+                    phen_files_test.push_back(filepath);
                 } else {
                     std::cout << "FATAL: file " << filepath << " not found\n";
                     exit(EXIT_FAILURE);
@@ -185,6 +217,24 @@ void Options::read_command_line_options(int argc, char** argv) {
             }
             N = (unsigned int) atoi(argv[++i]);
             ss << "--N " << N << "\n";
+        }
+        else if (!strcmp(argv[i], "--N-test")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 1) {
+                std::cout << "FATAL  : option --N_test has to be a strictly positive integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            N_test = (unsigned int) atoi(argv[++i]);
+            ss << "--N-test " << N_test << "\n";
+        }
+        else if (!strcmp(argv[i], "--Mt-test")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 1) {
+                std::cout << "FATAL  : option --Mt_test has to be a strictly positive integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            Mt_test = (unsigned int) atoi(argv[++i]);
+            ss << "--Mt-test " << Mt_test << "\n";
         }
         else if (!strcmp(argv[i], "--CG-max-iter")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);

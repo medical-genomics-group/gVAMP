@@ -169,7 +169,7 @@ int main()
     int max_iter = 12;
     double rho = 0.9;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
-    std::string out_name = "x1_hat_height_main"; 
+    std::string out_name = "x1_hat_height_main_11_10_2022"; 
     std::string model = "linear";
     gamw = 1;
     

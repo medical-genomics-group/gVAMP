@@ -178,3 +178,36 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
 
     return stdev;
  }
+
+ std::vector<double> divide_work(int Mt){
+
+    int rank = 0;
+    int nranks = 0;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &nranks);
+
+    const int modu = Mt % nranks;
+    const int size = Mt / nranks;
+
+    int Mm = Mt % nranks != 0 ? size + 1 : size;
+
+    int len[nranks], start[nranks];
+    int cum = 0;
+    for (int i=0; i<nranks; i++) {
+        len[i]  = i < modu ? size + 1 : size;
+        start[i] = cum;
+        cum += len[i];
+    }
+    assert(cum == Mt);
+
+    int M = len[rank];
+    int S = start[rank];  // task marker start
+
+    printf("INFO   : rank %4d has %d markers over tot Mt = %d, max Mm = %d, starting at S = %d\n", rank, M, Mt, Mm, S);
+
+    std::vector<double> MS(2, 0.0);
+    MS[0] = M;
+    MS[1] = S;
+
+    return MS;
+ }

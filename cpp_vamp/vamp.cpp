@@ -315,9 +315,37 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         //MPI_File outfh;
         //MPI_Status status;
         std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + "_rank_" + std::to_string(rank) + ".txt";
+        //std::string path_out = out_dir + out_name + "_it_" + std::to_string(it) + ".txt";
+
+        /*
+        int S = (*dataset).get_S();
+        std::vector<double> ww(1,rank);
+        MPI_Status status;
+        MPI_File fh;
+        MPI_File_open(MPI_COMM_SELF, path_out.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+        MPI_File_write_ordered(fh, ww.data(), 1, MPI_INT, &status);
+        //MPI_File_write_at_all(fh, 0, ww.data(), 1, MPI_INT, &status);
+        MPI_File_close(&fh);
+
+        MPI_File_open(MPI_COMM_SELF, path_out.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+        std::vector<int> vec(5, 0);
+        MPI_File_read_ordered(fh, vec.data(), 5, MPI_INT, &status);
+        MPI_File_close(&fh);
+
+        std::cout << "vec[0] = " << vec[0] <<  ", rank = " << rank << std::endl;
+        std::cout << "vec[1] = " << vec[1] <<  ", rank = " << rank << std::endl;
+        std::cout << "vec[2] = " << vec[2] <<  ", rank = " << rank << std::endl;
+        std::cout << "vec[3] = " << vec[3] <<  ", rank = " << rank << std::endl;
+        std::cout << "vec[4] = " << vec[4] <<  ", rank = " << rank << std::endl;
+        */
+        //std::cout << "x1_hat[1] = " << x1_hat[1] <<  ", rank = " << rank << std::endl;
+        //std::cout << "vec[1] = " << vec[1] <<  ", rank = " << rank << std::endl;
+        
+        
+        //MPI_File_write_at_all(MPI_File fh, MPI_Offset offset, ROMIO_CONST void *buf, int count, MPI_Datatype datatype, MPI_Status *status);
         //std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + ".bin";
         if (rank == 0)
-            std::cout << "filepath_out is " << filepath_out << std::endl;
+           std::cout << "filepath_out is " << filepath_out << std::endl;
         /*
         MPI_File_open(MPI_COMM_WORLD, filepath_out.c_str(), MPI_MODE_WRONLY|MPI_MODE_CREATE, MPI_INFO_NULL, &outfh);
         MPI_Offset offset = size_t((*dataset).get_S());
@@ -678,7 +706,7 @@ void vamp::updatePrior() {
 
                 //if (rank==0 && it%10 == 1)
                 //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << std::endl;
-                vars[j+1] = res_gammas_total / res_total;
+                //vars[j+1] = res_gammas_total / res_total;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
 
