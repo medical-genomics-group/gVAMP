@@ -40,7 +40,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     EM_max_iter = opt.get_EM_max_iter();
     EM_err_thr = opt.get_EM_err_thr();
     CG_max_iter = opt.get_CG_max_iter();
-    std::cout<< "CG_max_iter = " << CG_max_iter << std::endl;
+    //std::cout<< "CG_max_iter = " << CG_max_iter << std::endl;
     stop_criteria_thr = opt.get_stop_criteria_thr();
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 }
@@ -259,8 +259,11 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
+    std::vector<double> x1_hat_stored(M, 0.0);
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
+
+    r1 = (*dataset).ATx((*dataset).get_phen());
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -306,55 +309,21 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
         if (rank == 0)
             std::cout << "rho = " << rho << std::endl;
-        //std::cout << "x1_hat_d[0] = " << x1_hat_d[0] << std::endl;
-        //std::cout << "g1d(0) = " << g1d(0, gam1) << "r1[0] = " << r1[0] << std::endl;
-        //std::cout << "sum_d = " << sum_d << std::endl;
-        //std::string filepath_out = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/x1_hat_it_" + std::to_string(it) + "_rank_" + std::to_string(rank) + ".txt";
-        
+
         // saving x1_hat
-        //MPI_File outfh;
-        //MPI_Status status;
-        std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + "_rank_" + std::to_string(rank) + ".txt";
-        //std::string path_out = out_dir + out_name + "_it_" + std::to_string(it) + ".txt";
-
-        /*
+        std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + ".bin";
         int S = (*dataset).get_S();
-        std::vector<double> ww(1,rank);
-        MPI_Status status;
-        MPI_File fh;
-        MPI_File_open(MPI_COMM_SELF, path_out.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
-        MPI_File_write_ordered(fh, ww.data(), 1, MPI_INT, &status);
-        //MPI_File_write_at_all(fh, 0, ww.data(), 1, MPI_INT, &status);
-        MPI_File_close(&fh);
+        for (int i0=0; i0<x1_hat_stored.size(); i0++)
+            x1_hat_stored[i0] =  x1_hat[i0] / sqrt(N);
+        mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
 
-        MPI_File_open(MPI_COMM_SELF, path_out.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
-        std::vector<int> vec(5, 0);
-        MPI_File_read_ordered(fh, vec.data(), 5, MPI_INT, &status);
-        MPI_File_close(&fh);
-
-        std::cout << "vec[0] = " << vec[0] <<  ", rank = " << rank << std::endl;
-        std::cout << "vec[1] = " << vec[1] <<  ", rank = " << rank << std::endl;
-        std::cout << "vec[2] = " << vec[2] <<  ", rank = " << rank << std::endl;
-        std::cout << "vec[3] = " << vec[3] <<  ", rank = " << rank << std::endl;
-        std::cout << "vec[4] = " << vec[4] <<  ", rank = " << rank << std::endl;
-        */
-        //std::cout << "x1_hat[1] = " << x1_hat[1] <<  ", rank = " << rank << std::endl;
-        //std::cout << "vec[1] = " << vec[1] <<  ", rank = " << rank << std::endl;
+        //store_vec_to_file(filepath_out, x1_hat);
         
-        
-        //MPI_File_write_at_all(MPI_File fh, MPI_Offset offset, ROMIO_CONST void *buf, int count, MPI_Datatype datatype, MPI_Status *status);
-        //std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + ".bin";
         if (rank == 0)
            std::cout << "filepath_out is " << filepath_out << std::endl;
-        /*
-        MPI_File_open(MPI_COMM_WORLD, filepath_out.c_str(), MPI_MODE_WRONLY|MPI_MODE_CREATE, MPI_INFO_NULL, &outfh);
-        MPI_Offset offset = size_t((*dataset).get_S());
-        std::cout << "rank = " << rank << ", S = " << offset << ", x1_hat[0] = " << x1_hat[0] << std::endl;
-        check_mpi(MPI_File_write_at_all(outfh, offset, x1_hat.data(), x1_hat.size(), MPI_DOUBLE, &status), __LINE__, __FILE__);
-        MPI_File_close(&outfh);
-        */
-        store_vec_to_file(filepath_out, x1_hat);
+        
 
+        // Onsager correction calculation 
         x1_hat_d_prev = x1_hat_d;
         double sum_d = 0;
         for (int i = 0; i < M; i++)
@@ -489,7 +458,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
     }
     //if (rank == 0)
     //    std::cout << "inside vamp: calc_stdev(x1_hat) = " << calc_stdev(x1_hat) << std::endl; 
-    return x1_hat;          
+    return x1_hat_stored;          
 }
 
 double vamp::g1(double y, double gam1) { 
@@ -706,7 +675,7 @@ void vamp::updatePrior() {
 
                 //if (rank==0 && it%10 == 1)
                 //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << std::endl;
-                //vars[j+1] = res_gammas_total / res_total;
+                vars[j+1] = res_gammas_total / res_total;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
 
@@ -811,9 +780,7 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dat
 
 void vamp::err_measures(data *dataset, int ind){
 
-    //double scale = 4.81e-5 / vars[vars.size()-1];
     double scale = 1.0 / (double) N;
-    //scale = 1.0;
     
     // correlation
     if (ind == 1){
@@ -842,12 +809,12 @@ void vamp::err_measures(data *dataset, int ind){
     if (ind == 1){
         for (int i = 0; i< M; i++)
             temp[i] = sqrt(scale) * x1_hat[i] - true_signal[i];
-        l2_norm2_xhat = l2_norm2(x1_hat, 1);
+        l2_norm2_xhat = l2_norm2(x1_hat, 1) * scale;
     }
     else if (ind == 2){
         for (int i = 0; i< M; i++)
             temp[i] = sqrt(scale) * x2_hat[i] - true_signal[i];
-        l2_norm2_xhat = l2_norm2(x2_hat, 1);
+        l2_norm2_xhat = l2_norm2(x2_hat, 1) * scale;
     }
 
     /*
@@ -879,8 +846,8 @@ void vamp::err_measures(data *dataset, int ind){
                 y[4*j + k] = 0;
 
     if (rank == 0){
-        std::cout << "N = " << N << std::endl;
-        std::cout << "y.size() = " << y.size()<< std::endl;
+        //std::cout << "N = " << N << std::endl;
+        //std::cout << "y.size() = " << y.size()<< std::endl;
         for (int j=1;j<N; j++)
             if(y[j] == std::numeric_limits<double>::max() && j <=200){
                 std::cout << j << " position is std::numeric_limits<double>::max(), j =" << j / 4 << ", k = " << j%4 << ", luk = " << na_lut[mask4[j/4] * 4 + (j%4)] << std::endl; 

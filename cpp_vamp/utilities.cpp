@@ -88,7 +88,8 @@ double noise_prec_calc(double SNR, std::vector<double> vars, std::vector<double>
     for(int i = 0; i < vars.size(); i++)
         expe += vars[i] * probs[i];
     //std::cout <<"expe = " << expe << std::endl;
-    double gamw = SNR * N / Mt / expe;
+    //double gamw = SNR * N / Mt / expe;
+    double gamw = SNR / Mt / expe;
     return gamw;
  }
 
@@ -205,9 +206,32 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
 
     printf("INFO   : rank %4d has %d markers over tot Mt = %d, max Mm = %d, starting at S = %d\n", rank, M, Mt, Mm, S);
 
-    std::vector<double> MS(2, 0.0);
+    std::vector<double> MS(3, 0.0);
     MS[0] = M;
     MS[1] = S;
+    MS[2] = Mm;
 
     return MS;
+ }
+
+ void mpi_store_vec_to_file(std::string filepath_out, std::vector<double> vec, int S, int M){
+    
+    MPI_File outfh;
+    MPI_Status status;
+    MPI_File_open(MPI_COMM_SELF, filepath_out.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &outfh);
+    MPI_File_set_view(outfh, S*sizeof(double), MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL);
+    MPI_File_write_at(outfh, 0, (void*) vec.data(), M, MPI_DOUBLE, &status);
+    MPI_File_close(&outfh);
+ }
+
+ std::vector<double> mpi_read_vec_from_file(std::string filename, int M, int S){
+        
+    MPI_File outfh;
+    MPI_Status status;
+    MPI_File_open(MPI_COMM_SELF, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &outfh);
+    std::vector<double> vec(M, 0.0);
+    MPI_File_set_view(outfh, S*sizeof(double), MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL);
+    MPI_File_read_at(outfh, 0, (void*) vec.data(), M, MPI_DOUBLE, &status);
+    MPI_File_close(&outfh);  
+    return vec;
  }

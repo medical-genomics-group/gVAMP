@@ -44,7 +44,7 @@ void Options::read_command_line_options(int argc, char** argv) {
         }
         else if (!strcmp(argv[i], "--run-mode")) {
             if (i == argc - 1) fail_if_last(argv, i);
-            estimate_file = argv[++i];
+            run_mode = argv[++i];
             ss << "--run-mode " << run_mode << "\n";
         }
         /*

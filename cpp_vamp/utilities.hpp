@@ -24,7 +24,11 @@ double noise_prec_calc(double SNR, std::vector<double> vars, std::vector<double>
 
 std::vector<double> read_vec_from_file(std::string filename, int M, int S);
 
+std::vector<double> mpi_read_vec_from_file(std::string filename, int M, int S);
+
 void store_vec_to_file(std::string filepath, std::vector<double> vec);
+
+void mpi_store_vec_to_file(std::string filepath, std::vector<double> vec, int S, int M);
 
 double inner_prod(std::vector<double> const& u, std::vector<double> const& v, int sync);
 
