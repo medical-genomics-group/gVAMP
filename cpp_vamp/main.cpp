@@ -149,10 +149,18 @@ int main()
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
     std::string out_name = "x1_hat_height_main_11_10_2022"; 
     std::string model = "linear";
-    gamw = 1;
+    double gamw_init = 1;
     
-    vamp emvamp(N, M, Mt, gam1, gamw, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
+    vamp emvamp(N, M, Mt, gam1, gamw_init, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
     std::vector<double> x_est = emvamp.infere(&dataset);
+
+    if (rank == 0){
+        std::cout << "var(y) = " << pow(calc_stdev(y), 2) << std::endl;
+        double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
+        std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
+        std::cout << "true gamw = " << gamw << std::endl;
+        std::cout << "noise prec = " << 1.0 / pow(calc_stdev(noise), 2) << std::endl;
+    }
 
     MPI_Finalize();
     return 0;
