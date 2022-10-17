@@ -46,7 +46,6 @@ double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vecto
 {
     std::random_device rand_dev;
     std::mt19937 generator(rand_dev());  
-    //std::mt19937 generator(1);
     std::uniform_real_distribution<double> unif(0.0,1.0);
     double u = unif(generator);
     double c_sum = 0;

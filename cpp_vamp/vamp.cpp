@@ -263,7 +263,10 @@ std::vector<double> vamp::infere_linear( data* dataset ){
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
 
-    r1 = (*dataset).ATx((*dataset).get_phen());
+    r1 = (*dataset).ATx( ((*dataset).get_phen()).data() );
+
+    for (int i0=0; i0<M; i0++)
+	r1[i0] = r1[i0]*N;
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -396,7 +399,11 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
-        x2_hat = CG_solver(v, gamw, dataset);
+        if (it >= 1)
+            x2_hat = CG_solver(v, std::vector<double>(M, 0.0), v, gamw, dataset);
+        else 
+            x2_hat = CG_solver(v, mu_CG_last, p_CG_last, gamw, dataset);
+        //x2_hat = CG_solver(v, gamw, dataset);
         double end_CG = MPI_Wtime();
 
         if (rank == 0)
@@ -708,6 +715,8 @@ void vamp::updatePrior() {
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset){ // multiplying with (tau*A^TAv + gam2*v)
 
+    if (v == std::vector<double>(M, 0.0))
+        return std::vector<double>(M, 0.0);
     std::vector<double> res(M, 0.0);
     size_t phen_size = 4 * (*dataset).get_mbytes();
     std::vector<double> res_temp(phen_size, 0.0);;
@@ -730,10 +739,21 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
 }
 
 std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dataset){
-
     // we start with approximation x0 = 0
     std::vector<double> mu(M, 0.0);
-    std::vector<double> p = v, r = v, d;
+    return CG_solver(v, mu, v, tau, dataset);
+}
+
+std::vector<double> vamp::CG_solver(std::vector<double> v, std::vector<double> mu_start, std::vector<double> p_start, double tau, data* dataset){
+
+    // we start with approximation x0 = 0
+    //std::vector<double> mu(M, 0.0);
+    std::vector<double> mu = mu_start;
+    //std::vector<double> p = v, r = v, d;
+    std::vector<double> p = p_start, d;
+    std::vector<double> r = lmmse_mult(mu, tau, dataset);
+    for (int i0=0; i0<r.size(); i0++)
+        r[i0] = v[i0] - r[i0];
     //std::vector<double> r = v;
     //std::vector<double> d;
     std::vector<double> p_temp(M, 0.0);
@@ -753,10 +773,8 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dat
         //std::cout << "[CG_solver] alpha = " << alpha << ", rank = " << rank << std::endl;
         /*std::cout << "[CG_solver] mu[1] = " << mu[1] << std::endl;
         std::cout << "[CG_solver] mu[2] = " << mu[2] << std::endl;
-        std::cout << "[CG_solver] mu[3] = " << mu[3] << std::endl;
         std::cout << "[CG_solver] p[1] = " << p[1] << std::endl;
         std::cout << "[CG_solver] p[2] = " << p[2] << std::endl;
-        std::cout << "[CG_solver] p[3] = " << p[3] << std::endl;
         */
         for (int j = 0; j < M; j++)
             palpha[j] = alpha * p[j];
@@ -775,6 +793,8 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dat
             p[j] = r[j] + beta * p[j];
     }
 
+    mu_CG_last = mu;
+    p_CG_last = p;
     return mu;
  }
 

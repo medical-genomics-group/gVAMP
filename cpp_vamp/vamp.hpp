@@ -13,6 +13,7 @@ private:
     std::vector<double> z1;
     std::vector<double> r1, r2;
     std::vector<double> p1, p2;
+    std::vector<double> p_CG_last, mu_CG_last;
     double gam1, gam2, eta1, eta2, rho, gamw, gam_before, tau1, tau2;
     std::vector<double> probs, probs_before;
     std::vector<double> vars, vars_before;
@@ -53,6 +54,7 @@ public:
     void updateNoisePrec(data* dataset);
     std::vector<double> lmmse_mult(std::vector<double> v, double tau, data* dataset);
     std::vector<double> CG_solver(std::vector<double> v, double tau, data* dataset);
+    std::vector<double> CG_solver(std::vector<double> v, std::vector<double> mu_start, std::vector<double> p_start, double tau, data* dataset);
     double vamp_obj_func(double eta, double gam, std::vector<double> invQu, std::vector<double> u, std::vector<double> vars, std::vector<double> pi, data* dataset);
     void err_measures(data * dataset, int ind);
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);

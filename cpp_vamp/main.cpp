@@ -54,7 +54,6 @@ int main()
     std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
     //probs_init = probs;
 
-    srand(10);
     std::vector<double> beta_true(M, 0.0); 
     
     if (rank == 0){
