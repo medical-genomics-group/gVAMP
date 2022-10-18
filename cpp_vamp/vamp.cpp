@@ -884,9 +884,9 @@ void vamp::err_measures(data *dataset, int ind){
 
     //if (rank == 0)
     //    std::cout << "[err_measures] l2_norm2_xhat = " << l2_norm2_xhat << std::endl; 
-    //double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
-    double l2_true_signal2 = l2_norm2(true_signal, 1);
-    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
+    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
+    //double l2_true_signal2 = l2_norm2(true_signal, 1);
+    //double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
     if (rank == 0){
         std::cout << "l2 signal error = " << l2_signal_err << std::endl;
         //std::cout << sqrt( l2_norm2_xhat ) << std::endl;
