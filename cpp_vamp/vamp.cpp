@@ -7,6 +7,7 @@
 #include <random>
 #include <omp.h>
 #include <fstream>
+#include <cfloat>
 #include "na_lut.hpp"
 #include "vamp.hpp"
 #include "utilities.hpp"
@@ -263,10 +264,31 @@ std::vector<double> vamp::infere_linear( data* dataset ){
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
 
-    r1 = (*dataset).ATx( ((*dataset).get_phen()).data() );
+    std::vector<double> y = (*dataset).get_phen();
+    std::vector<unsigned char> mask4 = (*dataset).get_mask4();
 
-    for (int i0=0; i0<M; i0++)
-	r1[i0] = r1[i0]*N;
+    int im4 = (*dataset).get_im4();
+    for (int j=0; j<im4; j++) 
+        for (int k=0; k<4; k++) 
+            if (4*j + k < N)
+                if (na_lut[mask4[j] * 4 + k] == 0)
+                    y[4*j + k] = 0;
+        
+    //for (int i0=0; i0<y.size(); i0++)
+    //    if (y[i0] == DBL_MAX)
+    //        y[i0] = 0;
+    //std::cout <<"size of y = " << y.size()<< ", rank = " << rank << std::endl;
+    
+    // linear estimator
+    r1 = (*dataset).ATx(y.data());
+
+    //std::cout << "calc_stdev(r1) = " << calc_stdev(r1) << std::endl;
+
+    //if (rank == 0)
+    //    std::cout << "1st r1[0] = "  << r1[0] << std::endl;
+
+    //for (int i0=0; i0<M; i0++)
+	//    r1[i0] = r1[i0]*M/N;
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -387,7 +409,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         //gamw = 1 / ( 1 - inner_prod(z1, z1, 0) );
 
         std::vector<double> y = (*dataset).get_phen();
-        std::vector<unsigned char> mask4 = (*dataset).get_mask4();
+        //std::vector<unsigned char> mask4 = (*dataset).get_mask4();
         for (int j=0;j<(*dataset).get_mbytes();j++)
             for(int k=0;k<4;k++)
                 if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
@@ -624,6 +646,19 @@ void vamp::updatePrior() {
                     double num_gammas = gam1 * r1[i] / ( 1 / vars[j] + gam1 );
                     //if (rank == 0 && i == 0)
                         //std::cout << "num = " << num << std::endl;
+                    //if (~std::isfinite(num)){
+                        //std::cout << "num is not finite" << std::endl;
+                    //    num = 0;
+                    //}
+                    
+                    //if (rank == 0)
+                    //    if (j==2 && i<=10)
+                    //        std::cout << "i=" << i <<  ", j=" << j << ", num ="<< num << ", r1[i]=" << r1[i] << std::endl;
+                    /*
+                    if (rank == 0)
+                        if (j==2 && i<=10)
+                            std::cout << "i=" << i <<  ", j=" << j << ", num_gammas ="<< num_gammas << ", r1[i]=" << r1[i] << std::endl;
+                    */
                     temp.push_back(num);
                     temp_gammas.push_back(num_gammas);
                 }
@@ -638,7 +673,7 @@ void vamp::updatePrior() {
                 }
                 beta.push_back(temp);
                 gammas.push_back(temp_gammas);
-                pin[i] = 1 / ( 1 + (1-lambda) / sqrt(2 * M_PI * noise_var) * exp( - pow(r1[i], 2) / 2 * max_sigma / noise_var / (noise_var + max_sigma) ) / sum_of_elems  );
+                pin[i] = 1 / ( 1 + (1-lambda) / sqrt(2 * M_PI * noise_var) * exp( - pow(r1[i], 2) / 2 * max_sigma / noise_var / (noise_var + max_sigma) ) / sum_of_elems );
             } 
             //if (rank == 0)
                 //std::cout << "pin[0] = " << pin[0] << std::endl;
@@ -661,7 +696,8 @@ void vamp::updatePrior() {
                 }
             }
 
-            double sum_of_pin = std::accumulate(pin.begin(), pin.end(), decltype(pin)::value_type(0));
+            //double sum_of_pin = std::accumulate(pin.begin(), pin.end(), decltype(pin)::value_type(0));
+            double sum_of_pin = accumulate(pin.begin(), pin.end(), 0.0);
 
             double sum_of_pin_total = 0;
             MPI_Allreduce(&sum_of_pin, &sum_of_pin_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -680,14 +716,14 @@ void vamp::updatePrior() {
                 MPI_Allreduce(&res_gammas, &res_gammas_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
                 MPI_Allreduce(&res, &res_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-                //if (rank==0 && it%10 == 1)
-                //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << std::endl;
+                //if (rank==0 && it%10 == 0)
+                //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << ", sum_of_pin =" << sum_of_pin << std::endl;
                 vars[j+1] = res_gammas_total / res_total;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
 
                 //if (rank == 0)
-                    //std::cout << " j = " << j << ", vars[j+1] = " << vars[j+1] << ", probs[j+1] = " << probs[j+1] << std::endl;
+                //    std::cout << " j = " << j << ", vars[j+1] = " << vars[j+1] << ", probs[j+1] = " << probs[j+1] << std::endl;
             }
             probs[0] = 1 - lambda;
         
@@ -848,9 +884,14 @@ void vamp::err_measures(data *dataset, int ind){
 
     //if (rank == 0)
     //    std::cout << "[err_measures] l2_norm2_xhat = " << l2_norm2_xhat << std::endl; 
-    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
-    if (rank == 0)
+    //double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
+    double l2_true_signal2 = l2_norm2(true_signal, 1);
+    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
+    if (rank == 0){
         std::cout << "l2 signal error = " << l2_signal_err << std::endl;
+        //std::cout << sqrt( l2_norm2_xhat ) << std::endl;
+        //std::cout << sqrt( l2_true_signal2 ) << std::endl;
+    }
     
     // l2 prediction error
     size_t phen_size = 4 * (*dataset).get_mbytes();

@@ -421,15 +421,21 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
 
 std::vector<double> data::ATx(double* __restrict__ phen) {
 
+    //if (rank == 0)
+        //std::cout << "inside ATx" << std::endl;
     std::vector<double> ATx(M, 0.0);
 
     //unsigned char* bed;
     #ifdef _OPENMP
         #pragma omp parallel for schedule(static)
     #endif
-    for (int mloc=0; mloc < M; mloc++)
+    for (int mloc=0; mloc < M; mloc++){
         ATx[mloc] = dot_product( mloc, phen, mave[mloc], msig[mloc] ) / sqrt(N); // we scale elements of A with 1/sqrt(N)
-
+        //if (std::isnan(std::abs(ATx[mloc])))
+            //std::cout << "ATx nan index is " << mloc << ", rank = " << rank << std::endl;
+    }
+    //std::cout << "final ATx[0] = " << ATx[0] << std::endl;
+    //std::cout << "std::isnan(ATx[0]) = " << std::isnan(ATx[0]) << std::endl;
     return ATx;
     /*
     std::vector<double> ATx_total(Mtotal, 0.0);

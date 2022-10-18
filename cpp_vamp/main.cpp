@@ -145,7 +145,7 @@ int main()
     
     double gam1 = 1e-6;
     int max_iter = 10;
-    double rho = 0.9;
+    double rho = 0.85;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
     std::string out_name = "x1_hat_height_main_11_10_2022"; 
     std::string model = "linear";
