@@ -23,6 +23,6 @@ mpic++ main.cpp vamp.cpp utilities.cpp data.cpp options.cpp -march=native -DMANV
 
 time mpirun -np 5 ./main.exe
 
-# time mpirun -np 50 ./main_corr.exe
+# time mpirun -np 5 ./main_corr.exe
 
 #time mpirun -np 40 ./main_corr_big.exe

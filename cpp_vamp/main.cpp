@@ -46,21 +46,27 @@ int main()
 
 
     // simulating data for realistic valus of parameters
-    std::vector<double> vars{0, 3.0246351e-07, 1.2863391e-03};
-    std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
-    //vars_init = vars;
+    //std::vector<double> vars{0, 3.0246351e-07, 1.2863391e-03};
+    //std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
+    std::vector<double> vars{0, 1.2863391e-04};
+    std::vector<double> vars_init{0, N*3.0246351e-05};
+    //vars_init = vars; vars_init[1] *= N;
 
-    std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
-    std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
+    //std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
+    //std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
+    std::vector<double> probs{7e-1, 3e-1};
+    std::vector<double> probs_init{5e-1, 5e-1};
     //probs_init = probs;
 
     std::vector<double> beta_true(M, 0.0); 
     
     if (rank == 0){
         std::vector<double> beta_true_tmp = simulate(Mt, vars, probs);
+        for (int i0=S; i0<S+M; i0++)
+            beta_true[i0-S] = beta_true_tmp[i0];
         store_vec_to_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_12000_N_15000_beta_true.txt", beta_true_tmp);
         for (int ran = 1; ran < nranks; ran++)
-            MPI_Send(beta_true.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+            MPI_Send(beta_true_tmp.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
     }
     else{
         MPI_Status status;
@@ -68,7 +74,7 @@ int main()
         MPI_Recv(beta_true_full.data(), Mt, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &status);
         for (int i0=S; i0<S+M; i0++)
             beta_true[i0-S] = beta_true_full[i0];
-    }
+    }     
     
     MPI_Barrier(MPI_COMM_WORLD);
     //beta_true = read_vec_from_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_12000_N_15000_beta_true.txt", M, S);
@@ -144,12 +150,13 @@ int main()
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     double gam1 = 1e-6;
-    int max_iter = 10;
-    double rho = 0.85;
+    int max_iter = 26;
+    double rho = 0.96;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
-    std::string out_name = "x1_hat_height_main_11_10_2022"; 
+    std::string out_name = "x1_hat_height_main_25_10_2022"; 
     std::string model = "linear";
     double gamw_init = 1;
+    // gamw_init = 1.7;
     
     vamp emvamp(N, M, Mt, gam1, gamw_init, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
     std::vector<double> x_est = emvamp.infere(&dataset);

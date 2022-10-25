@@ -280,7 +280,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
     //std::cout <<"size of y = " << y.size()<< ", rank = " << rank << std::endl;
     
     // linear estimator
-    r1 = (*dataset).ATx(y.data());
+    //r1 = (*dataset).ATx(y.data());
 
     //std::cout << "calc_stdev(r1) = " << calc_stdev(r1) << std::endl;
 
@@ -363,6 +363,15 @@ std::vector<double> vamp::infere_linear( data* dataset ){
             if (rank == 0)
                 std::cout << "gam2_bar = " << std::get<2>(state_evo_par2) << std::endl; 
         }
+
+        // if the vtrue value of the signal is known, we print out the true gam2
+        double se_dev = 0;
+        for (int i0=0; i0<M; i0++)
+            se_dev += (r2[i0]- sqrt(N)*true_signal[i0])*(r2[i0]- sqrt(N)*true_signal[i0]);
+        double se_dev_total = 0;
+        MPI_Allreduce(&se_dev, &se_dev_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        if (rank == 0)
+            std::cout << "true gam2 = " << Mt / se_dev_total << std::endl; 
 
         //std::cout << "sum_d = " << sum_d << std::endl;
         double alpha1;
@@ -633,6 +642,7 @@ void vamp::updatePrior() {
         for (int it = 0; it < EM_max_iter; it++){
 
             std::vector<double> probs_prev = probs;
+            std::vector<double> vars_prev = vars;
             std::vector< std::vector<double> > gammas;
             std::vector< std::vector<double> > beta;
             std::vector<double> pin(M, 0.0);
@@ -727,15 +737,18 @@ void vamp::updatePrior() {
             }
             probs[0] = 1 - lambda;
         
-        double distance = 0, norm_probs = 0;
+        double distance_probs = 0, norm_probs = 0;
+        double distance_vars = 0, norm_vars = 0;
         for (int j = 0; j < probs.size(); j++){
-            distance += ( probs[j] - probs_prev[j] ) * ( probs[j] - probs_prev[j] );
+            distance_probs += ( probs[j] - probs_prev[j] ) * ( probs[j] - probs_prev[j] );
             norm_probs += probs[j] * probs[j];
+            distance_vars += ( vars[j] - vars_prev[j] ) * ( vars[j] - vars_prev[j] );
+            norm_vars += vars[j] * vars[j];
         }
         
-        if ( distance / norm_probs < EM_err_thr ){
+        if ( sqrt(distance_probs / norm_probs) < EM_err_thr  && sqrt(distance_vars / norm_vars) < EM_err_thr ){
             if (rank == 0)
-                std::cout << "final number of prior EM iterations = " << it + 1 << std::endl;
+                std::cout << "EM error threshold satisfied - final number of prior EM iterations = " << it + 1 << std::endl;
             break;   
         }
 
@@ -884,9 +897,9 @@ void vamp::err_measures(data *dataset, int ind){
 
     //if (rank == 0)
     //    std::cout << "[err_measures] l2_norm2_xhat = " << l2_norm2_xhat << std::endl; 
-    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
+    //double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
     //double l2_true_signal2 = l2_norm2(true_signal, 1);
-    //double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
+    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
     if (rank == 0){
         std::cout << "l2 signal error = " << l2_signal_err << std::endl;
         //std::cout << sqrt( l2_norm2_xhat ) << std::endl;
