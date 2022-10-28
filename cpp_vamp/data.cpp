@@ -1,5 +1,6 @@
 #include "data.hpp"
 #include <cmath> 
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <regex>
@@ -9,6 +10,7 @@
 #include <omp.h>
 #include "dotp_lut.hpp"
 #include "na_lut.hpp"
+#include "perm_lut.hpp"
 #include "utilities.hpp"
 #include <immintrin.h>
 #include <bits/stdc++.h>
@@ -202,8 +204,31 @@ data::data(std::string fp, std::string bedfp, const int N, const int M, const in
     check_malloc(mave, __LINE__, __FILE__);
     msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
     check_malloc(msig, __LINE__, __FILE__);
+    perm_idxs = std::vector<int>(M, 1);
 }
 
+//constructor for class data
+data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm) :
+    phenfp(fp),
+    bedfp(bedfp),
+    N(N),
+    M(M),
+    S(S),
+    rank(rank),
+    perm(perm),
+    mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
+    im4(N%4 == 0 ? N/4 : N/4+1) {
+    mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(mave, __LINE__, __FILE__);
+    msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(msig, __LINE__, __FILE__);
+
+    if (perm == 0)
+        perm_idxs = std::vector<int>(M, 1);
+    else if (perm == 1)
+        for (int i=0; i<M; i++)
+            perm_idxs.push_back( (rand() % 6) + 1);
+}
 
 double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv) {
 
@@ -479,5 +504,53 @@ void data::read_genotype_data(){
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0)
         std::cout <<"reading genotype data took " << te - ts << " seconds."<< std::endl;
+
+}
+
+std::vector < double* > data::perm_luts(){
+
+    std::vector < double* > luts;
+
+    luts.push_back(perm_lut_01);
+    luts.push_back(perm_lut_02);
+    luts.push_back(perm_lut_03);
+
+    alignas(32) double perm_lut_04[1024], perm_lut_05[1024], perm_lut_06[1024];
+
+    for (int i=0; i<1024; i++){
+        if (perm_lut_03[i] == 0.0)
+        {
+            if (perm_lut_01[i] == 1.0)
+            {
+                perm_lut_04[i] = 1.0;
+                perm_lut_05[i] = 2.0;
+                perm_lut_06[i] = 0.0;
+            }
+            else
+            {
+                perm_lut_04[i] = 0.0;
+                perm_lut_05[i] = 0.0;
+                perm_lut_06[i] = 0.0;
+            }
+        }
+        else if (perm_lut_03[i] == 1.0)
+        {
+            perm_lut_04[i] = 2.0;
+            perm_lut_05[i] = 1.0;
+            perm_lut_06[i] = 2.0;
+        }
+        else if (perm_lut_03[i] == 2.0)
+        {
+            perm_lut_04[i] = 0.0;
+            perm_lut_05[i] = 0.0;
+            perm_lut_06[i] = 1.0;
+        }
+    }
+
+    luts.push_back(perm_lut_04);
+    luts.push_back(perm_lut_05);
+    luts.push_back(perm_lut_06);
+
+    return luts;
 
 }

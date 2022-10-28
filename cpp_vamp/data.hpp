@@ -27,6 +27,8 @@ private:
     int nas;
     int m4;
     int im4 = 0;
+    int perm = 0;
+    std::vector<int> perm_idxs;
     std::vector<unsigned char> mask4;
     double* mave     = nullptr;
     double* msig     = nullptr;
@@ -55,6 +57,7 @@ public:
 
     // constructor and destructor for class data
     data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank);
+    data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm);
     ~data() {
         if (mave     != nullptr)  _mm_free(mave);
         if (msig     != nullptr)  _mm_free(msig);
@@ -68,6 +71,8 @@ public:
     std::vector<double> Ax(double* __restrict__ phen);
     
     std::vector<double> ATx(double* __restrict__ phen);
+
+    std::vector < double* > perm_luts();
 
     //double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi);
 

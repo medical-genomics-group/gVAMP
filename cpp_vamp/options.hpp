@@ -34,6 +34,7 @@ public:
     unsigned int get_Mt_test()  const { return Mt_test; }
     unsigned int get_N() const { return N; }
     unsigned int get_N_test() const { return N_test; }
+    unsigned int get_perm() const { return perm; }
     unsigned int get_num_mix_comp() const { return num_mix_comp; }
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
@@ -65,13 +66,14 @@ private:
     std::string model = "linear";
     double stop_criteria_thr = 1e-6;
     double EM_err_thr = 1e-4;
-    unsigned int EM_max_iter = 10;
+    unsigned int EM_max_iter = 5;
     unsigned int CG_max_iter = 10;
     unsigned int Mt;
     unsigned int N;
     unsigned int N_test;
     unsigned int Mt_test;
     unsigned int num_mix_comp;
+    unsigned int perm = 0;
     std::vector<double> vars;
     std::vector<double> probs;
     double rho = 0.98;

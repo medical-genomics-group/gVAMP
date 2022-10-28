@@ -134,6 +134,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             iterations = (unsigned int) atoi(argv[++i]);
             ss << "--iterations " << iterations << "\n";
         }
+        else if (!strcmp(argv[i], "--perm")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 1) {
+                std::cout << "FATAL  : option --perm has to be a strictly positive integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            perm = (unsigned int) atoi(argv[++i]);
+            ss << "--perm " << perm << "\n";
+        }
         else if (!strcmp(argv[i], "--num-mix-comp")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 1) {

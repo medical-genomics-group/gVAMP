@@ -307,7 +307,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         // updating parameters of prior distribution
         probs_before = probs;
         vars_before = vars;
-        updatePrior();
+        //updatePrior();
 
         for (int i = 0; i < M; i++ )
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
@@ -347,11 +347,10 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         if (rank == 0)
            std::cout << "filepath_out is " << filepath_out << std::endl;
         
-
         // Onsager correction calculation 
         x1_hat_d_prev = x1_hat_d;
         double sum_d = 0;
-        for (int i = 0; i < M; i++)
+        for (int i=0; i<M; i++)
         {
             // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
             x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i]; 
@@ -362,16 +361,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
             std::tuple<double, double, double> state_evo_par2 = state_evo(1, gam1, gam_before, probs_before, vars_before, dataset);
             if (rank == 0)
                 std::cout << "gam2_bar = " << std::get<2>(state_evo_par2) << std::endl; 
-        }
-
-        // if the vtrue value of the signal is known, we print out the true gam2
-        double se_dev = 0;
-        for (int i0=0; i0<M; i0++)
-            se_dev += (r2[i0]- sqrt(N)*true_signal[i0])*(r2[i0]- sqrt(N)*true_signal[i0]);
-        double se_dev_total = 0;
-        MPI_Allreduce(&se_dev, &se_dev_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        if (rank == 0)
-            std::cout << "true gam2 = " << Mt / se_dev_total << std::endl; 
+        } 
 
         //std::cout << "sum_d = " << sum_d << std::endl;
         double alpha1;
@@ -389,9 +379,23 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         }
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
+
+
+        // if the true value of the signal is known, we print out the true gam2
+        double se_dev = 0;
+        for (int i0=0; i0<M; i0++)
+            se_dev += (r2[i0]- sqrt(N)*true_signal[i0])*(r2[i0]- sqrt(N)*true_signal[i0]);
+        double se_dev_total = 0;
+        MPI_Allreduce(&se_dev, &se_dev_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        if (rank == 0)
+            std::cout << "true gam2 = " << Mt / se_dev_total << std::endl;
+            
         //if (rank ==0)
         //    std::cout << "r2[1] = "<< r2[1] << std::endl;
         //std::cout << "norm(r2)^2 = " << l2_norm2(r2, 1) << std::endl;
+
+        // new place for prior update
+        updatePrior();
     
         err_measures(dataset, 1);
 
@@ -465,6 +469,15 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         r1_prev = r1;
         for (int i = 0; i < M; i++)
             r1[i] = (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1;
+
+        // if the true value of the signal is known, we print out the true gam1
+        double se_dev1 = 0;
+        for (int i0=0; i0<M; i0++)
+            se_dev1 += (r1[i0]- sqrt(N)*true_signal[i0])*(r1[i0]- sqrt(N)*true_signal[i0]);
+        double se_dev_total1 = 0;
+        MPI_Allreduce(&se_dev1, &se_dev_total1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        if (rank == 0)
+            std::cout << "true gam1 = " << Mt / se_dev_total1 << std::endl; 
 
         // learning a noise precision parameter
         updateNoisePrec(dataset);
@@ -639,7 +652,8 @@ void vamp::updatePrior() {
         //double* beta = new double[M * probs.size()];
                        
         // calculating normalized beta and pin
-        for (int it = 0; it < EM_max_iter; it++){
+        int it;
+        for (it = 0; it < EM_max_iter; it++){
 
             std::vector<double> probs_prev = probs;
             std::vector<double> vars_prev = vars;
@@ -748,7 +762,7 @@ void vamp::updatePrior() {
         
         if ( sqrt(distance_probs / norm_probs) < EM_err_thr  && sqrt(distance_vars / norm_vars) < EM_err_thr ){
             if (rank == 0)
-                std::cout << "EM error threshold satisfied - final number of prior EM iterations = " << it + 1 << std::endl;
+                std::cout << "EM error threshold satisfied." << std::endl;
             break;   
         }
 
@@ -756,8 +770,9 @@ void vamp::updatePrior() {
         //else
             //if (rank ==0)
                 //std::cout << "distance / norm_probs = " << distance / norm_probs << std::endl;
-        //}   
-        
+        //} 
+        if (rank == 0)  
+            std::cout << "Final number of prior EM iterations = " << it + 1 << std::endl;
         //if (rank == 0)
         //        std::cout << "final number of prior EM iterations = " << EM_max_iter << std::endl;
 }
@@ -768,7 +783,7 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
         return std::vector<double>(M, 0.0);
     std::vector<double> res(M, 0.0);
     size_t phen_size = 4 * (*dataset).get_mbytes();
-    std::vector<double> res_temp(phen_size, 0.0);;
+    std::vector<double> res_temp(phen_size, 0.0);
     //std::cout << "before res_temp!" << std::endl;
     res_temp = (*dataset).Ax( v.data() );
     //std::cout << "before res!" << std::endl;

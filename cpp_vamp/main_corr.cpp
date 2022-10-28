@@ -29,7 +29,8 @@ int main()
     
     // size_t Mt = 115233;
     // size_t Mt = 8430446;
-    size_t Mt = 40082;
+    // size_t Mt = 40082;
+    size_t Mt = 613049;
     size_t N = 458747;
 
     std::vector<double> MS = divide_work(Mt);
@@ -48,8 +49,9 @@ int main()
     //const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/1kg_chr20_genotypes.txt";
     //const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPvsGibbsvsLasso/genomes/12000_1.bed";
     // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/chr/ukb22828_c21_UKB_EST_v3.bed";
-    const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_all_prunned_010_maf_005.bed";
-    //const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/chr/ukb22828_UKB_EST_v3_all.bed";
+    // !!!!! const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_all_prunned_010_maf_005.bed";
+    // !!!!! const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/chr/ukb22828_UKB_EST_v3_all.bed";
+    const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp005.bed";
     //const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/exploring_corr_effects_on_spectrum_12102021/ukb_imp_v3_UKB_EST_uncorrpeople_N45000_pruned_00000001.bed";
     const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/N_458747_M_115233_y.txt";
     //const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/exploring_corr_effects_on_spectrum_12102021/ukb_imp_v3_UKB_EST_uncorrpeople_N45000_pruned_00001_y.txt";
@@ -155,7 +157,7 @@ int main()
     if (rank == 0){
         std::cout << "var(y) = " << pow(calc_stdev(y), 2) << std::endl;
         double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
-        std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp / pow(calc_stdev(y), 2) << std::endl;
+        std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
     }
     
 
@@ -165,7 +167,7 @@ int main()
     
     double gam1 = 1e-6;
     int max_iter = 15;
-    double rho = 0.85;
+    double rho = 0.3;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
     std::string out_name = "x1_hat_height_main_25_10_2022"; 
     std::string model = "linear";
