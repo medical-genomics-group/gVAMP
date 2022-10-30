@@ -2054,7 +2054,7 @@ alignas(32) const double dotp_lut_b[1024] = { // 01 -> NaN
     1.0, // 255 | 11111111 (b = 00000011, (b & 0b11) = 00000011) 
 };
 
-alignas(32) const double dotp_lut_ab[2048] = {  // last 4 bits just count the number of NaNs
+alignas(32) const double dotp_lut_ab[2048] = {  // last 4 output bits just count the number of NaNs
     2.0, // 0 | 00000000 (b = 00000000, (b & 0b11) = 00000000) 
     2.0, // 0 | 00000000 (b = 00000000, (b & 0b11) = 00000000) 
     2.0, // 0 | 00000000 (b = 00000000, (b & 0b11) = 00000000) 

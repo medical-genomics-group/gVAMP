@@ -29,6 +29,8 @@ private:
     int im4 = 0;
     int perm = 0;
     std::vector<int> perm_idxs;
+    std::vector < double* > p_luts;
+    std::vector < double* > p_dotp_luts;
     std::vector<unsigned char> mask4;
     double* mave     = nullptr;
     double* msig     = nullptr;
@@ -64,7 +66,7 @@ public:
     }
     void compute_markers_statistics();
 
-    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma);
+    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv);
 
     void read_genotype_data();
 
@@ -73,6 +75,8 @@ public:
     std::vector<double> ATx(double* __restrict__ phen);
 
     std::vector < double* > perm_luts();
+
+    std::vector < double* > perm_dotp_luts();
 
     //double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi);
 
