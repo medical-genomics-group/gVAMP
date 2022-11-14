@@ -4355,3 +4355,4 @@ alignas(32) double perm_dotp_lut_ab_03[2048] = {  // last 4 output bits just cou
     1.0, // 255 | 11111111 (b = 00000011, (b & 0b11) = 00000011) 
 };
 
+alignas(32) double perm_dotp_lut_ab_02[2048], perm_dotp_lut_ab_04[2048], perm_dotp_lut_ab_05[2048], perm_dotp_lut_ab_06[2048];

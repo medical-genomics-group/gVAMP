@@ -130,7 +130,7 @@ int main()
     if (rank != 0)
         MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    data dataset(phenfp, bedfp, N, M, Mt, S, rank);
+    data dataset(phenfp, bedfp, N, M, Mt, S, rank, 1);
     dataset.read_phen();
     dataset.read_genotype_data();
     dataset.compute_markers_statistics();

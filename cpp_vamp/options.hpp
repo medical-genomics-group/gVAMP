@@ -66,7 +66,7 @@ private:
     std::string model = "linear";
     double stop_criteria_thr = 1e-6;
     double EM_err_thr = 1e-4;
-    unsigned int EM_max_iter = 5;
+    unsigned int EM_max_iter = 30;
     unsigned int CG_max_iter = 10;
     unsigned int Mt;
     unsigned int N;

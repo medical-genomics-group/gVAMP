@@ -3594,3 +3594,5 @@ alignas(32) double perm_lut_03[1024] = { // alignment of 32 means that memory ad
     1.0, // 255 | 11111111 (b = 00001111, (b & 0b11) = 00000011) 
     1.0, // 255 | 11111111 (b = 00000011, (b & 0b11) = 00000011) 
 };
+
+alignas(32) double perm_lut_04[1024], perm_lut_05[1024], perm_lut_06[1024];

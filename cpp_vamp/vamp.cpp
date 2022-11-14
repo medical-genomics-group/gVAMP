@@ -938,7 +938,7 @@ void vamp::err_measures(data *dataset, int ind){
         //std::cout << "N = " << N << std::endl;
         //std::cout << "y.size() = " << y.size()<< std::endl;
         for (int j=1;j<N; j++)
-            if(y[j] == std::numeric_limits<double>::max() && j <=200){
+            if(y[j] == std::numeric_limits<double>::max() && j <=20){
                 std::cout << j << " position is std::numeric_limits<double>::max(), j =" << j / 4 << ", k = " << j%4 << ", luk = " << na_lut[mask4[j/4] * 4 + (j%4)] << std::endl; 
             }
     }

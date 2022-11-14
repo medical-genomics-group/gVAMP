@@ -114,11 +114,16 @@ int main()
     double *noise_val = (double*) _mm_malloc(size_t(N) * sizeof(double), 32);
     if (rank != 0)
         MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    std::cout << "rank = " << rank << ", after noise val" << std::endl;
 
-    data dataset(phenfp, bedfp, N, M, Mt, S, rank);
+    data dataset(phenfp, bedfp, N, M, Mt, S, rank, 0);
     dataset.read_phen();
+    std::cout << "rank = " << rank << ", after read phen" << std::endl;
     dataset.read_genotype_data();
+    std::cout << "rank = " << rank << ", after read genotype data" << std::endl;
     dataset.compute_markers_statistics();
+   
+    std::cout << "rank = " << rank << ", after compute marker stats" << std::endl;
     std::vector<double> beta_true_scaled = beta_true;
     for (int i0=0; i0<M; i0++)
         beta_true_scaled[i0] *= sqrt(N);

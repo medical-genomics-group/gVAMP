@@ -16,6 +16,53 @@
 #include <immintrin.h>
 #include <bits/stdc++.h>
 
+
+
+//constructor for class data
+data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank) :
+    phenfp(fp),
+    bedfp(bedfp),
+    N(N),
+    M(M),
+    S(S),
+    rank(rank),
+    mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
+    im4(N%4 == 0 ? N/4 : N/4+1) {
+    mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(mave, __LINE__, __FILE__);
+    msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(msig, __LINE__, __FILE__);
+    perm_idxs = std::vector<int>(M, 1);
+    p_luts = perm_luts();
+    p_dotp_luts = perm_dotp_luts();
+}
+
+//constructor for class data
+data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm) :
+    phenfp(fp),
+    bedfp(bedfp),
+    N(N),
+    M(M),
+    S(S),
+    rank(rank),
+    perm(perm),
+    mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
+    im4(N%4 == 0 ? N/4 : N/4+1) {
+    mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(mave, __LINE__, __FILE__);
+    msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(msig, __LINE__, __FILE__);
+
+    if (perm == 0)
+        perm_idxs = std::vector<int>(M, 1);
+    else if (perm == 1)
+        for (int i=0; i<M; i++)
+            perm_idxs.push_back( (rand() % 6) + 1);
+
+    p_luts = perm_luts();
+    p_dotp_luts = perm_dotp_luts();
+}
+
 // Read phenotype file assuming PLINK format:
 // Family ID, Individual ID, Phenotype; One row per individual
 void data::read_phen() {
@@ -122,7 +169,7 @@ void data::compute_markers_statistics() {
                 const unsigned char* bedm = &bed_data[bedix];
                 for (int j=0; j<mbytes; j++) {
                     //luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]); // bedm[j] contains 1 byte, an information about 4 people, hence 2^8 = 256 possibilities
-                    luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1])[bedm[j] * 4]);
+                    luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
                     lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                     lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
                     luta  = _mm256_mul_pd(luta, lutna);
@@ -131,6 +178,23 @@ void data::compute_markers_statistics() {
                     sumb  = _mm256_add_pd(sumb, lutb);
                 }
                 double asum = suma[0] + suma[1] + suma[2] + suma[3];
+                /*
+                    if (luta[0] != 0 && luta[0] != 1 && luta[0] != 2 && j == 111 && rank == 0){
+                        std::cout << "!!luta[0] neq = " << luta[0] << ", j = " << j << ", rank = " << rank << std::endl;
+                        std::cout << "!!perm_idxs[i]-1 = " << perm_idxs[i]-1 << ", bedm[j] * 4 = " << bedm[j] * 4 << std::endl;
+                        std::cout << "(p_luts[5])[1020] = " << (p_luts[5])[1020] << std::endl;
+                        std::cout << "*(p_luts[5]) = " << *(p_luts[5]) << std::endl;
+                        std::cout << "*(p_luts[5]+1) = " << *(p_luts[5]+1) << std::endl;
+                        std::cout << "*(p_luts[5] + 1020) = " << *(p_luts[5] + 1020)<< std::endl;
+                    }
+                */
+                /*
+                if (rank == 0 && i == 110){
+                    std::cout << "rank = " << rank << ", perm_idxs[i]-1 = " << perm_idxs[i]-1<<  ", i = " << i << std::endl; 
+                    std::cout << "suma[0] = " << suma[0] << ", suma[1] = " << suma[1] << ", suma[2] = " << suma[2] << ", suma[3] = " << suma[3] << std::endl;
+                    std::cout << "luta[0] = " << luta[0] << ", luta[1] = " << luta[1] << ", luta[2] = " << luta[2] << ", luta[3] = " << luta[3] << std::endl;
+                }
+                */
                 double bsum = sumb[0] + sumb[1] + sumb[2] + sumb[3];
                 double avg  = asum / bsum; // calculation of average value of one marker column
 
@@ -138,7 +202,7 @@ void data::compute_markers_statistics() {
                 __m256d sums = _mm256_set1_pd(0.0);
                 for (int j=0; j<mbytes; j++) {
                     //luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
-                    luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1])[bedm[j] * 4]);
+                    luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
                     lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                     lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
                     luta  = _mm256_add_pd(luta, vave);    // - mu
@@ -165,7 +229,7 @@ void data::compute_markers_statistics() {
                 for (int j=0; j<im4; j++) {
 
                     for (int k=0; k<4; k++) {
-                        suma += (p_luts[perm_idxs[i]-1])[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                        suma += p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                         //suma += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
                         sumb += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                         //suma += dotp_lut_a[bedm[j] * 4 + k] * 1; // we pretend that all phenotypes are present in the data
@@ -177,7 +241,7 @@ void data::compute_markers_statistics() {
                 for (int j=0; j<im4; j++) {
                     for (int k=0; k<4; k++) {
                         //double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                        double val = ((p_luts[perm_idxs[i]-1])[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                        double val = (p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                         //double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * 1; // we pretend that all phenotypes are present in the data
                         // calculate the value and filter for nans in genotype and phenotype
                         sumsqr += val * val;
@@ -191,53 +255,6 @@ void data::compute_markers_statistics() {
         double end = MPI_Wtime();
         if (rank == 0)
             std::cout << "statistics took " << end - start << " seconds to run." << std::endl;
-}
-
-
-
-//constructor for class data
-data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank) :
-    phenfp(fp),
-    bedfp(bedfp),
-    N(N),
-    M(M),
-    S(S),
-    rank(rank),
-    mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
-    im4(N%4 == 0 ? N/4 : N/4+1) {
-    mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
-    check_malloc(mave, __LINE__, __FILE__);
-    msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
-    check_malloc(msig, __LINE__, __FILE__);
-    perm_idxs = std::vector<int>(M, 1);
-    p_luts = perm_luts();
-    p_dotp_luts = perm_dotp_luts();
-}
-
-//constructor for class data
-data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm) :
-    phenfp(fp),
-    bedfp(bedfp),
-    N(N),
-    M(M),
-    S(S),
-    rank(rank),
-    perm(perm),
-    mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
-    im4(N%4 == 0 ? N/4 : N/4+1) {
-    mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
-    check_malloc(mave, __LINE__, __FILE__);
-    msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
-    check_malloc(msig, __LINE__, __FILE__);
-
-    if (perm == 0)
-        perm_idxs = std::vector<int>(M, 1);
-    else if (perm == 1)
-        for (int i=0; i<M; i++)
-            perm_idxs.push_back( (rand() % 6) + 1);
-
-    p_luts = perm_luts();
-    p_dotp_luts = perm_dotp_luts();
 }
 
 double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv) {
@@ -262,7 +279,7 @@ double data::dot_product(const int mloc, double* __restrict__ phen, const double
             //luta  = _mm256_load_pd(&dotp_lut_ab[bed[j] * 8]);
             //lutb  = _mm256_load_pd(&dotp_lut_ab[bed[j] * 8 + 4]);
             //lutab = _mm512_load_pd(&dotp_lut_ab[bed[j] * 8]);
-            lutab = _mm512_load_pd(&(p_dotp_luts[perm_idxs[mloc]-1])[bed[j] * 8]);
+            lutab = _mm512_load_pd(&p_dotp_luts[perm_idxs[mloc]-1][bed[j] * 8]);
             //p4    = _mm256_load_pd(&phen[j * 4]);
             p42 = _mm512_broadcast_f64x4(_mm256_load_pd(&phen[j * 4])); // broadcasts the 4 packed double-precision (64-bit) floating-point elements
             ////lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]); // phen = 0.0 on NAs!
@@ -290,7 +307,7 @@ double data::dot_product(const int mloc, double* __restrict__ phen, const double
         #endif
         for (int i=0; i<mbytes; i++) {
         double dotp_lut_a_p[2048];
-        std::copy( &(p_luts[perm_idxs[mloc]-1])[0], &(p_luts[perm_idxs[mloc]-1])[1024], dotp_lut_a_p);
+        std::copy(&p_luts[perm_idxs[mloc]-1][0], &p_luts[perm_idxs[mloc]-1][1024], dotp_lut_a_p);
         //dotp_lut_a_p = p_luts[perm_idxs[mloc]-1];
         #ifdef _OPENMP
         //#pragma omp simd aligned(dotp_lut_a,dotp_lut_b,phen:32)
@@ -363,7 +380,7 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
         #endif
             for (int j=0; j<mbytes; j++) {
                 //luta = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
-                luta = _mm256_load_pd(&(p_luts[perm_idxs[i]-1])[bedm[j] * 4]);
+                luta = _mm256_load_pd(&p_luts[perm_idxs[i]-1][bedm[j] * 4]);
                 lutb = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                 luta = _mm256_add_pd(luta, minave);
                 luta = _mm256_mul_pd(luta, sig);
@@ -427,7 +444,7 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
         for (int j=0; j<mbytes; j++) {
              for (int k=0; k<4; k++) {
                 //Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig * phen_i * dotp_lut_b[bed[j] * 4 + k]; // because msig[i] is the precision of the i-th marker
-                Ax_temp[j * 4 + k] += ((p_luts[perm_idxs[i]-1])[bed[j]*4 + k] - ave) * sig * phen_i * dotp_lut_b[bed[j] * 4 + k]; // because msig[i] is the precision of the i-th marker
+                Ax_temp[j * 4 + k] += (p_luts[perm_idxs[i]-1][bed[j]*4 + k] - ave) * sig * phen_i * dotp_lut_b[bed[j] * 4 + k]; // because msig[i] is the precision of the i-th marker
                 //if ( k == 0 && (i < 5 || i == M-1) && j == 0 && rank == 0 )
                 //    std::cout << "Ax_temp[0] = " << Ax_temp[0] << ", rank = "<< rank << std::endl;
             }
@@ -533,8 +550,6 @@ std::vector < double* > data::perm_luts(){
     luts.push_back(perm_lut_02);
     luts.push_back(perm_lut_03);
 
-    alignas(32) double perm_lut_04[1024], perm_lut_05[1024], perm_lut_06[1024];
-
     for (int i=0; i<1024; i++){
         if (perm_lut_03[i] == 0.0)
         {
@@ -578,8 +593,6 @@ std::vector < double* > data::perm_dotp_luts(){
     std::vector < double* > luts;
 
     luts.push_back(perm_dotp_lut_ab_01);
-
-    alignas(32) double perm_dotp_lut_ab_02[2048], perm_dotp_lut_ab_04[2048], perm_dotp_lut_ab_05[2048], perm_dotp_lut_ab_06[2048];
 
     for (int i=0; i<2048;){
         if (perm_dotp_lut_ab_03[i] == 0.0)
