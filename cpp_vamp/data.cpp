@@ -10,8 +10,8 @@
 #include <omp.h>
 #include "dotp_lut.hpp"
 #include "na_lut.hpp"
-#include "perm_lut.hpp"
-#include "perm_dotp_lut.hpp"
+//#include "perm_lut.hpp"
+//#include "perm_dotp_lut.hpp"
 #include "utilities.hpp"
 #include <immintrin.h>
 #include <bits/stdc++.h>
@@ -19,25 +19,45 @@
 
 
 //constructor for class data
-data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank) :
+data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
     phenfp(fp),
     bedfp(bedfp),
     N(N),
     M(M),
+    Mtotal(Mt),
     S(S),
     rank(rank),
     mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
+    normal_data(normal),
     im4(N%4 == 0 ? N/4 : N/4+1) {
     mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
     check_malloc(mave, __LINE__, __FILE__);
     msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
     check_malloc(msig, __LINE__, __FILE__);
-    perm_idxs = std::vector<int>(M, 1);
-    p_luts = perm_luts();
-    p_dotp_luts = perm_dotp_luts();
+
+    // in the constructor we load phen, read genotype data and compute marker statistics
+    read_phen();
+    read_genotype_data();
+    compute_markers_statistics();
+
+    if (normal == 2){
+        double SK_err_thr = 1e-6;
+        int SK_max_iter = 50;
+        xR = std::vector<double> (M, 1.0);
+        xL = std::vector<double> (4*mbytes, 1.0);
+        //std::cout << "before SK!" << std::endl;
+        SinkhornKnopp(xL, xR, SK_err_thr, SK_max_iter);
+    }
+
+    // std::cout << "after SK!" << std::endl;
+
+    // perm_idxs = std::vector<int>(M, 1);
+    // p_luts = perm_luts();
+    // p_dotp_luts = perm_dotp_luts();
 }
 
 //constructor for class data
+/*
 data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm) :
     phenfp(fp),
     bedfp(bedfp),
@@ -62,6 +82,7 @@ data::data(std::string fp, std::string bedfp, const int N, const int M, const in
     p_luts = perm_luts();
     p_dotp_luts = perm_dotp_luts();
 }
+*/
 
 // Read phenotype file assuming PLINK format:
 // Family ID, Individual ID, Phenotype; One row per individual
@@ -101,6 +122,7 @@ void data::read_phen() {
         }
         infile.close();
 
+        //std::cout << "nas + nonas = " << nas + nonas << ", N = " << N << std::endl;
         assert(nas + nonas == N);
 
         // Set last bits to 0 if ninds % 4 != 0
@@ -168,8 +190,8 @@ void data::compute_markers_statistics() {
                 size_t bedix = size_t(i) * size_t(mbytes);
                 const unsigned char* bedm = &bed_data[bedix];
                 for (int j=0; j<mbytes; j++) {
-                    //luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]); // bedm[j] contains 1 byte, an information about 4 people, hence 2^8 = 256 possibilities
-                    luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
+                    luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]); // bedm[j] contains 1 byte, an information about 4 people, hence 2^8 = 256 possibilities
+                    //luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
                     lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                     lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
                     luta  = _mm256_mul_pd(luta, lutna);
@@ -201,8 +223,8 @@ void data::compute_markers_statistics() {
                 __m256d vave = _mm256_set1_pd(-avg);
                 __m256d sums = _mm256_set1_pd(0.0);
                 for (int j=0; j<mbytes; j++) {
-                    //luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
-                    luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
+                    luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
+                    //luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
                     lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                     lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
                     luta  = _mm256_add_pd(luta, vave);    // - mu
@@ -229,8 +251,8 @@ void data::compute_markers_statistics() {
                 for (int j=0; j<im4; j++) {
 
                     for (int k=0; k<4; k++) {
-                        suma += p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                        //suma += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
+                        //suma += p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                        suma += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
                         sumb += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                         //suma += dotp_lut_a[bedm[j] * 4 + k] * 1; // we pretend that all phenotypes are present in the data
                         //sumb += dotp_lut_b[bedm[j] * 4 + k] * 1;
@@ -240,8 +262,8 @@ void data::compute_markers_statistics() {
                 double sumsqr = 0.0;
                 for (int j=0; j<im4; j++) {
                     for (int k=0; k<4; k++) {
-                        //double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                        double val = (p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                        double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                        //double val = (p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                         //double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * 1; // we pretend that all phenotypes are present in the data
                         // calculate the value and filter for nans in genotype and phenotype
                         sumsqr += val * val;
@@ -257,82 +279,163 @@ void data::compute_markers_statistics() {
             std::cout << "statistics took " << end - start << " seconds to run." << std::endl;
 }
 
-double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv) {
+double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal) {
+// __restrict__ means that phen is the only pointer pointing to that data
 
     unsigned char* bed = &bed_data[mloc * mbytes];
 
-    #ifdef MANVEC
-        __m256d luta, lutb; //, lutna;
-        __m512d lutab, p42;
-        __m256d p4   = _mm256_set1_pd(0.0);
-        __m256d suma = _mm256_set1_pd(0.0);
-        __m256d sumb = _mm256_set1_pd(0.0);
-        __m512d sum42 = _mm512_set1_pd(0.0);
-
-        #ifdef _OPENMP
+    #ifdef MANVECT
+        if (normal == 1){
+            __m256d luta; // lutb, lutna;
+            __m512d lutab, p42;
+            // __m256d p4   = _mm256_set1_pd(0.0);
+            __m256d suma = _mm256_set1_pd(0.0);
+            // __m256d sumb = _mm256_set1_pd(0.0);
+            __m512d sum42 = _mm512_set1_pd(0.0);
+            #ifdef _OPENMP
             //#pragma omp parallel for schedule(static) reduction(addpd4:suma,sumb)
-        #pragma omp parallel for schedule(static) reduction(addpd8:sum42)
-        #endif
-        for (int j=0; j<mbytes; j++) {
-            //luta  = _mm256_load_pd(&dotp_lut_a[bed[j] * 4]);
-            //lutb  = _mm256_load_pd(&dotp_lut_b[bed[j] * 4]);
-            //luta  = _mm256_load_pd(&dotp_lut_ab[bed[j] * 8]);
-            //lutb  = _mm256_load_pd(&dotp_lut_ab[bed[j] * 8 + 4]);
-            //lutab = _mm512_load_pd(&dotp_lut_ab[bed[j] * 8]);
-            lutab = _mm512_load_pd(&p_dotp_luts[perm_idxs[mloc]-1][bed[j] * 8]);
-            //p4    = _mm256_load_pd(&phen[j * 4]);
-            p42 = _mm512_broadcast_f64x4(_mm256_load_pd(&phen[j * 4])); // broadcasts the 4 packed double-precision (64-bit) floating-point elements
-            ////lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]); // phen = 0.0 on NAs!
-            //luta  = _mm256_mul_pd(luta, p4);
-            //lutb  = _mm256_mul_pd(lutb, p4);
-            p42 = _mm512_mul_pd(p42, lutab);
-            //suma  = _mm256_add_pd(suma, luta);
-            //sumb  = _mm256_add_pd(sumb, lutb);
-            sum42 = _mm512_add_pd(sum42, p42);
+            #pragma omp parallel for schedule(static) private(luta,lutab,p42) reduction(addpd8:sum42)
+            #endif
+            for (int j=0; j<mbytes; j++){
+                //luta  = _mm256_load_pd(&dotp_lut_a[bed[j] * 4]);
+                //lutb  = _mm256_load_pd(&dotp_lut_b[bed[j] * 4]);
+                //luta  = _mm256_load_pd(&dotp_lut_ab[bed[j] * 8]);
+                //lutb  = _mm256_load_pd(&dotp_lut_ab[bed[j] * 8 + 4]);
+                lutab = _mm512_load_pd(&dotp_lut_ab[bed[j] * 8]);
+                //lutab = _mm512_load_pd(&p_dotp_luts[perm_idxs[mloc]-1][bed[j] * 8]);
+                //p4    = _mm256_load_pd(&phen[j * 4]);
+                p42 = _mm512_broadcast_f64x4(_mm256_load_pd(&phen[j * 4])); // broadcasts the 4 packed double-precision (64-bit) floating-point elements
+                ////lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]); // phen = 0.0 on NAs!
+                //luta  = _mm256_mul_pd(luta, p4);
+                //lutb  = _mm256_mul_pd(lutb, p4);
+                p42 = _mm512_mul_pd(p42, lutab);
+                //suma  = _mm256_add_pd(suma, luta);
+                //sumb  = _mm256_add_pd(sumb, lutb);
+                sum42 = _mm512_add_pd(sum42, p42);
+            }
+            return sigma_inv * (sum42[0] + sum42[1] + sum42[2] + sum42[3] - mu * (sum42[4] + sum42[5] + sum42[6] + sum42[7]));
         }
-
+        else if (normal == 0){
+            __m256d luta, p4;
+            __m256d suma = _mm256_set1_pd(0.0);
+            #ifdef _OPENMP
+            #pragma omp parallel for schedule(static) private(luta,p4) reduction(addpd4:suma)
+            #endif
+            for (int j=0; j<mbytes; j++){
+                luta  = _mm256_load_pd(&dotp_lut_a[bed[j] * 4]);
+                /*if (j < 1){
+                    std::cout << "after loading luta" << std::endl;
+                    std::cout << "phen[0] = " << phen[0] << std::endl;
+                    std::cout << "phen[1] = " << phen[1] << std::endl;
+                    std::cout << "phen[2] = " << phen[2] << std::endl;
+                    std::cout << "phen[3] = " << phen[3] << std::endl;
+                    std::cout << "phen[4] = " << phen[4] << std::endl;
+                    std::cout << "phen[5] = " << phen[5] << std::endl;
+                    std::cout << "phen[11999] = " << phen[11999] << std::endl;
+                    std::cout << "j = " << j << std::endl;
+                } */
+                p4 = _mm256_load_pd(&phen[j * 4]); 
+                // __m256d p4 = _mm256_load_pd(&phen[j * 4]);
+                luta  = _mm256_mul_pd(luta, p4);
+                suma  = _mm256_add_pd(suma, luta);
+            }
+            return (suma[0] + suma[1] + suma[2] + suma[3]);
+        }
+        else if (normal == 2){
+            __m256d luta, p4, mmxL;
+            __m256d suma = _mm256_set1_pd(0.0);
+            #ifdef _OPENMP
+            #pragma omp parallel for schedule(static) private(luta,p4,mmxL) reduction(addpd4:suma)
+            #endif
+            for (int j=0; j<mbytes; j++){
+                luta  = _mm256_load_pd(&dotp_lut_a[bed[j] * 4]);
+                if (j<=3 && mloc<=0)
+                    std::cout << "mloc=" << mloc << ", j = " << j << ", phen[j]=" << phen[j] << std::endl;
+                p4 = _mm256_load_pd(&phen[j * 4]); 
+                if (j<=3 && mloc<=0)
+                    std::cout << "after loading phen in VAMP ATx"<< std::endl;
+                mmxL =  _mm256_load_pd(&xL[j * 4]);
+                p4 = _mm256_mul_pd(p4, mmxL);
+                luta  = _mm256_mul_pd(luta, p4);
+                suma  = _mm256_add_pd(suma, luta);
+            }
+            return (xR[mloc] * (suma[0] + suma[1] + suma[2] + suma[3]));
+        }
         //return sigma_inv *
         //    (suma[0] + suma[1] + suma[2] + suma[3] - mu * (sumb[0] + sumb[1] + sumb[2] + sumb[3]));
-        return sigma_inv *
-            (sum42[0] + sum42[1] + sum42[2] + sum42[3] - mu * (sum42[4] + sum42[5] + sum42[6] + sum42[7]));
+
+        return std::numeric_limits<double>::max();
 
     #else
 
-        double dpa = 0.0;
-        double dpb = 0.0;
+        if (normal == 1){
+            double dpa = 0.0;
+            double dpb = 0.0;
 
-        #ifdef _OPENMP
-            //#pragma omp parallel for schedule(static) reduction(addpd4:suma,sumb)
-        #pragma omp parallel for schedule(static) reduction(+:dpa,dpb)
-        #endif
-        for (int i=0; i<mbytes; i++) {
-        double dotp_lut_a_p[2048];
-        std::copy(&p_luts[perm_idxs[mloc]-1][0], &p_luts[perm_idxs[mloc]-1][1024], dotp_lut_a_p);
-        //dotp_lut_a_p = p_luts[perm_idxs[mloc]-1];
-        #ifdef _OPENMP
-        //#pragma omp simd aligned(dotp_lut_a,dotp_lut_b,phen:32)
-        #pragma omp simd aligned(dotp_lut_a_p,dotp_lut_b,phen:32)
-        #endif
-            for (int j=0; j<4; j++) {
-                //dpa += dotp_lut_a[bed[i] * 4 + j] * phen[i * 4 + j];
-                dpa += dotp_lut_a_p[bed[i] * 4 + j] * phen[i * 4 + j];
-                dpb += dotp_lut_b[bed[i] * 4 + j] * phen[i * 4 + j];
+            #ifdef _OPENMP
+                //#pragma omp parallel for schedule(static) reduction(addpd4:suma,sumb)
+            #pragma omp parallel for schedule(static) reduction(+:dpa,dpb)
+            #endif
+            for (int i=0; i<mbytes; i++) {
+            //double dotp_lut_a_p[2048];
+            //std::copy(&p_luts[perm_idxs[mloc]-1][0], &p_luts[perm_idxs[mloc]-1][1024], dotp_lut_a_p);
+            //dotp_lut_a_p = p_luts[perm_idxs[mloc]-1];
+            #ifdef _OPENMP
+            #pragma omp simd aligned(dotp_lut_a,dotp_lut_b,phen:32)
+            //#pragma omp simd aligned(dotp_lut_a_p,dotp_lut_b,phen:32)
+            #endif
+                for (int j=0; j<4; j++) {
+                    dpa += dotp_lut_a[bed[i] * 4 + j] * phen[i * 4 + j];
+                    //dpa += dotp_lut_a_p[bed[i] * 4 + j] * phen[i * 4 + j];
+                    dpb += dotp_lut_b[bed[i] * 4 + j] * phen[i * 4 + j];
+                }
             }
+            return sigma_inv * (dpa - mu * dpb);
+        }
+        else if (normal == 0){
+            double dpa = 0.0;
+            #ifdef _OPENMP
+            #pragma omp parallel for schedule(static) reduction(+:dpa)
+            #endif
+            for (int i=0; i<mbytes; i++) {
+            #ifdef _OPENMP
+            #pragma omp simd aligned(dotp_lut_a,phen:32)
+            #endif
+                for (int j=0; j<4; j++) {
+                    dpa += dotp_lut_a[bed[i] * 4 + j] * phen[i * 4 + j];
+                }
+            }
+            return dpa;
+        }
+        else if (normal == 2){
+            double dpa = 0.0;
+            double* xLdata = xL.data();
+            #ifdef _OPENMP
+            #pragma omp parallel for schedule(static) reduction(+:dpa)
+            #endif
+            for (int i=0; i<mbytes; i++) {
+            #ifdef _OPENMP
+            #pragma omp simd aligned(dotp_lut_a,phen,xLdata:32)
+            #endif
+                for (int j=0; j<4; j++) {
+                    dpa += dotp_lut_a[bed[i] * 4 + j] * phen[i * 4 + j] * xLdata[i * 4 + j];
+                }
+            }
+            return xR[mloc] * dpa;
         }
 
-        return sigma_inv * (dpa - mu * dpb);
+        return std::numeric_limits<double>::max();
 
     #endif
-
 }
 
 
-std::vector<double> data::Ax(double* __restrict__ phen) {
+std::vector<double> data::Ax(double* __restrict__ phen, int normal) {
 
  #ifdef MANVECT
 
     //if (rank == 0)
-        //std::cout << "MANCVECT is active!" << std::endl;
+    //    std::cout << "MANCVECT is active!" << std::endl;
 
     double* mave = get_mave();
     double* msig = get_msig();
@@ -350,6 +453,7 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
 
     // for more details see here: http://www.archer.ac.uk/training/course-material/2018/07/AdvOpenMP-camb/L09-OpenMP4.pdf
     
+    /*
     #ifdef _OPENMP2
 
     if (rank == 0)
@@ -362,29 +466,31 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
         #pragma omp for nowait schedule(static) reduction(vec_add_d:Ax_temp)
 
     #endif
+    */
 
-    for (int i=0; i<M; i++){
-        unsigned char* bedm = &bed_data[i * mbytes];
+    if (normal == 1){
+        for (int i=0; i<M; i++){
+            unsigned char* bedm = &bed_data[i * mbytes];
 
-        __m256d luta, lutb;
-        __m256d minave = _mm256_set1_pd(-mave[i]);
-        __m256d sig = _mm256_set1_pd(msig[i]);
-        __m256d suma = _mm256_set1_pd(0.0); // setting all 4 values to 0.0
-        __m256d mmphen = _mm256_set1_pd(phen[i]);
-        #ifdef _OPENMP2
+            __m256d luta, lutb;
+            __m256d minave = _mm256_set1_pd(-mave[i]);
+            __m256d sig = _mm256_set1_pd(msig[i]);
+            __m256d suma = _mm256_set1_pd(0.0); // setting all 4 values to 0.0
+            __m256d mmphen = _mm256_set1_pd(phen[i]);
+            //#ifdef _OPENMP2
 
-        //#pragma omp parallel private(suma, luta, lutb) shared(Ax_temp)
-        //{
-            //#pragma omp for nowait schedule(static) // reduction(vec_add_d:Ax_temp)
-        
-        #endif
+            //#pragma omp parallel private(suma, luta, lutb) shared(Ax_temp)
+            //{
+                //#pragma omp for nowait schedule(static) // reduction(vec_add_d:Ax_temp)
+            
+            //#endif
             for (int j=0; j<mbytes; j++) {
-                //luta = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
-                luta = _mm256_load_pd(&p_luts[perm_idxs[i]-1][bedm[j] * 4]);
+                luta = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
+                //luta = _mm256_load_pd(&p_luts[perm_idxs[i]-1][bedm[j] * 4]);
                 lutb = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                 luta = _mm256_add_pd(luta, minave);
                 luta = _mm256_mul_pd(luta, sig);
-                luta = _mm256_mul_pd(luta, lutb);
+                luta = _mm256_mul_pd(luta, lutb); // because we need to multiply - mu / sigma with 0
                 suma = _mm256_load_pd(&Ax_temp[j * 4]);
                 suma = _mm256_fmadd_pd(luta, mmphen, suma);
                 //if ( (i < 5 || i == M-1) && j == 0 && rank == 0)
@@ -393,28 +499,64 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
                 //if ( (i < 5 || i == M-1) && j == 0 && rank == 0)
                 //    std::cout << "Ax_temp[0] = " << Ax_temp[0] << ", rank = " << rank << std::endl;
             }
-        #ifdef _OPENMP2
-        //}
-        #endif
+            // #ifdef _OPENMP2
+            //}
+            // #endif  
+        }
     }
-
-    #ifdef _OPENMP2
+    else if (normal == 0){
+        for (int i=0; i<M; i++){
+            unsigned char* bedm = &bed_data[i * mbytes];
+            __m256d luta;
+            __m256d suma = _mm256_set1_pd(0.0); // setting all 4 values to 0.0
+            __m256d mmphen = _mm256_set1_pd(phen[i]);
+            for (int j=0; j<mbytes; j++) {
+                luta = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
+                suma = _mm256_load_pd(&Ax_temp[j * 4]);
+                suma = _mm256_fmadd_pd(luta, mmphen, suma);
+                _mm256_storeu_pd(&Ax_temp[j * 4], suma);
+            }
+        }
     }
-    #endif
+    else if (normal == 2){ // means we use normalization s.t. X = sqrt(Diag(xL)) * G * sqrt(Diag(xR))
+        for (int i=0; i<M; i++){
+            unsigned char* bedm = &bed_data[i * mbytes];
+            __m256d luta;
+            __m256d suma = _mm256_set1_pd(0.0); // setting all 4 values to 0.0
+            __m256d xR_mmphen = _mm256_set1_pd(xR[i] * phen[i]); // xR should already containt sqrt of a diag vector
+            // std::cout << "i = " << i << ", before starting inner loop!" << std::endl;
+            for (int j=0; j<mbytes; j++) {
+                luta = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
+                suma = _mm256_load_pd(&Ax_temp[j * 4]);
+                suma = _mm256_fmadd_pd(luta, xR_mmphen, suma);
+                _mm256_storeu_pd(&Ax_temp[j * 4], suma);
+            }
+        }
+    }
 
     std::vector<double> Ax_total(4 * mbytes, 0.0);
     MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    for(int i = 0; i < 4 * mbytes; i++)
-        Ax_total[i] /= sqrt(N);
+    if (normal == 1)
+        for(int i = 0; i < 4 * mbytes; i++)
+            Ax_total[i] /= sqrt(N);
 
-    //std::cout << "dividing by sqrt(N) where N = " << N << " is finished." << std::endl;
-    
-    //double sqrtNm1 = 1/sqrt(N);
-    //for_each(Ax_total.begin(), Ax_total.end(), [sqrtNm1](double &c){ c *= sqrtNm1; });
-    
-    //Ax_total = std::accumulate(begin(vars), end(vars), sqrtNm1 , std::multiplies<double>());
-    //foreach( double val, Ax_total ) val / sqrtN;
+    if (normal == 2){
+        for(int i = 0; i < 4 * mbytes; i++)
+            Ax_total[i] *= xL[i];  
 
+        /*
+        __m256d GxRvec, mmxL, xLGxRvec;
+        for (int j=0; j<mbytes; j++) {
+            GxRvec = _mm256_load_pd(&Ax_total[j * 4]);
+            std::cout << "j = " << j << ", after GxRvec" << std::endl;
+            mmxL = _mm256_load_pd(&xL[j * 4]);
+            std::cout << "after mmxL" << std::endl;
+            xLGxRvec = _mm256_mul_pd(mmxL, GxRvec);
+            std::cout << "after xLGxRvec" << std::endl;
+            _mm256_storeu_pd(&Ax_total[j * 4], xLGxRvec);
+        }
+        */
+    }
     return Ax_total;
 
  #else
@@ -429,85 +571,87 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
 
     //#pragma omp parallel for reduction(vec_double_plus : Ax_temp)
     //#endif
-    //shared(
 
-    for (int i=0; i<M; i++){
-        bed = &bed_data[i * mbytes];
-        double ave = mave[i];
-        double sig = msig[i];
-        double phen_i = phen[i];
-        
-        #ifdef _OPENMP
-            #pragma omp parallel for shared(Ax_temp)
-        #endif
-        
-        for (int j=0; j<mbytes; j++) {
-             for (int k=0; k<4; k++) {
-                //Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig * phen_i * dotp_lut_b[bed[j] * 4 + k]; // because msig[i] is the precision of the i-th marker
-                Ax_temp[j * 4 + k] += (p_luts[perm_idxs[i]-1][bed[j]*4 + k] - ave) * sig * phen_i * dotp_lut_b[bed[j] * 4 + k]; // because msig[i] is the precision of the i-th marker
-                //if ( k == 0 && (i < 5 || i == M-1) && j == 0 && rank == 0 )
-                //    std::cout << "Ax_temp[0] = " << Ax_temp[0] << ", rank = "<< rank << std::endl;
-            }
-        } 
+    if (normal == 1){
+        for (int i=0; i<M; i++){
+            bed = &bed_data[i * mbytes];
+            double ave = mave[i];
+            double sig = msig[i];
+            double phen_i = phen[i];
+            
+            #ifdef _OPENMP
+                #pragma omp parallel for shared(Ax_temp)
+            #endif
+            
+            for (int j=0; j<mbytes; j++) {
+                for (int k=0; k<4; k++) {
+                    Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig * phen_i * dotp_lut_b[bed[j] * 4 + k]; // because msig[i] is the precision of the i-th marker
+                }
+            } 
+        }
     }
-    
-    //std::cout << "Ax[1] = " << Ax[1] << ", rank = " << rank << std::endl; 
-    std::vector<double> Ax_total(4 * mbytes, 0.0 );
-    //std::cout << "Ax_total[1] = " << Ax_total[1]<< ", rank = "<< rank << std::endl;
-    //double suma = 0;
-    //for(int i = 0; i < 4 * mbytes; i++){   
-        //if (i % 100 == 0)
-            //std::cout << "suma = " << suma << std::endl;
-        //suma = 0;
-        //if (i == N-1 ||i == 0)
-        //    std::cout << "before MPI all reduce, rank =" << rank << std::endl;
-        //MPI_Allreduce(&Ax_temp[i], &suma, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        //if (i == N-1 || i == 0)
-        //    std::cout << "after MPI all reduce, rank =" << rank << std::endl;
-        //Ax_total[i] = suma / sqrt(N); // we scale elements of A with 1 / sqrt(N)
-        //if (i == N-1 || i == 0)
-        //    std::cout << "Ax_total[i], rank = " << rank << std::endl;
-    //}
-    MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    for(int i = 0; i < 4 * mbytes; i++)
-        Ax_total[i] /= sqrt(N);
+    else if (normal == 0){
+        for (int i=0; i<M; i++){
+            bed = &bed_data[i * mbytes];
+            double phen_i = phen[i];
+            
+            #ifdef _OPENMP
+                #pragma omp parallel for shared(Ax_temp)
+            #endif
+            for (int j=0; j<mbytes; j++) {
+                for (int k=0; k<4; k++) {
+                    Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * phen_i;
+                }
+            } 
+        }
+    }
+    else if (normal == 2){
+        for (int i=0; i<M; i++){
+            bed = &bed_data[i * mbytes];
+            double xRphen_i = xR[i] * phen[i];
+            
+            #ifdef _OPENMP
+                #pragma omp parallel for shared(Ax_temp)
+            #endif
+            for (int j=0; j<mbytes; j++) {
+                for (int k=0; k<4; k++) {
+                    Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * xRphen_i;
+                }
+            } 
+        }
+        for (int j=0; j<mbytes; j++){
+            for (int k=0; k<4; k++) {
+                Ax_temp[j * 4 + k] *= xL[j * 4 + k];
+            }
+        }
+    }
 
+    std::vector<double> Ax_total(4 * mbytes, 0.0);
+    MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if (normal == 1)
+        for(int i = 0; i < 4 * mbytes; i++)
+            Ax_total[i] /= sqrt(N);
     return Ax_total;
 
-    #endif
+#endif
 }
 
 
+std::vector<double> data::ATx(double* __restrict__ phen, int normal) {
 
-std::vector<double> data::ATx(double* __restrict__ phen) {
-
-    //if (rank == 0)
-        //std::cout << "inside ATx" << std::endl;
     std::vector<double> ATx(M, 0.0);
-
-    //unsigned char* bed;
     #ifdef _OPENMP
         #pragma omp parallel for schedule(static)
     #endif
     for (int mloc=0; mloc < M; mloc++){
-        ATx[mloc] = dot_product( mloc, phen, mave[mloc], msig[mloc] ) / sqrt(N); // we scale elements of A with 1/sqrt(N)
-        //if (std::isnan(std::abs(ATx[mloc])))
-            //std::cout << "ATx nan index is " << mloc << ", rank = " << rank << std::endl;
+        // ATx[mloc] = dot_product( mloc, phen, mave[mloc], msig[mloc], normal ) / sqrt(N); // we scale elements of A with 1/sqrt(N)
+        ATx[mloc] = dot_product(mloc, phen, mave[mloc], msig[mloc], normal);
     }
-    //std::cout << "final ATx[0] = " << ATx[0] << std::endl;
-    //std::cout << "std::isnan(ATx[0]) = " << std::isnan(ATx[0]) << std::endl;
+    // std::cout << "final ATx[0] = " << ATx[0] << std::endl;
+    if (normal == 1)
+        for (int mloc=0; mloc < M; mloc++)
+            ATx[mloc] /= sqrt(N);
     return ATx;
-    /*
-    std::vector<double> ATx_total(Mtotal, 0.0);
-    for(int i = 0; i < Mtotal; i++)
-    {   
-        double val = 0;
-        MPI_Allreduce(&ATx[i], &val, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        Ax_total[i] = val;
-    }
-
-    return ATx_total;
-    */
 }
 
 void data::read_genotype_data(){
@@ -542,6 +686,7 @@ void data::read_genotype_data(){
 
 }
 
+/*
 std::vector < double* > data::perm_luts(){
 
     std::vector < double* > luts;
@@ -587,7 +732,9 @@ std::vector < double* > data::perm_luts(){
     return luts;
 
 }
+*/
 
+/*
 std::vector < double* > data::perm_dotp_luts(){
 
     std::vector < double* > luts;
@@ -639,4 +786,98 @@ std::vector < double* > data::perm_dotp_luts(){
     luts.push_back(perm_dotp_lut_ab_06);
 
     return luts;
+}
+
+*/
+
+void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, double err_thr, int max_iter){
+
+    std::vector<double> err_vec1 = Ax(xR.data(), 0); // we don't use normalization here
+    std::vector<double> err_vec1abs = err_vec1;
+    for (int i=0; i<N; i++){
+        //err_vec1[i] *= (*xL)[i];
+        err_vec1abs[i] *= xL[i];
+        err_vec1abs[i] -= Mtotal; 
+        err_vec1abs[i] = std::abs(err_vec1abs[i]);
+    }
+    //std::cout << "begin err_vec1[10160] = " << err_vec1[10160] << std::endl;
+    double max_value1 = *(std::max_element(err_vec1abs.begin(), err_vec1abs.end()));
+    if (rank == 0)
+        std::cout << "begin max_value1 = " << max_value1 << std::endl;
+
+    std::vector<double> err_vec2 = ATx(xL.data(), 0); // we don't use normalization here
+    std::vector<double> err_vec2abs = err_vec2;
+    for (int j=0; j<M; j++){
+        err_vec2abs[j] *= xR[j];
+        err_vec2abs[j] -= N; 
+        err_vec2abs[j] = std::abs(err_vec2abs[j]);
+    }
+    double max_value2 = *(std::max_element(err_vec2abs.begin(), err_vec2abs.end()));
+    double max_value2_total;
+    MPI_Allreduce(&max_value2, &max_value2_total, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    if (rank == 0)
+        std::cout << "begin max_value2_total = " << max_value2_total << std::endl;
+
+    int iter_count = 0;
+    while (max_value1 > err_thr * Mtotal || max_value2_total > err_thr * N)
+    {
+        for (int j=0; j<M; j++){
+            xR[j] = N / err_vec2[j];
+        }
+        
+        // updating err_vec taking into account newly updated xR
+        err_vec1 = Ax(xR.data(), 0);
+        err_vec1abs = err_vec1;
+        for (int i=0; i<N; i++){
+            err_vec1abs[i] *= xL[i];
+            err_vec1abs[i] -= Mtotal; 
+            err_vec1abs[i] = std::abs(err_vec1abs[i]);
+        }
+
+        // for (int i = N; i <4*mbytes; i++)
+        //    std::cout << "i = " << i << "err_vec1[i] = " << err_vec1[i] << std::endl;
+
+        max_value1 = *(std::max_element(err_vec1abs.begin(), std::next(err_vec1abs.begin(), N-1)));
+        if (rank == 0)
+            std::cout << "iter = " << iter_count << ", max_value1 = " << max_value1 << std::endl;
+
+        for (int i=0; i<N; i++){
+            xL[i] = Mtotal / err_vec1[i];
+        }
+
+        // updating max_value2
+        err_vec2 = ATx(xL.data(), 0);
+        err_vec2abs = err_vec2;
+        for (int j=0; j<M; j++){
+            err_vec2abs[j] *= xR[j];
+            err_vec2abs[j] -= N; 
+            err_vec2abs[j] = std::abs(err_vec2abs[j]);
+        }
+        max_value2 = *(std::max_element(err_vec2abs.begin(), err_vec2abs.end()));
+        MPI_Allreduce(&max_value2, &max_value2_total, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+        if (rank == 0)
+            std::cout << "iter = " << iter_count << ", max_value2_total = " << max_value2_total << std::endl;
+        
+        iter_count++;
+
+        if (iter_count == max_iter)
+            break;
+    }
+    if (rank == 0)
+        std::cout << "Sinkhorn - Knopp preprocessing finished after " << iter_count << " / " << max_iter << " iterations." << std::endl;
+
+    for (int i = 0; i < N; i++)
+        xL[i] = sqrt( xL[i] ); 
+    for (int j = 0; j < M; j++)
+        xR[j] = sqrt( xR[j] ); // the function returns the left and right vector that is used in normalization
+
+    /*
+    std::cout << "xL[0] = " << xL[0] << std::endl;
+    std::cout << "xL[1] = " << xL[1] << std::endl;
+    std::cout << "xL[2] = " << xL[2] << std::endl;
+
+    std::cout << "xR[0] = " << xR[0] << std::endl;
+    std::cout << "xR[1] = " << xR[1] << std::endl;
+    std::cout << "xR[2] = " << xR[2] << std::endl;
+    */
 }

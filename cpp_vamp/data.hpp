@@ -39,6 +39,8 @@ private:
     double sigma_max = 1e8;
     double intercept = 0;
     double scale = 1; 
+    int normal_data;
+    std::vector<double> xL, xR;
 
 public:
 
@@ -56,27 +58,30 @@ public:
     int     get_im4()   const { return im4; }
     int     get_nonas()       { return nonas; }
     int     get_S()     const { return S; }
+    int     get_normal_data()   const {return normal_data; }
 
     // constructor and destructor for class data
-    data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank);
-    data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm);
+    data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
+    // data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm);
     ~data() {
         if (mave     != nullptr)  _mm_free(mave);
         if (msig     != nullptr)  _mm_free(msig);
     }
     void compute_markers_statistics();
 
-    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv);
+    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal);
 
     void read_genotype_data();
 
-    std::vector<double> Ax(double* __restrict__ phen);
+    std::vector<double> Ax(double* __restrict__ phen, int normal);
     
-    std::vector<double> ATx(double* __restrict__ phen);
+    std::vector<double> ATx(double* __restrict__ phen, int normal);
 
-    std::vector < double* > perm_luts();
+    //std::vector < double* > perm_luts();
 
-    std::vector < double* > perm_dotp_luts();
+    //std::vector < double* > perm_dotp_luts();
+
+    void SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, double err_thr, int SK_max_iter);
 
     //double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi);
 

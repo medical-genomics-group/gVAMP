@@ -24,7 +24,7 @@ private:
     double EM_err_thr; // = 1e-4;
     int CG_max_iter; // = 10;
     int use_adap_damp = 0;
-    int calc_state_evo = 1;
+    int calc_state_evo = 0;
     int numb_adap_damp_hist = 2;
     int poly_deg_apr_vamp_obj = 5;
     double damp_inc_fact = 1.05;
@@ -36,6 +36,7 @@ private:
     std::string out_name;
     std::vector<double> bern_vec;
     std::vector<double> invQ_bern_vec;
+    int normal = 2;
 
 public:
 

@@ -48,7 +48,8 @@ int main()
     // simulating data for realistic valus of parameters
     //std::vector<double> vars{0, 3.0246351e-07, 1.2863391e-03};
     //std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
-    std::vector<double> vars{0, 1.2863391e-04};
+    //std::vector<double> vars{0, 1.2863391e-04};
+    std::vector<double> vars{0, 1.2863391e-02};
     std::vector<double> vars_init{0, N*3.0246351e-05};
     //vars_init = vars; vars_init[1] *= N;
 
@@ -79,12 +80,25 @@ int main()
     MPI_Barrier(MPI_COMM_WORLD);
     //beta_true = read_vec_from_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_12000_N_15000_beta_true.txt", M, S);
     
+    const int normal = 2;
     //printing out true variances
     if (rank == 0)
         std::cout << "true scaled variances = ";
     for (int i = 0; i < vars.size(); i++){
         if (rank == 0)
-            std::cout << vars[i] * N << ' ';
+            if (normal == 2)
+                std::cout << vars[i] << ' ';
+            else if (normal == 1)
+                std::cout << vars[i] * N << ' ';
+    }
+    if (rank ==0)
+        std::cout << std::endl;
+
+    if (rank == 0)
+        std::cout << "true probs = ";
+    for (int i = 0; i < probs.size(); i++){
+        if (rank == 0)
+            std::cout << probs[i] << ' ';
     }
     if (rank ==0)
         std::cout << std::endl;
@@ -100,7 +114,7 @@ int main()
 
     std::random_device rand_dev;
     std::mt19937 generator(rand_dev());  
-    std::normal_distribution<double> gauss_beta_gen( 0, 1 / sqrt(gamw) ); //2nd parameter is stddev
+    std::normal_distribution<double> gauss_beta_gen(0, 1 / sqrt(gamw)); //2nd parameter is stddev
     std::vector<double> noise(N, 0.0);
     for (int i = 0; i < N; i++){
         noise[i] = gauss_beta_gen(generator);
@@ -114,23 +128,19 @@ int main()
     double *noise_val = (double*) _mm_malloc(size_t(N) * sizeof(double), 32);
     if (rank != 0)
         MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    std::cout << "rank = " << rank << ", after noise val" << std::endl;
 
-    data dataset(phenfp, bedfp, N, M, Mt, S, rank, 0);
-    dataset.read_phen();
-    std::cout << "rank = " << rank << ", after read phen" << std::endl;
-    dataset.read_genotype_data();
-    std::cout << "rank = " << rank << ", after read genotype data" << std::endl;
-    dataset.compute_markers_statistics();
+    data dataset(phenfp, bedfp, N, M, Mt, S, normal, rank);
    
-    std::cout << "rank = " << rank << ", after compute marker stats" << std::endl;
     std::vector<double> beta_true_scaled = beta_true;
-    for (int i0=0; i0<M; i0++)
-        beta_true_scaled[i0] *= sqrt(N);
-    std::vector<double> y = dataset.Ax( beta_true_scaled.data() );
+    if (normal == 1){
+        for (int i0=0; i0<M; i0++)
+            beta_true_scaled[i0] *= sqrt(N);
+    }
+
+    std::vector<double> y = dataset.Ax(beta_true_scaled.data(), normal);
 
     if (rank == 0)
-        std::cout << "Ax stdev = " << calc_stdev(y) << std::endl;
+        std::cout << "Var(Ax) = " << pow(calc_stdev(y), 2) << std::endl;
 
     //if (rank == 0)
     //    std::cout << "noise_val stdev = " << calc_stdev(noise_val) << std::endl;
@@ -144,7 +154,7 @@ int main()
     dataset.set_phen(y);
 
     if (rank == 0){
-        std::cout << "var(y) = " << pow(calc_stdev(y), 2) << std::endl;
+        std::cout << "Var(y) = " << pow(calc_stdev(y), 2) << std::endl;
         double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
         std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
     }
@@ -155,13 +165,14 @@ int main()
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     double gam1 = 1e-6;
-    int max_iter = 26;
-    double rho = 0.96;
+    int max_iter = 36;
+    double rho = 0.98;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
-    std::string out_name = "x1_hat_height_main_25_10_2022"; 
+    std::string out_name = "x1_hat_height_main_05_12_2022"; 
     std::string model = "linear";
     double gamw_init = 1;
     // gamw_init = 1.7;
+    // gam1 = pow(calc_stdev(beta_true), 2);
     
     vamp emvamp(N, M, Mt, gam1, gamw_init, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
     std::vector<double> x_est = emvamp.infere(&dataset);

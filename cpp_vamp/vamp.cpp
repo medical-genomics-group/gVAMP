@@ -86,6 +86,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
 
 std::vector<double> vamp::infere( data* dataset ){
 
+    normal = (*dataset).get_normal_data();
     if (!strcmp(model.c_str(), "linear"))
         return infere_linear(dataset);
     else if (!strcmp(model.c_str(), "bin_class"))
@@ -201,7 +202,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // LMMSE estimation of x
         //************************
 
-        std::vector<double> v = (*dataset).ATx(p2.data());
+        std::vector<double> v = (*dataset).ATx(p2.data(), normal);
 
         for (int i = 0; i < M; i++)
             v[i] = tau2 * v[i] + gam2 * r2[i];
@@ -227,7 +228,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // LMMSE estimation of x
         //************************
         
-        z2_hat = (*dataset).Ax(x2_hat.data());
+        z2_hat = (*dataset).Ax(x2_hat.data(), normal);
         double beta2 = N / M * (1-alpha2);
 
         for (int i=0; i<M; i++)
@@ -256,8 +257,6 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 std::vector<double> vamp::infere_linear( data* dataset ){
 
-    double tol = 1e-11;
-
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
     std::vector<double> x1_hat_stored(M, 0.0);
@@ -273,20 +272,10 @@ std::vector<double> vamp::infere_linear( data* dataset ){
             if (4*j + k < N)
                 if (na_lut[mask4[j] * 4 + k] == 0)
                     y[4*j + k] = 0;
-        
-    //for (int i0=0; i0<y.size(); i0++)
-    //    if (y[i0] == DBL_MAX)
-    //        y[i0] = 0;
-    //std::cout <<"size of y = " << y.size()<< ", rank = " << rank << std::endl;
-    
+
     // linear estimator
     //r1 = (*dataset).ATx(y.data());
-
     //std::cout << "calc_stdev(r1) = " << calc_stdev(r1) << std::endl;
-
-    //if (rank == 0)
-    //    std::cout << "1st r1[0] = "  << r1[0] << std::endl;
-
     //for (int i0=0; i0<M; i0++)
 	//    r1[i0] = r1[i0]*M/N;
 
@@ -307,12 +296,14 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         // updating parameters of prior distribution
         probs_before = probs;
         vars_before = vars;
-        //updatePrior();
+        //updatePrior(); -> moved to after iteration
 
+        // if (it == 1)
+        //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
         for (int i = 0; i < M; i++ )
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
 
-        z1 = (*dataset).Ax(x1_hat.data());
+        z1 = (*dataset).Ax(x1_hat.data(), normal);
         // we start adaptive damping from iteration numb_adap_damp_hist
         while (use_adap_damp == 1 && it>numb_adap_damp_hist){
             double obj_fun_val = vamp_obj_func(eta1, gam1, invQ_bern_vec, bern_vec, vars, probs, dataset);
@@ -327,7 +318,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
                 rho *= damp_dec_fact;
                 for (int i = 0; i < M; i++)
                     x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
-                z1 = (*dataset).Ax(x1_hat.data());
+                z1 = (*dataset).Ax(x1_hat.data(), normal);
                 assert(rho > 1e-8);                  
             }   
         }
@@ -335,13 +326,18 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         if (rank == 0)
             std::cout << "rho = " << rho << std::endl;
 
+        double scale;
+        if (normal == 1)
+            scale = sqrt(N);
+        else if (normal == 2)
+            scale = 1;
+
         // saving x1_hat
         std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + ".bin";
         int S = (*dataset).get_S();
         for (int i0=0; i0<x1_hat_stored.size(); i0++)
-            x1_hat_stored[i0] =  x1_hat[i0] / sqrt(N);
+            x1_hat_stored[i0] =  x1_hat[i0] / scale;
         mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
-
         //store_vec_to_file(filepath_out, x1_hat);
         
         if (rank == 0)
@@ -383,8 +379,9 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
         // if the true value of the signal is known, we print out the true gam2
         double se_dev = 0;
-        for (int i0=0; i0<M; i0++)
-            se_dev += (r2[i0]- sqrt(N)*true_signal[i0])*(r2[i0]- sqrt(N)*true_signal[i0]);
+        for (int i0=0; i0<M; i0++){
+            se_dev += (r2[i0]- scale*true_signal[i0])*(r2[i0]- scale*true_signal[i0]);
+        }
         double se_dev_total = 0;
         MPI_Allreduce(&se_dev, &se_dev_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         if (rank == 0)
@@ -403,7 +400,6 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
         if (rank == 0)
             std::cout << "denoising step took " << end_denoising - start_denoising << " seconds." << std::endl;
-
 
         //x1_hat = true_signal; // just for noise precision learning tests
         //for (int i0 = 0; i0 < M; i0++)
@@ -427,7 +423,11 @@ std::vector<double> vamp::infere_linear( data* dataset ){
             for(int k=0;k<4;k++)
                 if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
                     y[4*j + k] = 0;
-        std::vector<double> v = (*dataset).ATx(y.data());
+        
+        // std::cout << "after get phen! y.size() = " << y.size() << std::endl;
+        // std::cout << "normal in VAMP = " << normal << std::endl;
+        std::vector<double> v = (*dataset).ATx(y.data(), normal);
+        // std::cout << "afer ATx inside VAMP-LMMSE" << std::endl;
 
         for (int i = 0; i < M; i++)
             v[i] = gamw * v[i] + gam2 * r2[i];
@@ -473,7 +473,7 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         // if the true value of the signal is known, we print out the true gam1
         double se_dev1 = 0;
         for (int i0=0; i0<M; i0++)
-            se_dev1 += (r1[i0]- sqrt(N)*true_signal[i0])*(r1[i0]- sqrt(N)*true_signal[i0]);
+            se_dev1 += (r1[i0]- scale*true_signal[i0])*(r1[i0]- scale*true_signal[i0]);
         double se_dev_total1 = 0;
         MPI_Allreduce(&se_dev1, &se_dev_total1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         if (rank == 0)
@@ -610,8 +610,8 @@ void vamp::updateNoisePrec(data* dataset){
         MPI_Recv(u.data(), phen_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
 
-    std::vector<double> v = (*dataset).ATx(u.data());
-    std::vector<double> temp = (*dataset).Ax(x2_hat.data());
+    std::vector<double> v = (*dataset).ATx(u.data(), normal);
+    std::vector<double> temp = (*dataset).Ax(x2_hat.data(), normal);
     std::vector<double> y = (*dataset).get_phen();
 
     //filtering for NAs
@@ -779,15 +779,16 @@ void vamp::updatePrior() {
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset){ // multiplying with (tau*A^TAv + gam2*v)
 
+    // std::cout << "normal in lmmse_mult = " << normal << std::endl;
     if (v == std::vector<double>(M, 0.0))
         return std::vector<double>(M, 0.0);
     std::vector<double> res(M, 0.0);
     size_t phen_size = 4 * (*dataset).get_mbytes();
     std::vector<double> res_temp(phen_size, 0.0);
     //std::cout << "before res_temp!" << std::endl;
-    res_temp = (*dataset).Ax( v.data() );
+    res_temp = (*dataset).Ax( v.data(), normal);
     //std::cout << "before res!" << std::endl;
-    res = (*dataset).ATx( res_temp.data() );
+    res = (*dataset).ATx( res_temp.data(), normal);
     //std::cout << "before loop!" << std::endl;
     for (int i = 0; i < M; i++){
         //res[i] *= gamw;
@@ -816,6 +817,7 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, std::vector<double> m
     //std::vector<double> p = v, r = v, d;
     std::vector<double> p = p_start, d;
     std::vector<double> r = lmmse_mult(mu, tau, dataset);
+    //std::cout << "inside CG after lmmmse" << std::endl;
     for (int i0=0; i0<r.size(); i0++)
         r[i0] = v[i0] - r[i0];
     //std::vector<double> r = v;
@@ -826,6 +828,7 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, std::vector<double> m
     for (int i = 0; i < CG_max_iter; i++){
         //std::cout << "[CG_solver] i = " << i << ", rank = " << rank << std::endl;
         double start_lmmse = MPI_Wtime();
+        //std::cout << "before new lmmse" << std::endl;
         d = lmmse_mult(p, tau, dataset);
         double end_lmmse = MPI_Wtime();
         //if (rank == 0 && (i % 10 == 0) )
@@ -864,7 +867,12 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, std::vector<double> m
 
 void vamp::err_measures(data *dataset, int ind){
 
-    double scale = 1.0 / (double) N;
+    double scale; // = 1.0 / (double) N;
+
+    if (normal == 1)
+        scale = 1.0 / (double) N;
+    else if (normal == 2)
+        scale = 1.0;
     
     // correlation
     if (ind == 1){
@@ -934,6 +942,7 @@ void vamp::err_measures(data *dataset, int ind){
             if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
                 y[4*j + k] = 0;
 
+    /*
     if (rank == 0){
         //std::cout << "N = " << N << std::endl;
         //std::cout << "y.size() = " << y.size()<< std::endl;
@@ -942,12 +951,13 @@ void vamp::err_measures(data *dataset, int ind){
                 std::cout << j << " position is std::numeric_limits<double>::max(), j =" << j / 4 << ", k = " << j%4 << ", luk = " << na_lut[mask4[j/4] * 4 + (j%4)] << std::endl; 
             }
     }
+    */
     std::vector<double> Axest;
     if (ind == 1)
         //Axest = (*dataset).Ax( x1_hat.data() );
         Axest = z1;
     else if (ind == 2)
-       Axest = (*dataset).Ax( x2_hat.data() );
+       Axest = (*dataset).Ax(x2_hat.data(), normal);
     //std::vector<double> Axtrue = (*dataset).Ax( true_signal.data() );
 
     for (int i = 0; i < N; i++){ // N because length(y) = N even though length(Axest) = 4*mbytes
@@ -1029,8 +1039,8 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     //std::vector<double> u = std::vector<double> (M, 0.0);
     //for (int i = 0; i < M; i++)
     //    u[i] = 2*bern(rd) - 1;
-    std::vector<double> temp = (*dataset).Ax(invQu.data());
-    std::vector<double> temp2 = (*dataset).ATx(temp.data());
+    std::vector<double> temp = (*dataset).Ax(invQu.data(), 1);
+    std::vector<double> temp2 = (*dataset).ATx(temp.data(), 1);
     for (int i=0; i<temp2.size(); i++)
         temp2[i] *= gamw;
     DKL2 += inner_prod(u, temp2, 1);
@@ -1045,7 +1055,7 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
             if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
                 y[4*j + k] = 0;
     DKL2 += (-2) * gamw * inner_prod(y, z1, 0);
-    DKL2 += gamw * inner_prod(x1_hat, (*dataset).ATx(z1.data()), 1);
+    DKL2 += gamw * inner_prod(x1_hat, (*dataset).ATx(z1.data(), 1), 1);
     DKL2 += (-1) * Mt / 2 * log(gamw);
 
     //for (int i = 0; i < M; i++)
