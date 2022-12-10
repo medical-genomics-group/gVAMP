@@ -44,13 +44,13 @@ private:
 
 public:
 
-    void read_phen();   // reading phenotype file
     std::vector<double> get_phen(){ return phen_data; };
     // int get_phen_size(){ return phen_data.size(); };
     double get_intercept() { return intercept; };
     double get_scale() { return scale; };
     double get_sigma_max() { return sigma_max; };
     size_t get_mbytes(){ return mbytes; };
+    unsigned char * get_bed_data() {return bed_data; }
     void set_phen( std::vector<double> new_data ) { phen_data = new_data; };
     std::vector<unsigned char>& get_mask4() { return mask4; }
     double* get_mave()        { return mave; }
@@ -59,15 +59,21 @@ public:
     int     get_nonas()       { return nonas; }
     int     get_S()     const { return S; }
     int     get_normal_data()   const {return normal_data; }
+    std::vector<double> get_xL() { return xL; }
+    std::vector<double> get_xR() { return xR; }
 
     // constructor and destructor for class data
+    data(std::vector<double> y, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
     data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
     // data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm);
     ~data() {
         if (mave     != nullptr)  _mm_free(mave);
         if (msig     != nullptr)  _mm_free(msig);
     }
-    void compute_markers_statistics();
+
+    void read_phen();   // reading phenotype file
+
+    void compute_markers_statistics(); 
 
     double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal);
 

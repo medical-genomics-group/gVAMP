@@ -209,7 +209,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
-        x2_hat = CG_solver(v, tau2, dataset);
+        x2_hat = precondCG_solver(v, tau2, dataset); // precond_change!
         double end_CG = MPI_Wtime();
         
         if (rank == 0)
@@ -255,7 +255,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 }
 
 
-std::vector<double> vamp::infere_linear( data* dataset ){
+std::vector<double> vamp::infere_linear(data* dataset){
 
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
@@ -266,12 +266,16 @@ std::vector<double> vamp::infere_linear( data* dataset ){
     std::vector<double> y = (*dataset).get_phen();
     std::vector<unsigned char> mask4 = (*dataset).get_mask4();
 
+    // filtering a phenotyp for nans
     int im4 = (*dataset).get_im4();
     for (int j=0; j<im4; j++) 
         for (int k=0; k<4; k++) 
             if (4*j + k < N)
                 if (na_lut[mask4[j] * 4 + k] == 0)
                     y[4*j + k] = 0;
+
+    // Gaussian noise start
+    r1 = simulate(M, std::vector<double> {1/gam1}, std::vector<double> {1});
 
     // linear estimator
     //r1 = (*dataset).ATx(y.data());
@@ -386,10 +390,6 @@ std::vector<double> vamp::infere_linear( data* dataset ){
         MPI_Allreduce(&se_dev, &se_dev_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         if (rank == 0)
             std::cout << "true gam2 = " << Mt / se_dev_total << std::endl;
-            
-        //if (rank ==0)
-        //    std::cout << "r2[1] = "<< r2[1] << std::endl;
-        //std::cout << "norm(r2)^2 = " << l2_norm2(r2, 1) << std::endl;
 
         // new place for prior update
         updatePrior();
@@ -417,12 +417,13 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
         //gamw = 1 / ( 1 - inner_prod(z1, z1, 0) );
 
-        std::vector<double> y = (*dataset).get_phen();
+        //std::vector<double> y = (*dataset).get_phen();
         //std::vector<unsigned char> mask4 = (*dataset).get_mask4();
-        for (int j=0;j<(*dataset).get_mbytes();j++)
+        /* for (int j=0;j<(*dataset).get_mbytes();j++)
             for(int k=0;k<4;k++)
                 if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
                     y[4*j + k] = 0;
+        */
         
         // std::cout << "after get phen! y.size() = " << y.size() << std::endl;
         // std::cout << "normal in VAMP = " << normal << std::endl;
@@ -434,11 +435,14 @@ std::vector<double> vamp::infere_linear( data* dataset ){
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
-        if (it >= 1)
-            x2_hat = CG_solver(v, std::vector<double>(M, 0.0), v, gamw, dataset);
-        else 
-            x2_hat = CG_solver(v, mu_CG_last, p_CG_last, gamw, dataset);
-        //x2_hat = CG_solver(v, gamw, dataset);
+        if (it >= 1){
+            // x2_hat = CG_solver(v, std::vector<double>(M, 0.0), v, gamw, dataset); // precond_change!
+            x2_hat = precondCG_solver(v, std::vector<double>(M, 0.0), gamw, dataset); // precond_change!
+        }
+        else{
+            // x2_hat = CG_solver(v, mu_CG_last, p_CG_last, gamw, dataset); // precond_change!
+            x2_hat = precondCG_solver(v, mu_CG_last, gamw, dataset); // precond_change!
+        }
         double end_CG = MPI_Wtime();
 
         if (rank == 0)
@@ -502,13 +506,9 @@ std::vector<double> vamp::infere_linear( data* dataset ){
             break;
         }
         */
-            
-
         if (rank == 0)
             std::cout << std::endl << std::endl;
     }
-    //if (rank == 0)
-    //    std::cout << "inside vamp: calc_stdev(x1_hat) = " << calc_stdev(x1_hat) << std::endl; 
     return x1_hat_stored;          
 }
 
@@ -587,15 +587,15 @@ double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared bet
 
     bern_vec = std::vector<double> (M, 0.0);
     for (int i = 0; i < M; i++)
-        bern_vec[i] = 2*bern(rd) - 1;
-    std::vector<double> invQ_bern_vec = CG_solver(bern_vec, tau, dataset);
-    double onsager = gam2 * inner_prod(bern_vec, invQ_bern_vec, 1) / Mt; 
-    return onsager;
-    
+        bern_vec[i] = (2*bern(rd) - 1) / sqrt(Mt); // Bernoulli variables are sampled independently
+    std::vector<double> invQ_bern_vec = precondCG_solver(bern_vec, tau, dataset); // precond_change
+    double onsager = gam2 * inner_prod(bern_vec, invQ_bern_vec, 1); 
+    return onsager;    
 }
 
 void vamp::updateNoisePrec(data* dataset){
 
+    /*
     std::random_device rd;
     std::bernoulli_distribution bern(0.5);
     size_t phen_size = 4 * (*dataset).get_mbytes();
@@ -611,6 +611,8 @@ void vamp::updateNoisePrec(data* dataset){
     }
 
     std::vector<double> v = (*dataset).ATx(u.data(), normal);
+    */
+   
     std::vector<double> temp = (*dataset).Ax(x2_hat.data(), normal);
     std::vector<double> y = (*dataset).get_phen();
 
@@ -625,7 +627,10 @@ void vamp::updateNoisePrec(data* dataset){
         temp[i] -= y[i];
     
     double temp_norm2 = l2_norm2(temp, 0); 
-    double trace_corr = inner_prod(CG_solver(v, gamw, dataset), v, 1); // check this! ad
+    //double trace_corr = inner_prod(precondCG_solver(v, gamw, dataset), v, 1); // check this! ad // precond_change
+    std::vector<double> trace_corr_vec_N = (*dataset).Ax(invQ_bern_vec.data(), normal);
+    std::vector<double> trace_corr_vec_M = (*dataset).ATx(trace_corr_vec_N.data(), normal);
+    double trace_corr = inner_prod(bern_vec, trace_corr_vec_M, 1) * Mt;
     //std::vector<double> z2 = (*dataset).Ax(x2_hat.data());
     if (rank == 0){
         std::cout << "l2_norm2(temp) / N = " << temp_norm2 / N << std::endl;
@@ -667,40 +672,19 @@ void vamp::updatePrior() {
                 std::vector<double> temp_gammas;
                 for (int j = 1; j < probs.size(); j++ ){
                     double num = lambda * exp( - pow(r1[i], 2) / 2 * (max_sigma - vars[j]) / (vars[j] + noise_var) / (max_sigma + noise_var) ) / sqrt(vars[j] + noise_var) / sqrt(2 * M_PI) * omegas[j];
-                    double num_gammas = gam1 * r1[i] / ( 1 / vars[j] + gam1 );
-                    //if (rank == 0 && i == 0)
-                        //std::cout << "num = " << num << std::endl;
-                    //if (~std::isfinite(num)){
-                        //std::cout << "num is not finite" << std::endl;
-                    //    num = 0;
-                    //}
-                    
-                    //if (rank == 0)
-                    //    if (j==2 && i<=10)
-                    //        std::cout << "i=" << i <<  ", j=" << j << ", num ="<< num << ", r1[i]=" << r1[i] << std::endl;
-                    /*
-                    if (rank == 0)
-                        if (j==2 && i<=10)
-                            std::cout << "i=" << i <<  ", j=" << j << ", num_gammas ="<< num_gammas << ", r1[i]=" << r1[i] << std::endl;
-                    */
+                    double num_gammas = gam1 * r1[i] / ( 1 / vars[j] + gam1 );                    
                     temp.push_back(num);
                     temp_gammas.push_back(num_gammas);
                 }
                 double sum_of_elems = std::accumulate(temp.begin(), temp.end(), decltype(temp)::value_type(0));
-                //if (rank == 0 && i == 0)
-                    //std::cout << "sum_of_elems = " << sum_of_elems << ", it = " << it << std::endl;
                 //for_each(temp.begin(), temp.end(), [sum_of_elems](int &c){ c /= sum_of_elems; });
                 for (int j = 0; j < temp.size(); j++ ){
                     temp[j] /= sum_of_elems;
-                    //if (rank == 0 && i == 0)
-                        //std::cout << "j = " << j << ", temp[j] = " << temp[j] << std::endl;
                 }
                 beta.push_back(temp);
                 gammas.push_back(temp_gammas);
                 pin[i] = 1 / ( 1 + (1-lambda) / sqrt(2 * M_PI * noise_var) * exp( - pow(r1[i], 2) / 2 * max_sigma / noise_var / (noise_var + max_sigma) ) / sum_of_elems );
             } 
-            //if (rank == 0)
-                //std::cout << "pin[0] = " << pin[0] << std::endl;
             for (int j = 1; j < probs.size(); j++){
                 v.push_back( 1 / ( 1 / vars[j] + gam1 ) ); // v is of size (L-1) in the end
             }
@@ -759,8 +743,11 @@ void vamp::updatePrior() {
             distance_vars += ( vars[j] - vars_prev[j] ) * ( vars[j] - vars_prev[j] );
             norm_vars += vars[j] * vars[j];
         }
-        
-        if ( sqrt(distance_probs / norm_probs) < EM_err_thr  && sqrt(distance_vars / norm_vars) < EM_err_thr ){
+        double dist_probs = sqrt(distance_probs / norm_probs);
+        double dist_vars = sqrt(distance_vars / norm_vars);
+        if (rank == 0)
+            std::cout << "it = " << it << ": dist_probs = " << dist_probs << " & dist_vars = " << dist_vars << std::endl;
+        if ( dist_probs < EM_err_thr  && dist_vars < EM_err_thr ){
             if (rank == 0)
                 std::cout << "EM error threshold satisfied." << std::endl;
             break;   
@@ -773,8 +760,6 @@ void vamp::updatePrior() {
         //} 
         if (rank == 0)  
             std::cout << "Final number of prior EM iterations = " << it + 1 << std::endl;
-        //if (rank == 0)
-        //        std::cout << "final number of prior EM iterations = " << EM_max_iter << std::endl;
 }
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset){ // multiplying with (tau*A^TAv + gam2*v)
@@ -794,12 +779,7 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
         //res[i] *= gamw;
         res[i] *= tau;
         res[i] += gam2 * v[i];
-        if (std::isnan(res[i] && i < 5000)){
-        std::cout << "index at position "<< i << " is nan." << std::endl; 
-        }
     }
-    //std::cout << "[lmmse_mult] res[1] = " << res[1] << std::endl;
-
     return res;
 }
 
@@ -811,59 +791,117 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dat
 
 std::vector<double> vamp::CG_solver(std::vector<double> v, std::vector<double> mu_start, std::vector<double> p_start, double tau, data* dataset){
 
-    // we start with approximation x0 = 0
-    //std::vector<double> mu(M, 0.0);
     std::vector<double> mu = mu_start;
-    //std::vector<double> p = v, r = v, d;
     std::vector<double> p = p_start, d;
     std::vector<double> r = lmmse_mult(mu, tau, dataset);
-    //std::cout << "inside CG after lmmmse" << std::endl;
     for (int i0=0; i0<r.size(); i0++)
         r[i0] = v[i0] - r[i0];
-    //std::vector<double> r = v;
-    //std::vector<double> d;
     std::vector<double> p_temp(M, 0.0);
     std::vector<double> palpha(M, 0.0);
     double alpha, beta;
     for (int i = 0; i < CG_max_iter; i++){
-        //std::cout << "[CG_solver] i = " << i << ", rank = " << rank << std::endl;
         double start_lmmse = MPI_Wtime();
-        //std::cout << "before new lmmse" << std::endl;
+        // d = A*p
         d = lmmse_mult(p, tau, dataset);
         double end_lmmse = MPI_Wtime();
-        //if (rank == 0 && (i % 10 == 0) )
-            //std::cout << "[CG_solver] time for lmmse = " << end_lmmse - start_lmmse << std::endl;
-        //std::vector<double> p_temp(M, 0.0);
         alpha = l2_norm2(r, 1) / inner_prod(d, p, 1);
         
-        //std::cout << "[CG_solver] l2_norm2(r, 1) = " << l2_norm2(r, 1) << std::endl;
-        //std::cout << "[CG_solver] alpha = " << alpha << ", rank = " << rank << std::endl;
-        /*std::cout << "[CG_solver] mu[1] = " << mu[1] << std::endl;
-        std::cout << "[CG_solver] mu[2] = " << mu[2] << std::endl;
-        std::cout << "[CG_solver] p[1] = " << p[1] << std::endl;
-        std::cout << "[CG_solver] p[2] = " << p[2] << std::endl;
-        */
         for (int j = 0; j < M; j++)
             palpha[j] = alpha * p[j];
         std::transform (mu.begin(), mu.end(), palpha.begin(), mu.begin(), std::plus<double>());
         for (int j = 0; j < p.size(); j++)
             p_temp[j] = d[j] * alpha;
         beta = pow( l2_norm2(r, 1), -1 );
-        //std::cout << "(r-p_temp)[1] = " << r[1] - p_temp[1] << std::endl;
         std::transform (r.begin(), r.end(), p_temp.begin(), r.begin(), std::minus<double>());
-        //std::cout << "r_new[1] = " << r[1] << std::endl;
-        beta *= l2_norm2(r, 1);
-        //std::cout << "[CG_solver] beta = " << beta << ", rank = " << rank << std::endl;
-        //for (int j = 0; j < p.size(); j++)
-        //    p_temp[j] = p[j] * beta;
+        double l2_norm2_r = l2_norm2(r, 1);
+        beta *= l2_norm2_r;
         for (int j = 0; j < p.size(); j++)
             p[j] = r[j] + beta * p[j];
+
+        // stopping criteria
+        double rel_err = sqrt( l2_norm2_r / l2_norm2(v, 1) );
+        double err_tol = 1e-4;
+        if (rank == 0)
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << std::endl;
+        if (rel_err < err_tol) 
+            break;
     }
 
     mu_CG_last = mu;
     p_CG_last = p;
     return mu;
  }
+
+std::vector<double> vamp::precondCG_solver(std::vector<double> v, double tau, data* dataset){
+    // we start with approximation x0 = 0
+    std::vector<double> mu(M, 0.0);
+    return precondCG_solver(v, mu, tau, dataset);
+}
+
+std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, data* dataset){
+    // tau = gamw
+    // preconditioning part
+    std::vector<double> diag(M, 1.0);
+    double* mave = (*dataset).get_mave();
+    double* msig = (*dataset).get_msig();
+    if (normal != 1)
+        for (int j=0; j<M; j++)
+            diag[j] = tau * ((N-1) / msig[j] / msig[j] + mave[j] * mave[j] * N) + gam2;
+    if (normal == 2){
+        std::vector<double> xR, xL;
+        xL = (*dataset).get_xL();
+        xR = (*dataset).get_xR();
+        for (int j=0; j<M; j++)
+            diag[j] *= xL[j] * xR[j];
+    }
+         
+
+    std::vector<double> mu = mu_start;
+    std::vector<double> d;
+    std::vector<double> r = lmmse_mult(mu, tau, dataset);
+    for (int i0=0; i0<r.size(); i0++)
+        r[i0] = v[i0] - r[i0];
+    std::vector<double> z(M, 0.0);
+    for (int j=0; j<M; j++)
+        z[j] = r[j] / diag[j];
+    std::vector<double> p = z;
+    std::vector<double> p_temp(M, 0.0);
+    std::vector<double> palpha(M, 0.0);
+    double alpha, beta;
+    for (int i = 0; i < CG_max_iter; i++){
+        double start_lmmse = MPI_Wtime();
+        // d = A*p
+        d = lmmse_mult(p, tau, dataset);
+        double end_lmmse = MPI_Wtime();
+        alpha = inner_prod(r, z, 1) / inner_prod(d, p, 1);
+        
+        for (int j = 0; j < M; j++)
+            palpha[j] = alpha * p[j];
+        std::transform (mu.begin(), mu.end(), palpha.begin(), mu.begin(), std::plus<double>());
+        for (int j = 0; j < p.size(); j++)
+            p_temp[j] = d[j] * alpha;
+        beta = pow( inner_prod(r, z, 1), -1 );
+        std::transform (r.begin(), r.end(), p_temp.begin(), r.begin(), std::minus<double>());
+        for (int j=0; j<M; j++)
+            z[j] = r[j] / diag[j];
+        beta *= inner_prod(r, z, 1);
+        for (int j = 0; j < p.size(); j++)
+            p[j] = z[j] + beta * p[j];
+
+        // stopping criteria
+        double rel_err = sqrt( l2_norm2(r, 1) / l2_norm2(v, 1) );
+        double err_tol = 1e-4;
+        if (rank == 0)
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << std::endl;
+        if (rel_err < err_tol) 
+            break;
+    }
+
+    mu_CG_last = mu;
+    p_CG_last = p;
+    return mu;
+ }
+
 
 void vamp::err_measures(data *dataset, int ind){
 
@@ -909,17 +947,6 @@ void vamp::err_measures(data *dataset, int ind){
         l2_norm2_xhat = l2_norm2(x2_hat, 1) * scale;
     }
 
-    /*
-    int nan_found = 0;
-    for (int i=0;i<M;i++)
-        if (std::isnan(temp[i]))
-            nan_found=1;
-    if (nan_found==1)
-        std::cout << "nan_found in temp position in rank " << rank << std::endl; 
-    */
-
-    //if (rank == 0)
-    //    std::cout << "[err_measures] l2_norm2_xhat = " << l2_norm2_xhat << std::endl; 
     //double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2_xhat );
     //double l2_true_signal2 = l2_norm2(true_signal, 1);
     double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
@@ -942,16 +969,6 @@ void vamp::err_measures(data *dataset, int ind){
             if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
                 y[4*j + k] = 0;
 
-    /*
-    if (rank == 0){
-        //std::cout << "N = " << N << std::endl;
-        //std::cout << "y.size() = " << y.size()<< std::endl;
-        for (int j=1;j<N; j++)
-            if(y[j] == std::numeric_limits<double>::max() && j <=20){
-                std::cout << j << " position is std::numeric_limits<double>::max(), j =" << j / 4 << ", k = " << j%4 << ", luk = " << na_lut[mask4[j/4] * 4 + (j%4)] << std::endl; 
-            }
-    }
-    */
     std::vector<double> Axest;
     if (ind == 1)
         //Axest = (*dataset).Ax( x1_hat.data() );
@@ -964,20 +981,6 @@ void vamp::err_measures(data *dataset, int ind){
         tempNest[i] = -Axest[i] + y[i];
     }
 
-    /*
-    for (int i=0;i<phen_size;i++)
-        if (std::isnan(tempNest[i]))
-            nan_found=1;
-    if (nan_found==1)
-        std::cout << "nan_found in tempNest in rank " << rank << std::endl; 
-    if (rank == 0){
-        std::cout << "Axest[0] = " << Axest[0] << std::endl;
-        std::cout << "Axest[phen_size-1] = " << Axest[phen_size-1] << std::endl;
-        std::cout << "tempNest[0] = " << tempNest[0] << std::endl;
-        std::cout << "tempNest[phen_size-1] = " << tempNest[phen_size-1] << std::endl;
-        std::cout << "l2_norm2(y, 0) = " << l2_norm2(y, 0) << std::endl;
-        std::cout << "l2_norm2(tempNest, 0) = " << l2_norm2(tempNest, 0) << std::endl;
-    }*/
     double l2_pred_err = sqrt(l2_norm2(tempNest, 0) / l2_norm2(y, 0));
     if (rank == 0)
         std::cout << "l2 prediction error = " << l2_pred_err << std::endl;

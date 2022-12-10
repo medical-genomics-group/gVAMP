@@ -34,7 +34,8 @@ int main()
     //size_t N = 458747;
 
     // size_t Mt = 2174071;
-    size_t Mt = 1410403;
+    // size_t Mt = 1410403;
+    size_t Mt = 521208;
     size_t N = 419155;
     
     std::vector<double> MS = divide_work(Mt);
@@ -57,7 +58,8 @@ int main()
     // !!!!! const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/chr/ukb22828_UKB_EST_v3_all.bed";
     // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp005.bed";
     // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp08_fd.bed";
-    const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp08_fd_maf.bed";
+    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp08_fd_maf.bed";
+    const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_ldp08_fd_maf_thr050_2.bed";
     // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/exploring_corr_effects_on_spectrum_12102021/ukb_imp_v3_UKB_EST_uncorrpeople_N45000_pruned_00000001.bed";
     const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/N_419155_M_115233_y.txt";
     // const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/exploring_corr_effects_on_spectrum_12102021/ukb_imp_v3_UKB_EST_uncorrpeople_N45000_pruned_00001_y.txt";
@@ -69,14 +71,17 @@ int main()
     // std::vector<double> vars{0, 3.0246351e-07, 1.2863391e-03};
     // std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
     // std::vector<double> vars{0, 1.2863391e-04};
-    std::vector<double> vars{0, 1.2863391e-02};
-    std::vector<double> vars_init{0, N*3.0246351e-05};
-    // vars_init = vars; vars_init[1] *= N;
+    // std::vector<double> vars{0, 1.2863391e-02};
+    // std::vector<double> vars_init{0, 2e-02};
+    std::vector<double> vars{0, 1e-3, 1.2863391e-02};
+    std::vector<double> vars_init{0, 1e-3, 2e-02};
+    // std::vector<double> vars_init{0, N*3.0246351e-05};
+    // vars_init = vars; // vars_init[1] *= N;
 
-    // std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
-    // std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
-    std::vector<double> probs{7e-1, 3e-1};
-    std::vector<double> probs_init{5e-1, 5e-1};
+    std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
+    std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
+    //std::vector<double> probs{7e-1, 3e-1};
+    //std::vector<double> probs_init{5e-1, 5e-1};
     // probs_init = probs;
 
 
@@ -189,12 +194,13 @@ int main()
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     double gam1 = 1e-6;
+    gam1 = 1;
     int max_iter = 25;
     double rho = 0.80;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
-    std::string out_name = "x1_hat_height_main_corr_06_12_2022_rho080"; 
+    std::string out_name = "x1_hat_height_main_corr_10_12_2022_rho080"; 
     std::string model = "linear";
-    double gamw_init = 1;
+    double gamw_init = 0.01;
     
     vamp emvamp(N, M, Mt, gam1, gamw_init, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
     std::vector<double> x_est = emvamp.infere(&dataset);

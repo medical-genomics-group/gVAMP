@@ -50,14 +50,15 @@ int main()
     //std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
     //std::vector<double> vars{0, 1.2863391e-04};
     std::vector<double> vars{0, 1.2863391e-02};
-    std::vector<double> vars_init{0, N*3.0246351e-05};
-    //vars_init = vars; vars_init[1] *= N;
+    //std::vector<double> vars_init{0, N*3.0246351e-05};
+    std::vector<double> vars_init{0, 2e-02};
+    // vars_init = vars; // vars_init[1] *= N;
 
     //std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
     //std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
     std::vector<double> probs{7e-1, 3e-1};
     std::vector<double> probs_init{5e-1, 5e-1};
-    //probs_init = probs;
+    // probs_init = probs;
 
     std::vector<double> beta_true(M, 0.0); 
     
@@ -166,11 +167,11 @@ int main()
     
     double gam1 = 1e-6;
     int max_iter = 36;
-    double rho = 0.98;
+    double rho = 0.90;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
-    std::string out_name = "x1_hat_height_main_05_12_2022"; 
+    std::string out_name = "x1_hat_height_main_07_12_2022"; 
     std::string model = "linear";
-    double gamw_init = 1;
+    double gamw_init = gamw;
     // gamw_init = 1.7;
     // gam1 = pow(calc_stdev(beta_true), 2);
     
