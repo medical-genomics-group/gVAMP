@@ -7,7 +7,7 @@
 #SBATCH --mem 7gb
 # SBATCH --mem 0
 #SBATCH --time 1-20:15:00
-#SBATCH --output=main_gam11_normal2_3_length_CG60_precondCG_1112022_SK_gamma_corr_fd_maf_500k_400k.log
+#SBATCH --output=main_warm_gam11em6_normal1_3_length_CG60_precondCGsave_1112022_SK_corr_fd_maf_500k_400k.log
 #SBATCH --exclude=bjoern55,bjoern52,delta206
 # SBATCH --constraint=gamma|delta
 

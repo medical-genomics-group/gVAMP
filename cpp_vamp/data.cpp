@@ -18,7 +18,7 @@
 
 
 
-//constructors for class data
+// constructors for class data
 data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
     phenfp(fp),
     bedfp(bedfp),
@@ -53,7 +53,7 @@ data::data(std::string fp, std::string bedfp, const int N, const int M, const in
     // p_dotp_luts = perm_dotp_luts();
 }
 
-//constructors for class data
+// constructors for class data
 data::data(std::vector<double> y, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
     bedfp(bedfp),
     N(N),
@@ -88,6 +88,44 @@ data::data(std::vector<double> y, std::string bedfp, const int N, const int M, c
     // perm_idxs = std::vector<int>(M, 1);
     // p_luts = perm_luts();
     // p_dotp_luts = perm_dotp_luts();
+}
+
+// constructors for class data
+data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, std::string type_data, const int rank) :
+    N(N),
+    M(M),
+    phenfp(fp),
+    Mtotal(Mt),
+    S(S),
+    rank(rank),
+    mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
+    normal_data(normal),
+    im4(N%4 == 0 ? N/4 : N/4+1) {
+    mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(mave, __LINE__, __FILE__);
+    msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
+    check_malloc(msig, __LINE__, __FILE__);
+
+    // we read genotype data and compute marker statistics
+    if (type_data == "bed"){
+        bedfp = genofp;
+        read_phen();
+        read_genotype_data();
+        compute_markers_statistics();
+
+        if (normal == 2){
+            double SK_err_thr = 1e-4;
+            int SK_max_iter = 20;
+            xR = std::vector<double> (M, 1.0);
+            xL = std::vector<double> (4*mbytes, 1.0);
+            //std::cout << "before SK!" << std::endl;
+            SinkhornKnopp(xL, xR, SK_err_thr, SK_max_iter);
+        }
+    }
+    else if (type_data == "meth"){
+        methfp = genofp;
+        read_methylation_data();
+    }
 }
 
 /*
@@ -635,6 +673,42 @@ void data::read_genotype_data(){
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0)
         std::cout <<"reading genotype data took " << te - ts << " seconds."<< std::endl;
+}
+
+void data::read_methylation_data(){
+
+    double ts = MPI_Wtime();
+    MPI_File methfh;
+    if (rank == 0)
+        std::cout << "meth file name = " << methfp.c_str() << std::endl;
+    check_mpi(MPI_File_open(MPI_COMM_WORLD, methfp.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &methfh),  __LINE__, __FILE__);
+
+    const size_t size_bytes = size_t(M) * size_t(N) * sizeof(double);
+
+    meth_data = (double*)_mm_malloc(size_bytes, 64);
+    printf("INFO   : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
+
+    // Offset to section of bed file to be processed by task
+    MPI_Offset offset = size_t(0) + size_t(S) * size_t(N) * sizeof(unsigned char);
+
+    // Gather the sizes to determine common number of reads
+    size_t max_size_bytes = 0;
+    check_mpi(MPI_Allreduce(&size_bytes, &max_size_bytes, 1, MPI_UNSIGNED_LONG_LONG, MPI_MAX, MPI_COMM_WORLD), __LINE__, __FILE__);
+
+    const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
+    size_t bytes = 0;
+    std::cout << "before reading" << std::endl;
+    mpi_file_read_at_all <double*> (size_bytes, offset, methfh, MPI_DOUBLE, NREADS, meth_data, bytes);
+    std::cout << "after reading" << std::endl;
+    MPI_File_close(&methfh);
+    std::cout << "after closing" << std::endl;
+
+    double te = MPI_Wtime();
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (rank == 0)
+        std::cout <<"reading methylation data took " << te - ts << " seconds."<< std::endl;
+    std::cout << "meth_data[0] = " << meth_data[0] << std::endl;
+    std::cout << "meth_data[1] = " << meth_data[1] << std::endl;
 }
 
 /*

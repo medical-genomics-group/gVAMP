@@ -278,7 +278,7 @@ void Options::fail_if_last(char** argv, const int i) {
 
 // Check for minimal setup: a bed file + a dim file + phen file(s)
 void Options::check_options() {
-    if (get_bed_file() == "") {
+    if (get_bed_file() == "" && get_bed_file_test() == "") {
         std::cout << "FATAL  : no bed file provided! Please use the --bed-file option." << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -292,7 +292,7 @@ void Options::check_options() {
     */
     //std::cout << "  dim file: OK - " << get_dim_file() << "\n";
 
-    if (count_phen_files() == 0) {
+    if (count_phen_files() == 0 && count_phen_files_test() == 0) {
         std::cout << "FATAL  : no phen file(s) provided! Please use the --phen-files option." << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -322,8 +322,8 @@ void Options::check_options() {
     }
     */
 
-     assert(vars.size() == num_mix_comp);
-     assert(probs.size() == num_mix_comp);
+     assert(vars.size() == num_mix_comp || run_mode == "test");
+     assert(probs.size() == num_mix_comp || run_mode == "test");
 }
 
 /*

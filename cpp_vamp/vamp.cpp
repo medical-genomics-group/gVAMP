@@ -75,8 +75,6 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     stop_criteria_thr = opt.get_stop_criteria_thr();
     vars = opt.get_vars();
     // we scale the signal prior with N since X -> X / sqrt(N)
-    for (int i=0; i<vars.size(); i++)
-        vars[i] *= N;
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 }
 
@@ -87,6 +85,9 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
 std::vector<double> vamp::infere( data* dataset ){
 
     normal = (*dataset).get_normal_data();
+    if (normal == 1)
+        for (int i=0; i<vars.size(); i++)
+            vars[i] *= N;
     if (!strcmp(model.c_str(), "linear"))
         return infere_linear(dataset);
     else if (!strcmp(model.c_str(), "bin_class"))
@@ -209,7 +210,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
-        x2_hat = precondCG_solver(v, tau2, dataset); // precond_change!
+        x2_hat = precondCG_solver(v, tau2, 1, dataset); // precond_change!
         double end_CG = MPI_Wtime();
         
         if (rank == 0)
@@ -372,7 +373,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "alpha1 = " << alpha1 << std::endl;
         eta1 = gam1 / alpha1;
         gam_before = gam2;
-        gam2 = std::min( std::max( eta1 - gam1, gamma_min ), gamma_max );
+        gam2 = std::min(std::max(eta1 - gam1, gamma_min), gamma_max);
         if (rank == 0){
             std::cout << "eta1 = " << eta1 << std::endl;
             std::cout << "gam2 = " << gam2 << std::endl;
@@ -435,13 +436,13 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
-        if (it >= 1){
+        if (it == 1){
             // x2_hat = CG_solver(v, std::vector<double>(M, 0.0), v, gamw, dataset); // precond_change!
-            x2_hat = precondCG_solver(v, std::vector<double>(M, 0.0), gamw, dataset); // precond_change!
+            x2_hat = precondCG_solver(v, std::vector<double>(M, 0.0), gamw, 1, dataset); // precond_change!
         }
         else{
             // x2_hat = CG_solver(v, mu_CG_last, p_CG_last, gamw, dataset); // precond_change!
-            x2_hat = precondCG_solver(v, mu_CG_last, gamw, dataset); // precond_change!
+            x2_hat = precondCG_solver(v, mu_CG_last, gamw, 1, dataset); // precond_change!
         }
         double end_CG = MPI_Wtime();
 
@@ -495,17 +496,16 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "lmmse step took "  << end_lmmse_step - start_lmmse_step << " seconds." << std::endl;
         
         // stopping criteria
-        std::vector<double> x1_hat_diff(M, 0.0);
+        std::vector<double> x1_hat_diff = x1_hat;
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
 
-        /*
         if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
             if (rank == 0)
-                std::cout << "stopping criteria fulfilled" << std::endl;
+                std::cout << "VAMP stopping criteria fulfilled with threshold = " << stop_criteria_thr << "." << std::endl;
             break;
         }
-        */
+        
         if (rank == 0)
             std::cout << std::endl << std::endl;
     }
@@ -588,7 +588,7 @@ double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared bet
     bern_vec = std::vector<double> (M, 0.0);
     for (int i = 0; i < M; i++)
         bern_vec[i] = (2*bern(rd) - 1) / sqrt(Mt); // Bernoulli variables are sampled independently
-    std::vector<double> invQ_bern_vec = precondCG_solver(bern_vec, tau, dataset); // precond_change
+    invQ_bern_vec = precondCG_solver(bern_vec, tau, 0, dataset); // precond_change
     double onsager = gam2 * inner_prod(bern_vec, invQ_bern_vec, 1); 
     return onsager;    
 }
@@ -612,7 +612,7 @@ void vamp::updateNoisePrec(data* dataset){
 
     std::vector<double> v = (*dataset).ATx(u.data(), normal);
     */
-   
+
     std::vector<double> temp = (*dataset).Ax(x2_hat.data(), normal);
     std::vector<double> y = (*dataset).get_phen();
 
@@ -627,7 +627,7 @@ void vamp::updateNoisePrec(data* dataset){
         temp[i] -= y[i];
     
     double temp_norm2 = l2_norm2(temp, 0); 
-    //double trace_corr = inner_prod(precondCG_solver(v, gamw, dataset), v, 1); // check this! ad // precond_change
+    //double trace_corr = inner_prod(precondCG_solver(v, gamw, 0, dataset), v, 1); // check this! ad // precond_change
     std::vector<double> trace_corr_vec_N = (*dataset).Ax(invQ_bern_vec.data(), normal);
     std::vector<double> trace_corr_vec_M = (*dataset).ATx(trace_corr_vec_N.data(), normal);
     double trace_corr = inner_prod(bern_vec, trace_corr_vec_M, 1) * Mt;
@@ -726,7 +726,7 @@ void vamp::updatePrior() {
 
                 //if (rank==0 && it%10 == 0)
                 //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << ", sum_of_pin =" << sum_of_pin << std::endl;
-                vars[j+1] = res_gammas_total / res_total;
+                // vars[j+1] = res_gammas_total / res_total;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
 
@@ -832,13 +832,13 @@ std::vector<double> vamp::CG_solver(std::vector<double> v, std::vector<double> m
     return mu;
  }
 
-std::vector<double> vamp::precondCG_solver(std::vector<double> v, double tau, data* dataset){
+std::vector<double> vamp::precondCG_solver(std::vector<double> v, double tau, int save, data* dataset){
     // we start with approximation x0 = 0
     std::vector<double> mu(M, 0.0);
-    return precondCG_solver(v, mu, tau, dataset);
+    return precondCG_solver(v, mu, tau, save, dataset);
 }
 
-std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, data* dataset){
+std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset){
     // tau = gamw
     // preconditioning part
     std::vector<double> diag(M, 1.0);
@@ -890,15 +890,17 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
 
         // stopping criteria
         double rel_err = sqrt( l2_norm2(r, 1) / l2_norm2(v, 1) );
+        double norm_mu = sqrt( l2_norm2(mu, 1) );
         double err_tol = 1e-4;
         if (rank == 0)
-            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << std::endl;
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << std::endl;
         if (rel_err < err_tol) 
             break;
     }
-
-    mu_CG_last = mu;
-    p_CG_last = p;
+    if (save == 1){
+        mu_CG_last = mu;
+        p_CG_last = p;
+    }
     return mu;
  }
 

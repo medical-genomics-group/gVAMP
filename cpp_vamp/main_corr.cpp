@@ -77,6 +77,11 @@ int main()
     std::vector<double> vars_init{0, 1e-3, 2e-02};
     // std::vector<double> vars_init{0, N*3.0246351e-05};
     // vars_init = vars; // vars_init[1] *= N;
+    const int normal = 1;
+    if (normal == 1){
+        for (int i=0; i<vars_init.size(); i++)
+            vars_init[i] *= N;
+    }
 
     std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
     std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
@@ -106,8 +111,6 @@ int main()
     MPI_Barrier(MPI_COMM_WORLD);
     //beta_true = read_vec_from_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_12000_N_15000_beta_true.txt", M, S);
     
-    //printing out true variances
-    const int normal = 2;
     //printing out true variances
     if (rank == 0)
         std::cout << "true scaled variances = ";
@@ -194,7 +197,6 @@ int main()
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     double gam1 = 1e-6;
-    gam1 = 1;
     int max_iter = 25;
     double rho = 0.80;
     std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";

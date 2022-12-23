@@ -21,6 +21,7 @@ private:
 
     std::string phenfp;       // filepath to phenotypes
     std::string bedfp;          // filepath to .bed file
+    std::string methfp;          // filepath to methylation data
     std::vector<double> phen_data;   // vector of phenotype data
 
     int nonas;
@@ -35,6 +36,7 @@ private:
     double* mave     = nullptr;
     double* msig     = nullptr;
     unsigned char* bed_data = nullptr;
+    double* meth_data = nullptr;
     size_t mbytes;
     double sigma_max = 1e8;
     double intercept = 0;
@@ -50,8 +52,9 @@ public:
     double get_scale() { return scale; };
     double get_sigma_max() { return sigma_max; };
     size_t get_mbytes(){ return mbytes; };
-    unsigned char * get_bed_data() {return bed_data; }
-    void set_phen( std::vector<double> new_data ) { phen_data = new_data; };
+    unsigned char * get_bed_data() { return bed_data; }
+    double * get_meth_data() { return meth_data; }
+    void set_phen(std::vector<double> new_data) { phen_data = new_data; };
     std::vector<unsigned char>& get_mask4() { return mask4; }
     double* get_mave()        { return mave; }
     double* get_msig()        { return msig; }
@@ -64,6 +67,7 @@ public:
 
     // constructor and destructor for class data
     data(std::vector<double> y, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
+    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, std::string type_data, const int rank);
     data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
     // data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm);
     ~data() {
@@ -78,6 +82,8 @@ public:
     double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal);
 
     void read_genotype_data();
+
+    void read_methylation_data();
 
     std::vector<double> Ax(double* __restrict__ phen, int normal);
     

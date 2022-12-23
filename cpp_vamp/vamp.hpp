@@ -61,6 +61,6 @@ public:
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);
     double probit_var_EM_deriv(double v, std::vector<double> y);
     double update_probit_var(double v, std::vector<double> y);
-    std::vector<double> precondCG_solver(std::vector<double> v, double tau, data* dataset);
-    std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, data* dataset);    
+    std::vector<double> precondCG_solver(std::vector<double> v, double tau, int save, data* dataset);
+    std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);    
 };
