@@ -22,6 +22,7 @@
 data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
     phenfp(fp),
     bedfp(bedfp),
+    type_data("bed"),
     N(N),
     M(M),
     Mtotal(Mt),
@@ -56,6 +57,7 @@ data::data(std::string fp, std::string bedfp, const int N, const int M, const in
 // constructors for class data
 data::data(std::vector<double> y, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
     bedfp(bedfp),
+    type_data("bed"),
     N(N),
     M(M),
     Mtotal(Mt),
@@ -94,6 +96,7 @@ data::data(std::vector<double> y, std::string bedfp, const int N, const int M, c
 data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, std::string type_data, const int rank) :
     N(N),
     M(M),
+    type_data(type_data),
     phenfp(fp),
     Mtotal(Mt),
     S(S),
@@ -317,6 +320,8 @@ void data::compute_markers_statistics() {
 double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal) {
 // __restrict__ means that phen is the only pointer pointing to that data
 
+if (type_data == "bed"){
+
     unsigned char* bed = &bed_data[mloc * mbytes];
 
     #ifdef MANVECT
@@ -432,6 +437,30 @@ double data::dot_product(const int mloc, double* __restrict__ phen, const double
         return std::numeric_limits<double>::max();
     #endif
 }
+else if (type_data == "meth"){
+
+    double* meth = &meth_data[mloc * mbytes];
+
+    if (normal == 1){
+        double dpa = 0.0;
+
+        #ifdef _OPENMP
+        #pragma omp parallel for schedule(static) reduction(+:dpa)
+        #endif
+        for (int i=0; i<mbytes; i++) {
+        //#ifdef _OPENMP
+        //#pragma omp simd
+        //#endif
+            for (int j=0; j<4; j++) {
+                if (!std::isnan(meth[i * 4 + j]))
+                dpa += (meth[i * 4 + j] - mu) * phen[i * 4 + j];
+            }
+        }
+        return sigma_inv * dpa;
+    }
+}
+return std::numeric_limits<double>::max();
+}
 
 
 std::vector<double> data::ATx(double* __restrict__ phen, int normal) {
@@ -450,6 +479,7 @@ std::vector<double> data::ATx(double* __restrict__ phen, int normal) {
 
 std::vector<double> data::Ax(double* __restrict__ phen, int normal) {
 
+if (type_data == "bed"){
  #ifdef MANVECT
 
     //if (rank == 0)
@@ -645,6 +675,41 @@ std::vector<double> data::Ax(double* __restrict__ phen, int normal) {
     return Ax_total;
 #endif
 }
+else if (type_data == "meth"){
+
+    double* mave = get_mave();
+    double* msig = get_msig();
+    double* meth;
+    std::vector<double> Ax_temp(4 * mbytes, 0.0);    
+
+    if (normal == 1){
+        for (int i=0; i<M; i++){
+            meth = &meth_data[i * mbytes];
+            double ave = mave[i];
+            double sig_phen_i = msig[i] * phen[i];
+            
+            #ifdef _OPENMP
+                #pragma omp parallel for shared(Ax_temp)
+            #endif
+            for (int j=0; j<mbytes; j++) {
+                for (int k=0; k<4; k++) {
+                    if (!std::isnan(meth[j * 4 + k]))
+                        Ax_temp[j * 4 + k] += (meth[j * 4 + k] - ave) * sig_phen_i;
+                }
+            } 
+        }
+    }
+
+    // collecting results from different nodes
+    std::vector<double> Ax_total(4 * mbytes, 0.0);
+    MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if (normal == 1)
+        for(int i = 0; i < 4 * mbytes; i++)
+            Ax_total[i] /= sqrt(N);
+    return Ax_total;
+}
+return std::vector<double>(4 * mbytes, 0.0);
+}
 
 void data::read_genotype_data(){
 
@@ -686,10 +751,10 @@ void data::read_methylation_data(){
     const size_t size_bytes = size_t(M) * size_t(N) * sizeof(double);
 
     meth_data = (double*)_mm_malloc(size_bytes, 64);
-    printf("INFO   : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
+    printf("INFO  : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
 
     // Offset to section of bed file to be processed by task
-    MPI_Offset offset = size_t(0) + size_t(S) * size_t(N) * sizeof(unsigned char);
+    MPI_Offset offset = size_t(0) + size_t(S) * size_t(N) * sizeof(double);
 
     // Gather the sizes to determine common number of reads
     size_t max_size_bytes = 0;
@@ -697,18 +762,13 @@ void data::read_methylation_data(){
 
     const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
     size_t bytes = 0;
-    std::cout << "before reading" << std::endl;
     mpi_file_read_at_all <double*> (size_bytes, offset, methfh, MPI_DOUBLE, NREADS, meth_data, bytes);
-    std::cout << "after reading" << std::endl;
     MPI_File_close(&methfh);
-    std::cout << "after closing" << std::endl;
-
+    
     double te = MPI_Wtime();
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0)
         std::cout <<"reading methylation data took " << te - ts << " seconds."<< std::endl;
-    std::cout << "meth_data[0] = " << meth_data[0] << std::endl;
-    std::cout << "meth_data[1] = " << meth_data[1] << std::endl;
 }
 
 /*

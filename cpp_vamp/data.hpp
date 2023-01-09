@@ -23,6 +23,7 @@ private:
     std::string bedfp;          // filepath to .bed file
     std::string methfp;          // filepath to methylation data
     std::vector<double> phen_data;   // vector of phenotype data
+    std::string type_data;           // type of data used in inference("bed" or "meth")
 
     int nonas;
     int nas;
