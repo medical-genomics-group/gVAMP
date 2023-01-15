@@ -161,6 +161,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             use_adap_damp = (unsigned int) atoi(argv[++i]);
             ss << "--use-adap-damp " << use_adap_damp << "\n";
         }
+        /*else if (!strcmp(argv[i], "--meth-imp")){
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --meth-imp has to be an integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            meth_imp = (unsigned int) atoi(argv[++i]);
+            ss << "--meth-imp " << meth_imp << "\n";
+        }*/
         else if (!strcmp(argv[i], "--out-dir")) {
             if (i == argc - 1) fail_if_last(argv, i);
             out_dir = argv[++i];

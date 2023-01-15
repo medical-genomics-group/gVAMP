@@ -241,77 +241,106 @@ void data::compute_markers_statistics() {
     double* msig = get_msig();
 
     double start = MPI_Wtime();
-    #ifdef MANVECT
-    #ifdef _OPENMP
-    #pragma omp parallel for
-    #endif
-            for (int i=0; i<M; i++) {
-                __m256d suma = _mm256_set1_pd(0.0);
-                __m256d sumb = _mm256_set1_pd(0.0);
-                __m256d luta, lutb, lutna;
-                size_t bedix = size_t(i) * size_t(mbytes);
-                const unsigned char* bedm = &bed_data[bedix];
-                for (int j=0; j<mbytes; j++) {
-                    luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]); // bedm[j] contains 1 byte, an information about 4 people, hence 2^8 = 256 possibilities
-                    //luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
-                    lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
-                    lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
-                    luta  = _mm256_mul_pd(luta, lutna);
-                    lutb  = _mm256_mul_pd(lutb, lutna);
-                    suma  = _mm256_add_pd(suma, luta);
-                    sumb  = _mm256_add_pd(sumb, lutb);
-                }
-                double asum = suma[0] + suma[1] + suma[2] + suma[3];
-                double bsum = sumb[0] + sumb[1] + sumb[2] + sumb[3];
-                double avg  = asum / bsum; // calculation of average value of one marker column
 
-                __m256d vave = _mm256_set1_pd(-avg);
-                __m256d sums = _mm256_set1_pd(0.0);
-                for (int j=0; j<mbytes; j++) {
-                    luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
-                    //luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
-                    lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
-                    lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
-                    luta  = _mm256_add_pd(luta, vave);    // - mu
-                    luta  = _mm256_mul_pd(luta, lutb);    // M -> 0.0
-                    luta  = _mm256_mul_pd(luta, lutna);   // NAs
-                    luta  = _mm256_mul_pd(luta, luta);    // ^2
-                    sums  = _mm256_add_pd(sums, luta);    // sum
-                }
-                double sig = 1.0 / sqrt((sums[0] + sums[1] + sums[2] + sums[3]) / (double(get_nonas()) - 1.0)); // calculation of inverse standard deviation of one marker column
-                mave[i] = avg;
-                msig[i] = sig;
-           }
-    #else
-    #ifdef _OPENMP
-    #pragma omp parallel for
-    #endif
-            for (int i=0; i<M; i++) {
-                size_t bedix = size_t(i) * size_t(mbytes);
-                const unsigned char* bedm = &bed_data[bedix];
-                double suma = 0.0;
-                double sumb = 0.0;
-                for (int j=0; j<im4; j++) {
+    if (type_data == "bed"){
 
-                    for (int k=0; k<4; k++) {
-                        //suma += p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                        suma += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
-                        sumb += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                    }
-                }
-                mave[i] = suma / sumb;
-                double sumsqr = 0.0;
-                for (int j=0; j<im4; j++) {
-                    for (int k=0; k<4; k++) {
-                        double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                        //double val = (p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                        // calculate the value and filter for nans in genotype and phenotype
-                        sumsqr += val * val;
-                    }
-                }
-                msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
-            }
+        #ifdef MANVECT
+        #ifdef _OPENMP
+        #pragma omp parallel for
         #endif
+                for (int i=0; i<M; i++) {
+                    __m256d suma = _mm256_set1_pd(0.0);
+                    __m256d sumb = _mm256_set1_pd(0.0);
+                    __m256d luta, lutb, lutna;
+                    size_t bedix = size_t(i) * size_t(mbytes);
+                    const unsigned char* bedm = &bed_data[bedix];
+                    for (int j=0; j<mbytes; j++) {
+                        luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]); // bedm[j] contains 1 byte, an information about 4 people, hence 2^8 = 256 possibilities
+                        //luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
+                        lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
+                        lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
+                        luta  = _mm256_mul_pd(luta, lutna);
+                        lutb  = _mm256_mul_pd(lutb, lutna);
+                        suma  = _mm256_add_pd(suma, luta);
+                        sumb  = _mm256_add_pd(sumb, lutb);
+                    }
+                    double asum = suma[0] + suma[1] + suma[2] + suma[3];
+                    double bsum = sumb[0] + sumb[1] + sumb[2] + sumb[3];
+                    double avg  = asum / bsum; // calculation of average value of one marker column
+
+                    __m256d vave = _mm256_set1_pd(-avg);
+                    __m256d sums = _mm256_set1_pd(0.0);
+                    for (int j=0; j<mbytes; j++) {
+                        luta  = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
+                        //luta  = _mm256_load_pd(&(p_luts[perm_idxs[i]-1][bedm[j] * 4]));
+                        lutb  = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
+                        lutna = _mm256_load_pd(&na_lut[mask4[j] * 4]);
+                        luta  = _mm256_add_pd(luta, vave);    // - mu
+                        luta  = _mm256_mul_pd(luta, lutb);    // M -> 0.0
+                        luta  = _mm256_mul_pd(luta, lutna);   // NAs
+                        luta  = _mm256_mul_pd(luta, luta);    // ^2
+                        sums  = _mm256_add_pd(sums, luta);    // sum
+                    }
+                    double sig = 1.0 / sqrt((sums[0] + sums[1] + sums[2] + sums[3]) / (double(get_nonas()) - 1.0)); // calculation of inverse standard deviation of one marker column
+                    mave[i] = avg;
+                    msig[i] = sig;
+            }
+        #else
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+                for (int i=0; i<M; i++) {
+                    size_t bedix = size_t(i) * size_t(mbytes);
+                    const unsigned char* bedm = &bed_data[bedix];
+                    double suma = 0.0;
+                    double sumb = 0.0;
+                    for (int j=0; j<im4; j++) {
+
+                        for (int k=0; k<4; k++) {
+                            //suma += p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                            suma += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
+                            sumb += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                        }
+                    }
+                    mave[i] = suma / sumb;
+                    double sumsqr = 0.0;
+                    for (int j=0; j<im4; j++) {
+                        for (int k=0; k<4; k++) {
+                            double val = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                            //double val = (p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] - mave[i]) * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                            // calculate the value and filter for nans in genotype and phenotype
+                            sumsqr += val * val;
+                        }
+                    }
+                    msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                }
+            #endif
+    }
+    else if (type_data == "meth"){
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+                for (int i=0; i<M; i++) {
+                    size_t methix = size_t(i) * size_t(4*mbytes);
+                    const double* methm = &meth_data[methix];
+                    double suma = 0.0;
+
+                    for (int j=0; j<im4; j++) {
+                        for (int k=0; k<4; k++) {
+                            suma += methm[4*j + k]; // currently only non-missing methylation data is allowed
+                        }
+                    }
+                    mave[i] = suma / N;
+                    double sumsqr = 0.0;
+                    for (int j=0; j<im4; j++) {
+                        for (int k=0; k<4; k++) {
+                            double val = (methm[4*j + k] - mave[i]) * na_lut[mask4[j] * 4 + k];
+                            sumsqr += val * val;
+                        }
+                    }
+                    msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                }
+    }
         double end = MPI_Wtime();
         if (rank == 0)
             std::cout << "rank = " << rank << ": statistics took " << end - start << " seconds to run." << std::endl;
@@ -452,7 +481,7 @@ else if (type_data == "meth"){
         //#pragma omp simd
         //#endif
             for (int j=0; j<4; j++) {
-                if (!std::isnan(meth[i * 4 + j]))
+                // if (!std::isnan(meth[i * 4 + j]))
                 dpa += (meth[i * 4 + j] - mu) * phen[i * 4 + j];
             }
         }
@@ -693,7 +722,7 @@ else if (type_data == "meth"){
             #endif
             for (int j=0; j<mbytes; j++) {
                 for (int k=0; k<4; k++) {
-                    if (!std::isnan(meth[j * 4 + k]))
+                    // if (!std::isnan(meth[j * 4 + k])) // currently only non-missing methylation data is allowed
                         Ax_temp[j * 4 + k] += (meth[j * 4 + k] - ave) * sig_phen_i;
                 }
             } 
@@ -993,6 +1022,7 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
     double end_power_meth = MPI_Wtime();
     if (rank == 0)
         std::cout << "Power method did " << it << " / " << power_meth_maxiter << " iterations which took " << end_power_meth - start_power_meth << " seconds." << std::endl;
+        std::cout << "Largest singular value of the data matrix is " << lambda << std::endl;
 
     return lambda;
  }

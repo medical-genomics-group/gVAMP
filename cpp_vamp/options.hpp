@@ -77,6 +77,7 @@ private:
     unsigned int use_adap_damp = 0;
     unsigned int num_mix_comp;
     unsigned int perm = 0;
+    // unsigned int meth_imp = 0;
     std::vector<double> vars;
     std::vector<double> probs;
     double rho = 0.98;

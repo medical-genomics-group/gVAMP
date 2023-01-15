@@ -53,6 +53,5 @@ Currently supported input options to C++ version of the code:
 | `EM-max-iter` | maximal number of iterations of expectation maximization procedure |
 | `stop-criteria-thr` | relative error threshold within expectation maximization |
 | `model` | regression model that describes a relationship between effect sizes and phenotypes ('linear' or 'bin_class') |
+| `use-adap-damp` | indicates wheather or not the algorithm uses adaptive damping procedure (0 or 1) |
 
-## References
-[1] 
