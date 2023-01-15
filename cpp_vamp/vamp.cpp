@@ -54,6 +54,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     gam2(0),
     eta1(0),
     eta2(0),
+    use_adap_damp(opt.get_use_adap_damp()),
     rho(opt.get_rho()),
     probs(opt.get_probs()),
     out_dir(opt.get_out_dir()),
@@ -76,6 +77,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     vars = opt.get_vars();
     // we scale the signal prior with N since X -> X / sqrt(N)
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
+
 }
 
 //std::vector<double> predict(std::vector<double> est, data* dataset){
@@ -88,6 +90,9 @@ std::vector<double> vamp::infere( data* dataset ){
     if (normal == 1)
         for (int i=0; i<vars.size(); i++)
             vars[i] *= N;
+    if (use_adap_damp == 1)
+        largest_sing_val2 = (*dataset).largest_sing_val2();
+    
     if (!strcmp(model.c_str(), "linear"))
         return infere_linear(dataset);
     else if (!strcmp(model.c_str(), "bin_class"))
@@ -264,25 +269,16 @@ std::vector<double> vamp::infere_linear(data* dataset){
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
 
-    std::vector<double> y = (*dataset).get_phen();
-    std::vector<unsigned char> mask4 = (*dataset).get_mask4();
-
-    // filtering a phenotyp for nans
-    int im4 = (*dataset).get_im4();
-    for (int j=0; j<im4; j++) 
-        for (int k=0; k<4; k++) 
-            if (4*j + k < N)
-                if (na_lut[mask4[j] * 4 + k] == 0)
-                    y[4*j + k] = 0;
+    // filtering a phenotype for nans
+    std::vector<double> y =  (*dataset).filter_pheno();
 
     // Gaussian noise start
-    r1 = simulate(M, std::vector<double> {1/gam1}, std::vector<double> {1});
+    r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
 
     // linear estimator
-    //r1 = (*dataset).ATx(y.data());
-    //std::cout << "calc_stdev(r1) = " << calc_stdev(r1) << std::endl;
-    //for (int i0=0; i0<M; i0++)
-	//    r1[i0] = r1[i0]*M/N;
+    // r1 = (*dataset).ATx(y.data());
+    // for (int i0=0; i0<M; i0++)
+	//  r1[i0] = r1[i0]*M/N;
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -305,31 +301,31 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         // if (it == 1)
         //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
-        for (int i = 0; i < M; i++ )
+        for (int i = 0; i < M; i++)
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
 
         z1 = (*dataset).Ax(x1_hat.data(), normal);
         // we start adaptive damping from iteration numb_adap_damp_hist
         while (use_adap_damp == 1 && it>numb_adap_damp_hist){
             double obj_fun_val = vamp_obj_func(eta1, gam1, invQ_bern_vec, bern_vec, vars, probs, dataset);
-            double min_obj_fun_val = *std::min_element(obj_fun_vals.begin(), obj_fun_vals.end()); 
-            if (obj_fun_val >= min_obj_fun_val){
+            double max_obj_fun_val = *std::max_element(obj_fun_vals.begin(), obj_fun_vals.end()); 
+            if (obj_fun_val <= max_obj_fun_val){
                 obj_fun_vals.erase(obj_fun_vals.begin());
                 obj_fun_vals.push_back(obj_fun_val);
                 rho = std::min(rho*damp_inc_fact, damp_max);
                 break;
             }
             else{
-                rho *= damp_dec_fact;
+                rho = std::max(rho*damp_dec_fact, damp_min);
                 for (int i = 0; i < M; i++)
                     x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
                 z1 = (*dataset).Ax(x1_hat.data(), normal);
-                assert(rho > 1e-8);                  
+                // assert(rho > 1e-8);                  
             }   
         }
 
         if (rank == 0)
-            std::cout << "rho = " << rho << std::endl;
+           std::cout << "rho = " << rho << std::endl;
 
         double scale;
         if (normal == 1)
@@ -344,10 +340,18 @@ std::vector<double> vamp::infere_linear(data* dataset){
             x1_hat_stored[i0] =  x1_hat[i0] / scale;
         mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
         //store_vec_to_file(filepath_out, x1_hat);
-        
+
         if (rank == 0)
            std::cout << "filepath_out is " << filepath_out << std::endl;
-        
+
+        if (it % 5 == 0){
+            std::string filepath_out_r1 = out_dir + out_name + "_r1_it_" + std::to_string(it) + ".bin";
+            std::vector<double> r1_stored = r1;
+            for (int i0=0; i0<r1_stored.size(); i0++)
+                r1_stored[i0] =  r1[i0] / scale;
+            mpi_store_vec_to_file(filepath_out_r1, r1_stored, S, M);
+        }
+
         // Onsager correction calculation 
         x1_hat_d_prev = x1_hat_d;
         double sum_d = 0;
@@ -364,10 +368,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 std::cout << "gam2_bar = " << std::get<2>(state_evo_par2) << std::endl; 
         } 
 
-        //std::cout << "sum_d = " << sum_d << std::endl;
         double alpha1;
         MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        //std::cout << "alpha1 after MPI_Allreduce() = "<< alpha1 << std::endl;
         alpha1 /= Mt;
         if (rank == 0)
             std::cout << "alpha1 = " << alpha1 << std::endl;
@@ -417,19 +419,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "______________________" << std::endl<< "->LMMSE" << std::endl;
 
         //gamw = 1 / ( 1 - inner_prod(z1, z1, 0) );
-
-        //std::vector<double> y = (*dataset).get_phen();
-        //std::vector<unsigned char> mask4 = (*dataset).get_mask4();
-        /* for (int j=0;j<(*dataset).get_mbytes();j++)
-            for(int k=0;k<4;k++)
-                if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
-                    y[4*j + k] = 0;
-        */
         
-        // std::cout << "after get phen! y.size() = " << y.size() << std::endl;
-        // std::cout << "normal in VAMP = " << normal << std::endl;
         std::vector<double> v = (*dataset).ATx(y.data(), normal);
-        // std::cout << "afer ATx inside VAMP-LMMSE" << std::endl;
 
         for (int i = 0; i < M; i++)
             v[i] = gamw * v[i] + gam2 * r2[i];
@@ -726,7 +717,7 @@ void vamp::updatePrior() {
 
                 //if (rank==0 && it%10 == 0)
                 //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << ", sum_of_pin =" << sum_of_pin << std::endl;
-                // vars[j+1] = res_gammas_total / res_total;
+                 vars[j+1] = res_gammas_total / res_total;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
 
@@ -770,13 +761,9 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
     std::vector<double> res(M, 0.0);
     size_t phen_size = 4 * (*dataset).get_mbytes();
     std::vector<double> res_temp(phen_size, 0.0);
-    //std::cout << "before res_temp!" << std::endl;
-    res_temp = (*dataset).Ax( v.data(), normal);
-    //std::cout << "before res!" << std::endl;
-    res = (*dataset).ATx( res_temp.data(), normal);
-    //std::cout << "before loop!" << std::endl;
+    res_temp = (*dataset).Ax(v.data(), normal);
+    res = (*dataset).ATx(res_temp.data(), normal);
     for (int i = 0; i < M; i++){
-        //res[i] *= gamw;
         res[i] *= tau;
         res[i] += gam2 * v[i];
     }
@@ -880,7 +867,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         std::transform (mu.begin(), mu.end(), palpha.begin(), mu.begin(), std::plus<double>());
         for (int j = 0; j < p.size(); j++)
             p_temp[j] = d[j] * alpha;
-        beta = pow( inner_prod(r, z, 1), -1 );
+        beta = pow(inner_prod(r, z, 1), -1);
         std::transform (r.begin(), r.end(), p_temp.begin(), r.begin(), std::minus<double>());
         for (int j=0; j<M; j++)
             z[j] = r[j] / diag[j];
@@ -1017,17 +1004,21 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
   
     std::random_device rd;
     std::bernoulli_distribution bern(0.5);
+    double alpha = eta2/eta1;
+    double lambda1 = 2 * alpha * (gamw * largest_sing_val2 + gam2); 
+    int verbose_obj_func = 1;
 
     // calculating differential entropy of error distribution q
-    double Hq = Mt / 2 * (1 + log(2 * M_PI / eta));
+    // double Hq = Mt / 2 * (1 + log(2 * M_PI / eta));
+    double Hq = - Mt / 2 * log(eta);
+    if (verbose_obj_func == 1)
+        std::cout << "[vamp_obj_func] Hq = " << Hq << std::endl;
     
 
     // calculating KL divergence between two multivariate gaussians
     double DKL2 = 0;
-    // Chebishev approximation of a log(det) component
-    //DKL2 += ( 2*eta2 - (2 + log(2)) ) * Mt;
     // Taylor approximation of a log(det) component
-    DKL2 += - Mt*log(gamw * (*dataset).get_sigma_max() * (*dataset).get_sigma_max() + gam2);
+    // DKL2 += - Mt*log(gamw * (*dataset).get_sigma_max() * (*dataset).get_sigma_max() + gam2);
     for (int i = 0; i < M; i++)
         u[i] = 2*bern(rd) - 1;
     std::vector<double> temp_poly_apr = u;
@@ -1035,10 +1026,14 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     for (int i=1; i<=poly_deg_apr_vamp_obj; i++){
         temp_poly_apr = lmmse_mult(temp_poly_apr, gamw, dataset); // this function (vamp_obj_func) is hardcoded for the linear model
         for (int i1=0; i1<M; i1++)
+            temp_poly_apr[i1] *= alpha / lambda1;
+        for (int i1=0; i1<M; i1++)
             temp_poly_apr[i1] -= 1;
-        DKL2 += sign * inner_prod(temp_poly_apr, u, 1) / (gamw * (*dataset).get_sigma_max() * (*dataset).get_sigma_max() + gam2) / i;
+        // DKL2 += sign * inner_prod(temp_poly_apr, u, 1) / (gamw * (*dataset).get_sigma_max() * (*dataset).get_sigma_max() + gam2) / i;
+        DKL2 += sign * inner_prod(temp_poly_apr, u, 1) / i;
         sign *= -1;
-    } 
+    }
+    DKL2 += Mt * log(lambda1); 
     
     // trace component
     //std::vector<double> u = std::vector<double> (M, 0.0);
@@ -1046,23 +1041,21 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     //    u[i] = 2*bern(rd) - 1;
     std::vector<double> temp = (*dataset).Ax(invQu.data(), 1);
     std::vector<double> temp2 = (*dataset).ATx(temp.data(), 1);
-    for (int i=0; i<temp2.size(); i++)
-        temp2[i] *= gamw;
-    DKL2 += inner_prod(u, temp2, 1);
+    // for (int i=0; i<temp2.size(); i++)
+    //    temp2[i] *= gamw;
+    DKL2 += inner_prod(u, temp2, 1) / 2;
 
     // quadratic form component
     //std::vector<double> z2 = (*dataset).Ax(x2_hat.data());
-    std::vector<double> y = (*dataset).get_phen();
-    //filtering pheno vector for NAs
-    std::vector<unsigned char> mask4 = (*dataset).get_mask4();
-    for (int j=0;j<(*dataset).get_mbytes();j++)
-        for(int k=0;k<4;k++)
-            if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
-                y[4*j + k] = 0;
-    DKL2 += (-2) * gamw * inner_prod(y, z1, 0);
-    DKL2 += gamw * inner_prod(x1_hat, (*dataset).ATx(z1.data(), 1), 1);
-    DKL2 += (-1) * Mt / 2 * log(gamw);
+    std::vector<double> y = (*dataset).filter_pheno();
+    // DKL2 += (-2) * gamw * inner_prod(y, z1, 0);
+    DKL2 += (-1) * gamw * alpha * inner_prod(y, z1, 0);
+    DKL2 += gamw * alpha / 2 * inner_prod(x1_hat, (*dataset).ATx(z1.data(), 1), 1);
+    DKL2 += inner_prod(y,y,0) * gamw * alpha / 2;
+    DKL2 += (-1) * Mt / 2 * log(gamw * alpha);
 
+    if (verbose_obj_func == 1)
+        std::cout << "[vamp_obj_func] DKL2 = " << DKL2 << std::endl;
     //for (int i = 0; i < M; i++)
         //u[i] = 2*bern(rd) - 1;
     //DKL2 -= inner_prod(u, CG_solver(u, gamw, dataset), 1);
@@ -1081,6 +1074,8 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
         DKL3 += log( mix_gauss_pdf_ratio(x, vars_plus_gam, vars, pi) );
     }    
     DKL3 /= max_iter_obj_MC;
+    if (verbose_obj_func == 1)
+        std::cout << "[vamp_obj_func] DKL3 = " << DKL3 << std::endl;
 
     return Hq + DKL2 + DKL3;
 }

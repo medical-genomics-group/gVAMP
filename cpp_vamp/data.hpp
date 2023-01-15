@@ -96,6 +96,10 @@ public:
 
     void SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, double err_thr, int SK_max_iter);
 
+    std::vector<double> filter_pheno();
+    
+    double largest_sing_val2();
+
     //double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi);
 
     //std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double> pi);

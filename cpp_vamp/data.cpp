@@ -953,3 +953,46 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
     for (int j = 0; j < M; j++)
         xR[j] = sqrt( xR[j] ); 
 }
+
+ std::vector<double> data::filter_pheno(){
+    std::vector<double> y = get_phen();
+    std::vector<unsigned char> mask4 = get_mask4();
+    int im4 = get_im4();
+    for (int j=0; j<im4; j++) 
+        for (int k=0; k<4; k++) 
+            if (4*j + k < N)
+                if (na_lut[mask4[j] * 4 + k] == 0)
+                    y[4*j + k] = 0;
+    return y;
+ }
+
+ double data::largest_sing_val2(){
+    
+    double start_power_meth = MPI_Wtime();
+
+    double power_meth_err_thr = 1e-5;
+    int power_meth_maxiter = 30; 
+    int it = 0;
+    std::vector<double> res = simulate(M, std::vector<double> {1.0/M}, std::vector<double> {1});
+    std::vector<double> res_temp(4*get_mbytes(), 0.0);
+    std::vector<double> res_prev;
+    double lambda=0, lambda_prev;
+    for (; it<power_meth_maxiter; it++){
+        res_temp = Ax(res.data(), normal_data);
+        res_prev = res;
+        res = ATx(res_temp.data(), normal_data);
+        lambda_prev = lambda;
+        lambda = inner_prod(res, res_prev, 1);
+        if (std::abs(lambda-lambda_prev) / std::abs(lambda_prev) < power_meth_err_thr)
+            break;
+        double norm = sqrt(l2_norm2(res, 1));
+        for (int i=0; i<M; i++)
+            res[i] /= norm;
+    }
+
+    double end_power_meth = MPI_Wtime();
+    if (rank == 0)
+        std::cout << "Power method did " << it << " / " << power_meth_maxiter << " iterations which took " << end_power_meth - start_power_meth << " seconds." << std::endl;
+
+    return lambda;
+ }

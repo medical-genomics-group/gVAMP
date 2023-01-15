@@ -30,6 +30,7 @@ private:
     double damp_inc_fact = 1.05;
     double damp_dec_fact = 0.95;
     double damp_max = 1;
+    double damp_min = 0.05;
     double stop_criteria_thr; // = 1e-5;
     std::string model;
     std::string out_dir;
@@ -37,6 +38,7 @@ private:
     std::vector<double> bern_vec;
     std::vector<double> invQ_bern_vec;
     int normal = 2;
+    double largest_sing_val2;
 
 public:
 
