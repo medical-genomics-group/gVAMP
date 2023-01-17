@@ -1020,9 +1020,10 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
     }
 
     double end_power_meth = MPI_Wtime();
-    if (rank == 0)
+    if (rank == 0){
         std::cout << "Power method did " << it << " / " << power_meth_maxiter << " iterations which took " << end_power_meth - start_power_meth << " seconds." << std::endl;
-        std::cout << "Largest singular value of the data matrix is " << lambda << std::endl;
+        std::cout << "Largest eigenvalue of X^TX " << lambda << std::endl;
+    }
 
     return lambda;
  }

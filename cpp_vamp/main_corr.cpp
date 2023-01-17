@@ -8,7 +8,7 @@
 #include "data.hpp"
 #include "vamp.hpp"
 
-int main()
+int main(int argc, char** argv)
 {
 
     // starting parallel processes
@@ -16,87 +16,60 @@ int main()
     int provided_MPI_level;
     MPI_Init_thread(NULL, NULL, required_MPI_level, &provided_MPI_level);
 
+    const Options opt(argc, argv);
+
+    // retrieving MPI specific information
     int rank = 0;
     int nranks = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
-    
+
+    int normal = 1;
+    std::cout << "normal = " << normal << std::endl;
+
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // setting blocks of markers 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    
-    // size_t Mt = 115233;
-    // size_t Mt = 8430446;
-    // size_t Mt = 40082;
-    //size_t Mt = 613049;
-    //size_t N = 458747;
+    size_t Mt = opt.get_Mt();
+    size_t N = opt.get_N();
 
-    // size_t Mt = 2174071;
-    // size_t Mt = 1410403;
-    size_t Mt = 521208;
-    size_t N = 419155;
-    
     std::vector<double> MS = divide_work(Mt);
     int M = MS[0];
     int S = MS[1];
     int Mm = MS[2];
 
-    //  printf("INFO   : rank %4d has %d markers over tot Mt = %d, max Mm = %d, starting at S = %d\n", rank, M, Mt, Mm, S);
+    std::string phenfp = (opt.get_phen_files())[0];
+    data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, normal, rank);
+        
 
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    // running EM-VAMP algorithm on the data
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // reading genotype data / phenotype file
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/1kg_chr20_genotypes.bed";
-    // const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/1kg_chr20_genotypes.txt";
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPvsGibbsvsLasso/genomes/12000_1.bed";
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/chr/ukb22828_c21_UKB_EST_v3.bed";
-    // !!!!! const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_all_prunned_010_maf_005.bed";
-    // !!!!! const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/chr/ukb22828_UKB_EST_v3_all.bed";
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp005.bed";
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp08_fd.bed";
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/geno/ldp08/ukb22828_UKB_EST_v3_ldp08_fd_maf.bed";
-    const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_ldp08_fd_maf_thr050_2.bed";
-    // const std::string bedfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/exploring_corr_effects_on_spectrum_12102021/ukb_imp_v3_UKB_EST_uncorrpeople_N45000_pruned_00000001.bed";
-    const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/N_419155_M_115233_y.txt";
-    // const std::string phenfp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/exploring_corr_effects_on_spectrum_12102021/ukb_imp_v3_UKB_EST_uncorrpeople_N45000_pruned_00001_y.txt";
-    // const std::string true_betafp = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPvsGibbsvsLasso/genomes/12000_1_beta_true.txt";
-    // const std::string phen_out = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/beta_true_out.txt";
-
-
-    // simulating data for realistic valus of parameters
-    // std::vector<double> vars{0, 3.0246351e-07, 1.2863391e-03};
-    // std::vector<double> vars_init{0, N*3.0246351e-05, N*1.2863391e-04};
-    // std::vector<double> vars{0, 1.2863391e-04};
-    // std::vector<double> vars{0, 1.2863391e-02};
-    // std::vector<double> vars_init{0, 2e-02};
+    // simulating data for realistic values of parameters
     std::vector<double> vars{0, 1e-3, 1.2863391e-02};
-    std::vector<double> vars_init{0, 1e-3, 2e-02};
-    // std::vector<double> vars_init{0, N*3.0246351e-05};
-    // vars_init = vars; // vars_init[1] *= N;
-    const int normal = 1;
+    std::vector<double> vars_init{0, 2e-3, 2e-02};
     if (normal == 1){
         for (int i=0; i<vars_init.size(); i++)
             vars_init[i] *= N;
     }
-
     std::vector<double> probs{7.1100000e-01, 2.6440000e-01, 2.4600000e-02};
     std::vector<double> probs_init{6.000000e-01, 3.000000e-01, 1.0000000e-01};
-    //std::vector<double> probs{7e-1, 3e-1};
-    //std::vector<double> probs_init{5e-1, 5e-1};
-    // probs_init = probs;
 
-
+    // simulating beta
     std::vector<double> beta_true(M, 0.0); 
     
     if (rank == 0){
         std::vector<double> beta_true_tmp = simulate(Mt, vars, probs);
         for (int i0=S; i0<S+M; i0++)
             beta_true[i0-S] = beta_true_tmp[i0];
-        store_vec_to_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_115233_N_458747_beta_true.txt", beta_true_tmp);
+        // storing true beta
+        std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
+        mpi_store_vec_to_file(filepath_out, beta_true_tmp, S, M);
+        //store_vec_to_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_115233_N_458747_beta_true.txt", beta_true_tmp);
+        
         for (int ran = 1; ran < nranks; ran++)
             MPI_Send(beta_true_tmp.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
     }
@@ -109,8 +82,9 @@ int main()
    }
     
     MPI_Barrier(MPI_COMM_WORLD);
-    //beta_true = read_vec_from_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_12000_N_15000_beta_true.txt", M, S);
+    // beta_true = read_vec_from_file("/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/M_12000_N_15000_beta_true.txt", M, S);
     
+
     //printing out true variances
     if (rank == 0)
         std::cout << "true scaled variances = ";
@@ -137,6 +111,7 @@ int main()
     //    std::cout << "beta true stdev = " << calc_stdev(beta_true) << std::endl;
     //}
 
+    // noise precision calculation
     double SNR = 1;
     double gamw = noise_prec_calc(SNR, vars, probs, Mt, N);
     if (rank == 0)
@@ -159,53 +134,56 @@ int main()
     if (rank != 0)
         MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    data dataset(phenfp, bedfp, N, M, Mt, S, normal, rank);
-    // dataset.read_phen();
-    // dataset.read_genotype_data();
-    // dataset.compute_markers_statistics();
     std::vector<double> beta_true_scaled = beta_true;
     if (normal == 1)
         for (int i0=0; i0<M; i0++)
             beta_true_scaled[i0] *= sqrt(N);
-    //std::cout << "beta_true stdev = " << calc_stdev(beta_true) << ", rank = " << rank << std::endl;
-
+    
     std::vector<double> y = dataset.Ax(beta_true_scaled.data(), normal);
 
     if (rank == 0)
         std::cout << "Var(Ax) = " << pow(calc_stdev(y), 2) << std::endl;
 
-    //if (rank == 0)
-    //    std::cout << "noise_val stdev = " << calc_stdev(noise_val) << std::endl;
 
     for (int i = 0; i < N; i++)
         if (rank != 0)
             y[i] += noise_val[i];    
         else if (rank == 0)
             y[i] += noise[i];
-    
+
     dataset.set_phen(y);
+
+    std::string filepath_out_y = opt.get_out_dir() + opt.get_out_name() + "_y.txt";
+    store_vec_to_file(filepath_out_y, y);
 
     if (rank == 0){
         std::cout << "Var(y) = " << pow(calc_stdev(y), 2) << std::endl;
         double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
         std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
     }
-    
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // running EM-VAMP algorithm on the data
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+    double gamw_init = 2;
     double gam1 = 1e-6;
-    int max_iter = 25;
-    double rho = 0.80;
-    std::string out_dir = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/sig_estimates/";
-    std::string out_name = "x1_hat_height_main_corr_10_12_2022_rho080"; 
-    std::string model = "linear";
-    double gamw_init = 0.01;
-    
-    vamp emvamp(N, M, Mt, gam1, gamw_init, max_iter, rho, vars_init, probs_init, beta_true, rank, out_dir, out_name, model);
+    vamp emvamp(M, gam1, gamw_init, beta_true, rank, opt);
     std::vector<double> x_est = emvamp.infere(&dataset);
+
+    if (normal == 2){
+        std::string xL_file_name = opt.get_bed_file();
+        std::string xR_file_name = opt.get_bed_file();
+        int pos_dot = xL_file_name.find(".");
+        xL_file_name = xL_file_name.substr(0, pos_dot);
+        xL_file_name.append("_xL.csv");
+        xR_file_name.append("_xR.csv");
+
+        std::vector<double> xL = dataset.get_xL();
+        std::vector<double> xR = dataset.get_xR();
+
+        store_vec_to_file(xL_file_name, xL);
+        store_vec_to_file(xR_file_name, xR);
+    }
 
     if (rank == 0){
         std::cout << "var(y) = " << pow(calc_stdev(y), 2) << std::endl;

@@ -65,4 +65,5 @@ public:
     double update_probit_var(double v, std::vector<double> y);
     std::vector<double> precondCG_solver(std::vector<double> v, double tau, int save, data* dataset);
     std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);    
+    std::vector<double> pvals_calc();
 };
