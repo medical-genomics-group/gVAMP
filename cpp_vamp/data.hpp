@@ -67,9 +67,9 @@ public:
     std::vector<double> get_xR() { return xR; }
 
     // constructor and destructor for class data
-    data(std::vector<double> y, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
-    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, std::string type_data, const int rank);
-    data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
+    data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, const int rank, std::string type_data = "bed");
+    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, const int rank, std::string type_data = "bed");
+    // data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank);
     // data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm);
     ~data() {
         if (mave     != nullptr)  _mm_free(mave);

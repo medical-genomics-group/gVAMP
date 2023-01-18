@@ -9,7 +9,9 @@
 #include <fstream>
 #include <cfloat>
 #include "na_lut.hpp"
+#include "dotp_lut.hpp"
 #include "vamp.hpp"
+#include "vamp_probit.cpp"
 #include "utilities.hpp"
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
 
@@ -346,7 +348,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
     }
 
     if (store_pvals == 1){
-        std::vector<double> pvals = std::vector<double> pvals_calc(data* dataset);
+        std::vector<double> pvals = pvals_calc(dataset);
         // saving pvals vector
         std::string filepath_out_pvals = out_dir + out_name + "_pvals.bin";
         int S = (*dataset).get_S();
@@ -990,13 +992,13 @@ std::vector<double> vamp::pvals_calc(data* dataset){
     boost::math::students_t tdist(df);
     for (int k=0; k<M; k++){
         std::vector<double> y_mark = y_mod;
-        int mbytes = (*dataset).get_mbytes()
+        int mbytes = (*dataset).get_mbytes();
         unsigned char* bed_data = (*dataset).get_bed_data();
         unsigned char* bed = &bed_data[k * mbytes];
         double sumx = 0, sumsqx = 0, sumxy = 0;
         for (int i=0; i<mbytes; i++) {
             #ifdef _OPENMP
-            #pragma omp simd aligned(dotp_lut_a,dotp_lut_b,phen:32)
+            #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
             #endif
             for (int j=0; j<4; j++) {
                 y_mark[4*i+j] = dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];

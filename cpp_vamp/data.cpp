@@ -19,10 +19,10 @@
 
 
 // constructors for class data
-data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
+data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, const int rank, std::string type_data) :
     phenfp(fp),
     bedfp(bedfp),
-    type_data("bed"),
+    type_data(type_data),
     N(N),
     M(M),
     Mtotal(Mt),
@@ -36,28 +36,36 @@ data::data(std::string fp, std::string bedfp, const int N, const int M, const in
     msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
     check_malloc(msig, __LINE__, __FILE__);
 
-    // in the constructor we load phen, read genotype data and compute marker statistics
-    read_phen();
-    read_genotype_data();
-    compute_markers_statistics();
+    if (type_data == "bed"){
+        // in the constructor we load phen, read genotype data and compute marker statistics
+        read_phen();
+        read_genotype_data();
+        compute_markers_statistics();
 
-    if (normal == 2){
-        double SK_err_thr = 1e-4;
-        int SK_max_iter = 20;
-        xR = std::vector<double> (M, 1.0);
-        xL = std::vector<double> (4*mbytes, 1.0);
-        //std::cout << "before SK!" << std::endl;
-        SinkhornKnopp(xL, xR, SK_err_thr, SK_max_iter);
+        if (normal == 2){
+            double SK_err_thr = 1e-4;
+            int SK_max_iter = 20;
+            xR = std::vector<double> (M, 1.0);
+            xL = std::vector<double> (4*mbytes, 1.0);
+            //std::cout << "before SK!" << std::endl;
+            SinkhornKnopp(xL, xR, SK_err_thr, SK_max_iter);
+        }
+        // perm_idxs = std::vector<int>(M, 1);
+        // p_luts = perm_luts();
+        // p_dotp_luts = perm_dotp_luts();
+    } 
+    else if(type_data == "meth"){
+        methfp = genofp;
+        read_phen();
+        read_methylation_data();
+        compute_markers_statistics();
     }
-    // perm_idxs = std::vector<int>(M, 1);
-    // p_luts = perm_luts();
-    // p_dotp_luts = perm_dotp_luts();
+    
 }
 
 // constructors for class data
-data::data(std::vector<double> y, std::string bedfp, const int N, const int M, const int Mt, const int S, const int normal, const int rank) :
-    bedfp(bedfp),
-    type_data("bed"),
+data::data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, const int rank, std::string type_data) :
+    type_data(type_data),
     N(N),
     M(M),
     Mtotal(Mt),
@@ -75,23 +83,33 @@ data::data(std::vector<double> y, std::string bedfp, const int N, const int M, c
     for (int i=0; i<N/4; i++)
         mask4.push_back(0b00001111); // all phenotypes are present
 
-    // we read genotype data and compute marker statistics
-    read_genotype_data();
-    compute_markers_statistics();
+    if (type_data == "bed"){
+        bedfp = genofp;
+        // we read genotype data and compute marker statistics
+        read_genotype_data();
+        compute_markers_statistics();
 
-    if (normal == 2){
-        double SK_err_thr = 1e-4;
-        int SK_max_iter = 20;
-        xR = std::vector<double> (M, 1.0);
-        xL = std::vector<double> (4*mbytes, 1.0);
-        //std::cout << "before SK!" << std::endl;
-        SinkhornKnopp(xL, xR, SK_err_thr, SK_max_iter);
+        if (normal == 2){
+            double SK_err_thr = 1e-4;
+            int SK_max_iter = 20;
+            xR = std::vector<double> (M, 1.0);
+            xL = std::vector<double> (4*mbytes, 1.0);
+            //std::cout << "before SK!" << std::endl;
+            SinkhornKnopp(xL, xR, SK_err_thr, SK_max_iter);
+        }
+        // perm_idxs = std::vector<int>(M, 1);
+        // p_luts = perm_luts();
+        // p_dotp_luts = perm_dotp_luts();
     }
-    // perm_idxs = std::vector<int>(M, 1);
-    // p_luts = perm_luts();
-    // p_dotp_luts = perm_dotp_luts();
+    else if (type_data == "meth"){
+        methfp = genofp;
+        read_methylation_data();
+        compute_markers_statistics();
+    }
+    
 }
 
+/*
 // constructors for class data
 data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, std::string type_data, const int rank) :
     N(N),
@@ -127,9 +145,12 @@ data::data(std::string fp, std::string genofp, const int N, const int M, const i
     }
     else if (type_data == "meth"){
         methfp = genofp;
+        read_phen();
         read_methylation_data();
+        compute_markers_statistics();
     }
 }
+*/
 
 /*
 data::data(std::string fp, std::string bedfp, const int N, const int M, const int Mt, const int S, const int rank, const int perm) :

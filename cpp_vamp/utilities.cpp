@@ -174,14 +174,14 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
     
     if (sync == 1){
         double sum_total = 0;
-        double sq_sum_total = 0
+        double sq_sum_total = 0;
         MPI_Allreduce(&sum, &sum_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); 
         sum = sum_total;
         sq_sum = sq_sum_total; 
     }
 
     double mean = sum / vec.size();
-    double stdev = std::sqrt(sq_sum - * vec.size() * mean * mean) / (vec.size()-1);
+    double stdev = std::sqrt(sq_sum - vec.size() * mean * mean) / (vec.size()-1);
 
     return stdev;
  }
@@ -244,11 +244,11 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
 
  double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, std::vector<double> y_mark){
     double sumy = 0, sumsqy = 0;
-    int n = yreg.size();
+    int n = y_mark.size();
     std::vector<double> pvals(n, 0.0);
     for (int i = 0; i<n; i++){
-        sumy += yreg[i];
-        sumsqy += yreg[i]*yreg[i];
+        sumy += y_mark[i];
+        sumsqy += y_mark[i]*y_mark[i];
     }
 
     double s2y = (sumsqy - sumy*sumy/n) / (n-1);
@@ -258,8 +258,8 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
 
     double beta = rxy * s2y / s2x;
     double t = rxy * sqrt( (n-2) / (1-rxy*rxy) ); // t-statistics
-    students_t dist(n-2);
-    double pvalue = 2.0*cdf(complement(dist,t>0 ? t:(0-t)));
+    boost::math::students_t dist(n-2);
+    double pvalue = 2.0*boost::math::cdf(boost::math::complement(dist,t>0 ? t:(0-t)));
 
     return pvalue;
  }
