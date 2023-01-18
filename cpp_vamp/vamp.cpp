@@ -11,6 +11,7 @@
 #include "na_lut.hpp"
 #include "vamp.hpp"
 #include "utilities.hpp"
+#include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
 
 //constructor for class data
 vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model) :
@@ -61,6 +62,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     out_name(opt.get_out_name()),
     true_signal(true_signal),
     model(opt.get_model()),
+    store_pvals(opt.get_store_pvals()),
     rank(rank)  {
     N = opt.get_N();
     Mt = opt.get_Mt();
@@ -77,7 +79,6 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     vars = opt.get_vars();
     // we scale the signal prior with N since X -> X / sqrt(N)
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
-
 }
 
 //std::vector<double> predict(std::vector<double> est, data* dataset){
@@ -87,6 +88,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
 std::vector<double> vamp::infere( data* dataset ){
 
     normal = (*dataset).get_normal_data();
+    y = (*dataset).get_phen();
     if (normal == 1)
         for (int i=0; i<vars.size(); i++)
             vars[i] *= N;
@@ -342,6 +344,15 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << std::endl << std::endl;
     }
+
+    if (store_pvals == 1){
+        std::vector<double> pvals = std::vector<double> pvals_calc(data* dataset);
+        // saving pvals vector
+        std::string filepath_out_pvals = out_dir + out_name + "_pvals.bin";
+        int S = (*dataset).get_S();
+        mpi_store_vec_to_file(filepath_out_pvals, pvals, S, M);
+    }
+    
     return x1_hat_stored;          
 }
 
@@ -447,7 +458,7 @@ void vamp::updateNoisePrec(data* dataset){
     */
 
     std::vector<double> temp = (*dataset).Ax(x2_hat.data(), normal);
-    std::vector<double> y = (*dataset).get_phen();
+    // std::vector<double> y = (*dataset).get_phen();
 
     //filtering for NAs
     std::vector<unsigned char> mask4 = (*dataset).get_mask4();
@@ -790,7 +801,7 @@ void vamp::err_measures(data *dataset, int ind){
     size_t phen_size = 4 * (*dataset).get_mbytes();
     std::vector<double> tempNest(phen_size, 0.0);
     std::vector<double> tempNtrue(phen_size, 0.0);
-    std::vector<double> y = (*dataset).get_phen();
+    // std::vector<double> y = (*dataset).get_phen();
 
     //filtering pheno vector for NAs
     std::vector<unsigned char> mask4 = (*dataset).get_mask4();
@@ -965,4 +976,36 @@ std::tuple<double, double, double> vamp::state_evo(int ind, double gam_prev, dou
     }
 
     return {alpha_bar, eta_bar, gam_bar};
+}
+
+
+// finding p-values from t-test on regression coefficient = 0 
+// in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
+std::vector<double> vamp::pvals_calc(data* dataset){
+    std::vector<double> pvals(M, 0.0);
+    std::vector<double> y_mod = y;
+    for (int i=0; i<N; i++)
+        y_mod[i] -= z1[i];
+    double df = N-2;
+    boost::math::students_t tdist(df);
+    for (int k=0; k<M; k++){
+        std::vector<double> y_mark = y_mod;
+        int mbytes = (*dataset).get_mbytes()
+        unsigned char* bed_data = (*dataset).get_bed_data();
+        unsigned char* bed = &bed_data[k * mbytes];
+        double sumx = 0, sumsqx = 0, sumxy = 0;
+        for (int i=0; i<mbytes; i++) {
+            #ifdef _OPENMP
+            #pragma omp simd aligned(dotp_lut_a,dotp_lut_b,phen:32)
+            #endif
+            for (int j=0; j<4; j++) {
+                y_mark[4*i+j] = dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
+                sumx += dotp_lut_a[bed[i] * 4 + j];
+                sumsqx += dotp_lut_a[bed[i] * 4 + j]*dotp_lut_a[bed[i] * 4 + j];
+                sumxy += dotp_lut_a[bed[i] * 4 + j]*y_mark[4*i+j];
+            }
+        }
+        pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
+    }
+    return pvals;
 }

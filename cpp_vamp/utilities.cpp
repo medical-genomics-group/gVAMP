@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <algorithm>
 #include "utilities.hpp"
+#include<boost/math/distributions/students_t.hpp>
 
 double round_dp(const double in) {
     return in;
@@ -166,15 +167,21 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
     
  }
 
- double calc_stdev(std::vector<double> vec){
+ double calc_stdev(std::vector<double> vec, int sync){
 
     double sum = std::accumulate(vec.begin(), vec.end(), 0.0);
-    double mean = sum / vec.size();
-    //std::cout << "mean = " << mean << std::endl;
-
     double sq_sum = std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0);
-    //std::cout << "sq_sum = " << sq_sum << std::endl;
-    double stdev = std::sqrt(sq_sum / vec.size() - mean * mean);
+    
+    if (sync == 1){
+        double sum_total = 0;
+        double sq_sum_total = 0
+        MPI_Allreduce(&sum, &sum_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); 
+        sum = sum_total;
+        sq_sum = sq_sum_total; 
+    }
+
+    double mean = sum / vec.size();
+    double stdev = std::sqrt(sq_sum - * vec.size() * mean * mean) / (vec.size()-1);
 
     return stdev;
  }
@@ -233,4 +240,26 @@ double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<do
     MPI_File_read_at(outfh, 0, (void*) vec.data(), M, MPI_DOUBLE, &status);
     MPI_File_close(&outfh);  
     return vec;
+ }
+
+ double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, std::vector<double> y_mark){
+    double sumy = 0, sumsqy = 0;
+    int n = yreg.size();
+    std::vector<double> pvals(n, 0.0);
+    for (int i = 0; i<n; i++){
+        sumy += yreg[i];
+        sumsqy += yreg[i]*yreg[i];
+    }
+
+    double s2y = (sumsqy - sumy*sumy/n) / (n-1);
+    double s2x = (sumsqx - sumx*sumx/n) / (n-1);
+    double sxy = (sumxy - sumx*sumy/n) / (n-1);
+    double rxy = sxy / (s2x*s2y);
+
+    double beta = rxy * s2y / s2x;
+    double t = rxy * sqrt( (n-2) / (1-rxy*rxy) ); // t-statistics
+    students_t dist(n-2);
+    double pvalue = 2.0*cdf(complement(dist,t>0 ? t:(0-t)));
+
+    return pvalue;
  }

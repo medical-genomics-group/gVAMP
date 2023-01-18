@@ -1,7 +1,6 @@
 ## Table of contents
 * [General info](#general-info)
 * [Setup and supported options](#setup)
-* [References](#references)
 
 ## General info
 This repository contains a software implementation of Vector Approximate Message Passing algorithm suitable for doing inference in Genome-Wide Association Studies (GWAS).  
@@ -54,4 +53,5 @@ Currently supported input options to C++ version of the code:
 | `stop-criteria-thr` | relative error threshold within expectation maximization |
 | `model` | regression model that describes a relationship between effect sizes and phenotypes ('linear' or 'bin_class') |
 | `use-adap-damp` | indicates wheather or not the algorithm uses adaptive damping procedure (0 or 1) |
+| `store-pvals` | indicates wheather or not the algorithm stores p-values from association tests of each of the markers |
 

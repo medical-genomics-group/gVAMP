@@ -9,6 +9,7 @@ class vamp{
 private:
     int N, M, Mt, max_iter, rank, nranks;
     std::vector<double> x1_hat, x2_hat, true_signal, z1_hat, z2_hat;
+    std::vector<double> y;
     std::vector<double> obj_fun_vals;
     std::vector<double> z1;
     std::vector<double> r1, r2;
@@ -37,7 +38,8 @@ private:
     std::string out_name;
     std::vector<double> bern_vec;
     std::vector<double> invQ_bern_vec;
-    int normal = 2;
+    int normal = 1;
+    int store_pvals = 1;
     double largest_sing_val2;
 
 public:
@@ -65,5 +67,5 @@ public:
     double update_probit_var(double v, std::vector<double> y);
     std::vector<double> precondCG_solver(std::vector<double> v, double tau, int save, data* dataset);
     std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);    
-    std::vector<double> pvals_calc();
+    std::vector<double> pvals_calc(data* dataset);
 };

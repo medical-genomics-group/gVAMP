@@ -37,6 +37,7 @@ public:
     unsigned int get_perm() const { return perm; }
     unsigned int get_num_mix_comp() const { return num_mix_comp; }
     unsigned int get_use_adap_damp() const { return use_adap_damp; }
+    unsigned int get_store_pvals() const { return store_pvals; }
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
     const std::vector<std::string>& get_phen_files() const { return phen_files; }
@@ -77,6 +78,7 @@ private:
     unsigned int use_adap_damp = 0;
     unsigned int num_mix_comp;
     unsigned int perm = 0;
+    unsigned int store_pvals = 0;
     // unsigned int meth_imp = 0;
     std::vector<double> vars;
     std::vector<double> probs;

@@ -36,9 +36,11 @@ double l2_norm2(std::vector<double> const& u, int sync);
 
 double mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<double> eta_den, std::vector<double> pi);
 
-double calc_stdev(std::vector<double> vec);
+double calc_stdev(std::vector<double> vec, int sync = 0);
 
 std::vector<double> divide_work(int Mt);
+
+double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, std::vector<double> y_mark);
 
 //EO: this to allow reduction on avx256 pd4 datatype with OpenMP
 #ifdef _OPENMP
