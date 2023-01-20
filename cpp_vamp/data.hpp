@@ -61,6 +61,7 @@ public:
     double* get_msig()        { return msig; }
     int     get_im4()   const { return im4; }
     int     get_nonas()       { return nonas; }
+    void    set_nonas(int num){ nonas = num; }
     int     get_S()     const { return S; }
     int     get_normal_data()   const {return normal_data; }
     std::vector<double> get_xL() { return xL; }

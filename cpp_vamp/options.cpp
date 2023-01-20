@@ -318,11 +318,12 @@ void Options::check_options() {
     }
     */
     //std::cout << "  dim file: OK - " << get_dim_file() << "\n";
-
+    /*
     if (count_phen_files() == 0 && count_phen_files_test() == 0) {
         std::cout << "FATAL  : no phen file(s) provided! Please use the --phen-files option." << std::endl;
         exit(EXIT_FAILURE);
     }
+    */
     //std::cout << "  phen file(s): OK - " << count_phen_files() << " files passed.\n";
     //list_phen_files();
 

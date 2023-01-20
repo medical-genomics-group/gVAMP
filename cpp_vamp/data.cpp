@@ -80,8 +80,20 @@ data::data(std::vector<double> y, std::string genofp, const int N, const int M, 
     msig = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
     check_malloc(msig, __LINE__, __FILE__);
 
-    for (int i=0; i<N/4; i++)
-        mask4.push_back(0b00001111); // all phenotypes are present
+    for (int i=0; i<N; i++){
+        int m4 = i % 4;
+        if (m4 == 0)  mask4.push_back(0b00001111); // we are interested only in last 4 bits -> 1111 = all values present
+    }  
+    // Set last bits to 0 if ninds % 4 != 0
+    m4 = N % 4;
+    if (m4 != 0) {
+        for (int i=m4; i<4; i++) {
+            mask4.at(int(N / 4)) &= ~(0b1 << i);
+        }
+        std::cout << "rank = " << rank << ": setting last " << 4 - m4 << " bits to NAs" << std::endl;
+    }
+    
+    set_nonas(N);
 
     if (type_data == "bed"){
         bedfp = genofp;
@@ -338,20 +350,62 @@ void data::compute_markers_statistics() {
             #endif
     }
     else if (type_data == "meth"){
+        int im4m1 = im4-1;
         #ifdef _OPENMP
         #pragma omp parallel for
         #endif
                 for (int i=0; i<M; i++) {
-                    size_t methix = size_t(i) * size_t(4*mbytes);
+                    size_t methix = size_t(i) * size_t(N);
                     const double* methm = &meth_data[methix];
                     double suma = 0.0;
 
+                    // calculating marker mean in 2 step process since size(phen) = 4*mbytes and size(methm) = N
+                    // currently only non-missing methylation data is allowed 
+                    for (int j=0; j<(im4-1); j++) {
+                        #ifdef _OPENMP
+                        #pragma omp simd
+                        #endif
+                        for (int k=0; k<4; k++) 
+                            suma += methm[4*j + k] * na_lut[mask4[j] * 4 + k];
+                    }  
+                    #ifdef _OPENMP
+                    #pragma omp simd
+                    #endif
+                    for (int k=0; k<4; k++) {
+                        if (4*im4m1 + k < N){
+                            suma += methm[4*im4m1 + k] * na_lut[mask4[im4m1] * 4 + k];
+                        } 
+                    }
+
+                    //calculating vector of marker precision
+                    mave[i] = suma / double( get_nonas() );
+                    double sumsqr = 0.0;
+                    for (int j=0; j<(im4-1); j++) {
+                        #ifdef _OPENMP
+                        #pragma omp simd
+                        #endif
+                        for (int k=0; k<4; k++) {
+                            double val = (methm[4*j + k] - mave[i]) * na_lut[mask4[j] * 4 + k];
+                            sumsqr += val * val;
+                        }
+                    }
+                    #ifdef _OPENMP
+                    #pragma omp simd
+                    #endif
+                    for (int k=0; k<4; k++) {
+                        if (4*im4m1 + k < N){
+                            double val = (methm[4*im4m1 + k] - mave[i]) * na_lut[mask4[im4m1] * 4 + k];
+                            sumsqr += val * val;
+                        } 
+                    }
+
+                    /*
                     for (int j=0; j<im4; j++) {
                         for (int k=0; k<4; k++) {
                             suma += methm[4*j + k]; // currently only non-missing methylation data is allowed
                         }
                     }
-                    mave[i] = suma / N;
+                    mave[i] = suma / double( get_nonas() );
                     double sumsqr = 0.0;
                     for (int j=0; j<im4; j++) {
                         for (int k=0; k<4; k++) {
@@ -359,6 +413,9 @@ void data::compute_markers_statistics() {
                             sumsqr += val * val;
                         }
                     }
+                    */
+                    // std::cout << "sumsqr = " << sumsqr << std::endl;
+                    // std::cout << "nonas = " << get_nonas() << std::endl;
                     msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
                 }
     }
@@ -495,17 +552,22 @@ else if (type_data == "meth"){
         double dpa = 0.0;
 
         #ifdef _OPENMP
-        #pragma omp parallel for schedule(static) reduction(+:dpa)
+        #pragma omp parallel for simd schedule(static) reduction(+:dpa)
         #endif
+        for (int i=0; i<N; i++)
+            dpa += (meth[i] - mu) * phen[i];
+
+        /*
         for (int i=0; i<mbytes; i++) {
-        //#ifdef _OPENMP
-        //#pragma omp simd
-        //#endif
+        #ifdef _OPENMP
+        #pragma omp simd
+        #endif
             for (int j=0; j<4; j++) {
                 // if (!std::isnan(meth[i * 4 + j]))
                 dpa += (meth[i * 4 + j] - mu) * phen[i * 4 + j];
             }
         }
+        */
         return sigma_inv * dpa;
     }
 }
@@ -734,10 +796,23 @@ else if (type_data == "meth"){
 
     if (normal == 1){
         for (int i=0; i<M; i++){
-            meth = &meth_data[i * mbytes];
+            meth = &meth_data[i * N];
             double ave = mave[i];
             double sig_phen_i = msig[i] * phen[i];
+            /*
+            std::cout << "ave = " << ave << std::endl;
+            std::cout << "msig[i] = " << msig[i] << std::endl;
+            std::cout << "phen[i] = " << phen[i] << std::endl;
+            std::cout << "sig_phen_i = " << sig_phen_i << std::endl;
+            */
             
+            #ifdef _OPENMP
+                #pragma omp parallel for simd shared(Ax_temp)
+            #endif
+            for (int j=0; j<N; j++)
+                Ax_temp[j] += (meth[j] - ave) * sig_phen_i;
+
+            /*
             #ifdef _OPENMP
                 #pragma omp parallel for shared(Ax_temp)
             #endif
@@ -747,6 +822,7 @@ else if (type_data == "meth"){
                         Ax_temp[j * 4 + k] += (meth[j * 4 + k] - ave) * sig_phen_i;
                 }
             } 
+            */
         }
     }
 
@@ -754,7 +830,7 @@ else if (type_data == "meth"){
     std::vector<double> Ax_total(4 * mbytes, 0.0);
     MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     if (normal == 1)
-        for(int i = 0; i < 4 * mbytes; i++)
+        for(int i = 0; i < N; i++)
             Ax_total[i] /= sqrt(N);
     return Ax_total;
 }
@@ -812,9 +888,17 @@ void data::read_methylation_data(){
 
     const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
     size_t bytes = 0;
-    mpi_file_read_at_all <double*> (size_bytes, offset, methfh, MPI_DOUBLE, NREADS, meth_data, bytes);
+    mpi_file_read_at_all <double*> (size_t(M) * size_t(N), offset, methfh, MPI_DOUBLE, NREADS, meth_data, bytes);
     MPI_File_close(&methfh);
     
+    /*if (rank == 0){
+        std::cout << "meth_data[0] = " << meth_data[0] << std::endl;
+        std::cout << "meth_data[1] = " << meth_data[1] << std::endl;
+        std::cout << "meth_data[2] = " << meth_data[2] << std::endl;
+        std::cout << "meth_data[3] = " << meth_data[3] << std::endl;
+        std::cout << "meth_data[4] = " << meth_data[4] << std::endl;
+        std::cout << "meth_data[5] = " << meth_data[5] << std::endl;
+    }*/
     double te = MPI_Wtime();
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0)

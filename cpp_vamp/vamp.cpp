@@ -144,7 +144,6 @@ std::vector<double> vamp::infere_linear(data* dataset){
         probs_before = probs;
         vars_before = vars;
         //updatePrior(); -> moved to after iteration
-
         // if (it == 1)
         //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
         for (int i = 0; i < M; i++)

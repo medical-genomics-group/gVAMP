@@ -39,22 +39,26 @@ int main(int argc, char** argv)
     // simulating methylation data using i.i.d. Gaussians as entries of methylation matrix
     std::vector<double> meth_matrix = std::vector<double> (M * N, 0.0);
     meth_matrix = simulate(N*M, std::vector<double> {1}, std::vector<double> {1});
+    /*if (rank == 0){
+        std::cout << "meth_matrix[0] = " << meth_matrix[0] << std::endl;
+        std::cout << "meth_matrix[1] = " << meth_matrix[1] << std::endl;
+        std::cout << "meth_matrix[2] = " << meth_matrix[2] << std::endl;
+        std::cout << "meth_matrix[3] = " << meth_matrix[3] << std::endl;
+        std::cout << "meth_matrix[4] = " << meth_matrix[4] << std::endl;
+        std::cout << "meth_matrix[5] = " << meth_matrix[5] << std::endl;
+    }*/
 
     // saving meth matrix
     // std::string filepath_out_meth_data = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPBirtyhday/gVAMP/cpp_vamp/meth_data.bin";
     // mpi_store_vec_to_file(filepath_out_meth_data, meth_matrix, S*N, M*N);
     mpi_store_vec_to_file(opt.get_bed_file(), meth_matrix, S*N, M*N);
 
-    std::vector<double> y = std::vector<double> (M, 0.0);
+    std::vector<double> y = std::vector<double> (N, 0.0);
     data dataset(y, opt.get_bed_file(), N, M, Mt, S, normal, rank, type_data);
-    
-    
-    MPI_Barrier(MPI_COMM_WORLD);
-    double* meth_data = dataset.get_meth_data();
 
     // simulating data for realistic values of parameters
-    std::vector<double> vars{0, 1e-5};
-    std::vector<double> vars_init{0, 1e-3};
+    std::vector<double> vars{0, 1e-3};
+    std::vector<double> vars_init{0, 1e-2};
     if (normal == 1){
         for (int i=0; i<vars_init.size(); i++)
             vars_init[i] *= N;
@@ -63,7 +67,7 @@ int main(int argc, char** argv)
     std::vector<double> probs_init{0.9, 0.1};
 
     // simulating beta
-    std::vector<double> beta_true(M, 0.0); 
+    std::vector<double> beta_true(M, 0.0);
     
     if (rank == 0){
         std::vector<double> beta_true_tmp = simulate(Mt, vars, probs);
@@ -71,7 +75,7 @@ int main(int argc, char** argv)
             beta_true[i0-S] = beta_true_tmp[i0];
         // storing true beta
         std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
-        mpi_store_vec_to_file(filepath_out, beta_true_tmp, S, M);
+        // mpi_store_vec_to_file(filepath_out, beta_true_tmp, S, M);
         
         for (int ran = 1; ran < nranks; ran++)
             MPI_Send(beta_true_tmp.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
@@ -161,7 +165,7 @@ int main(int argc, char** argv)
     // running EM-VAMP algorithm on the data
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    double gamw_init = 2;
+    double gamw_init = 0.9 * gamw;
     double gam1 = 1e-6;
     vamp emvamp(M, gam1, gamw_init, beta_true, rank, opt);
     std::vector<double> x_est = emvamp.infere(&dataset);
