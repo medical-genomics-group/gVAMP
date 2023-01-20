@@ -1105,7 +1105,7 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
     double start_power_meth = MPI_Wtime();
 
     double power_meth_err_thr = 1e-5;
-    int power_meth_maxiter = 30; 
+    int power_meth_maxiter = 40; 
     int it = 0;
     std::vector<double> res = simulate(M, std::vector<double> {1.0/M}, std::vector<double> {1});
     std::vector<double> res_temp(4*get_mbytes(), 0.0);

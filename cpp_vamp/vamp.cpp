@@ -927,11 +927,11 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
         double x = generate_mixture_gaussians(vars_plus_gam.size(), vars_plus_gam, pi);
         std::cout << "x = "<< x << std::endl;
         std::cout << "vars_plus_gam.size() = " << vars_plus_gam.size() << std::endl;
-        std::cout << "vars.size() = " << vars.size() << std::endl;
-        std::cout << "pi.size() = " << pi.size() << std::endl;
-        double mix_gauss_ratio = mix_gauss_pdf_ratio(x, vars_plus_gam, vars, pi);
-        std::cout << "mix_gauss_ratio = " << mix_gauss_ratio  << std::endl;
-        DKL3 += log( mix_gauss_ratio );
+        std::cout << "vars_plus_gam[0] = " << vars_plus_gam[0] << std::endl;
+        std::cout << "vars_plus_gam[1] = " << vars_plus_gam[1] << std::endl;
+        double log_mix_gauss_ratio = log_mix_gauss_pdf_ratio(x, vars_plus_gam, vars, pi);
+        std::cout << "log_mix_gauss_ratio = " << log_mix_gauss_ratio  << std::endl;
+        DKL3 += log_mix_gauss_ratio;
         std::cout << "DKL3 = " << DKL3 << std::endl;
     }    
     DKL3 /= max_iter_obj_MC;

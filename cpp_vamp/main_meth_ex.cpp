@@ -38,7 +38,12 @@ int main(int argc, char** argv)
 
     // simulating methylation data using i.i.d. Gaussians as entries of methylation matrix
     std::vector<double> meth_matrix = std::vector<double> (M * N, 0.0);
+    double start_sim = MPI_Wtime();
     meth_matrix = simulate(N*M, std::vector<double> {1}, std::vector<double> {1});
+    double end_sim = MPI_Wtime();
+    if (rank == 0)
+        std::cout << "simulation took " << end_sim - start_sim << " seconds." << std::endl;
+
     /*if (rank == 0){
         std::cout << "meth_matrix[0] = " << meth_matrix[0] << std::endl;
         std::cout << "meth_matrix[1] = " << meth_matrix[1] << std::endl;

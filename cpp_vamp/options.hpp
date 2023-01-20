@@ -67,7 +67,7 @@ private:
     std::string out_dir = "";
     std::string out_name = "";
     std::string model = "linear";
-    double stop_criteria_thr = 1e-3;
+    double stop_criteria_thr = 1e-4;
     double EM_err_thr = 1e-2;
     unsigned int EM_max_iter = 2;
     unsigned int CG_max_iter = 60;

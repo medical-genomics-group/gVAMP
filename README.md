@@ -1,6 +1,6 @@
 ## Table of contents
 * [General info](#general-info)
-* [Setup and supported options](#setup)
+* [Setup and supported options](#setup-and-supported-options)
 
 ## General info
 This repository contains a software implementation of Vector Approximate Message Passing algorithm suitable for doing inference in Genome-Wide Association Studies (GWAS).  
