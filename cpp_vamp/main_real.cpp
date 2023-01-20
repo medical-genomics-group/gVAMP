@@ -52,7 +52,8 @@ int main(int argc, char** argv)
         //std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S); //for smaller dataset
         
         std::string phenfp = (opt.get_phen_files())[0];
-        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, normal, rank);
+        std::string type_data = "bed";
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, normal, rank, type_data);
         // dataset.read_phen();
         // dataset.read_genotype_data();
         // dataset.compute_markers_statistics();

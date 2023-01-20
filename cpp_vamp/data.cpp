@@ -21,7 +21,7 @@
 // constructors for class data
 data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int normal, const int rank, std::string type_data) :
     phenfp(fp),
-    bedfp(bedfp),
+    bedfp(genofp),
     type_data(type_data),
     N(N),
     M(M),
@@ -546,7 +546,7 @@ if (type_data == "bed"){
 }
 else if (type_data == "meth"){
 
-    double* meth = &meth_data[mloc * mbytes];
+    double* meth = &meth_data[mloc * N];
 
     if (normal == 1){
         double dpa = 0.0;
