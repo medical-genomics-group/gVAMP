@@ -1105,7 +1105,7 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
     double start_power_meth = MPI_Wtime();
 
     double power_meth_err_thr = 1e-5;
-    int power_meth_maxiter = 40; 
+    int power_meth_maxiter = 80; 
     int it = 0;
     std::vector<double> res = simulate(M, std::vector<double> {1.0/M}, std::vector<double> {1});
     std::vector<double> res_temp(4*get_mbytes(), 0.0);
@@ -1117,6 +1117,7 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
         res = ATx(res_temp.data(), normal_data);
         lambda_prev = lambda;
         lambda = inner_prod(res, res_prev, 1);
+        // std::cout << "[largest_sing_val2] it = " << it << " & lambda = " << lambda << std::endl;
         if (std::abs(lambda-lambda_prev) / std::abs(lambda_prev) < power_meth_err_thr)
             break;
         double norm = sqrt(l2_norm2(res, 1));

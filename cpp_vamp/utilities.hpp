@@ -34,7 +34,7 @@ double inner_prod(std::vector<double> const& u, std::vector<double> const& v, in
 
 double l2_norm2(std::vector<double> const& u, int sync);
 
-double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<double> eta_den, std::vector<double> pi);
+double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vector<double> eta_den, std::vector<double> pi_nom, std::vector<double> pi_den);
 
 double calc_stdev(std::vector<double> vec, int sync = 0);
 
