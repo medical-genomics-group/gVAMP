@@ -150,25 +150,28 @@ std::vector<double> vamp::infere_linear(data* dataset){
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
 
         z1 = (*dataset).Ax(x1_hat.data(), normal);
-        // we start adaptive damping from iteration numb_adap_damp_hist
-        while (use_adap_damp == 1 && it>numb_adap_damp_hist){
-            std::cout << "adaptive damping part " << std::endl;
+
+        // we start adaptive damping
+        if (use_adap_damp == 1 && it > 1){
             double obj_fun_val = vamp_obj_func(eta1, gam1, invQ_bern_vec, bern_vec, vars, probs, dataset);
-            double max_obj_fun_val = *std::max_element(obj_fun_vals.begin(), obj_fun_vals.end()); 
-            std::cout << "max_obj_fun_val = " << max_obj_fun_val << std::endl;
-            if (obj_fun_val <= max_obj_fun_val){
-                obj_fun_vals.erase(obj_fun_vals.begin());
-                obj_fun_vals.push_back(obj_fun_val);
-                rho = std::min(rho*damp_inc_fact, damp_max);
-                break;
+            double min_obj_fun_val = *std::min_element(obj_fun_vals.begin(), obj_fun_vals.end()); 
+
+            if (rank == 0){
+                std::cout << "min_obj_fun_val thr = " << min_obj_fun_val << std::endl;
+                std::cout << "obj_fun_val = " << obj_fun_val << std::endl;
             }
-            else{
-                rho = std::max(rho*damp_dec_fact, damp_min);
+
+            if (it>numb_adap_damp_hist){
+                if (obj_fun_val >= min_obj_fun_val)
+                    rho = std::min(rho*damp_inc_fact, damp_max);
+                else
+                    rho = std::max(rho*damp_dec_fact, damp_min);               
                 for (int i = 0; i < M; i++)
                     x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
                 z1 = (*dataset).Ax(x1_hat.data(), normal);
-                // assert(rho > 1e-8);                  
-            }   
+                obj_fun_vals.erase(obj_fun_vals.begin());  
+            }
+            obj_fun_vals.push_back(obj_fun_val);
         }
 
         if (rank == 0)
@@ -863,13 +866,13 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     double lambda1 = 2 * alpha * (gamw * largest_sing_val2 + gam2); 
     // if (rank == 0)
     //    std::cout << "lambda1 = " << lambda1 << std::endl;
-    int verbose_obj_func = 1;
+    // int verbose_obj_func = 1;
 
     // calculating differential entropy of error distribution q
     // double Hq = Mt / 2 * (1 + log(2 * M_PI / eta));
     double Hq = - Mt / 2 * log(eta);
-    if (verbose_obj_func == 1)
-        std::cout << "[vamp_obj_func] Hq = " << Hq / Mt << std::endl;
+    //if (verbose_obj_func == 1)
+    //   std::cout << "[vamp_obj_func] Hq = " << Hq / Mt << std::endl;
 
     // calculating KL divergence between two multivariate gaussians
     double DKL2 = 0;
@@ -902,7 +905,7 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     std::vector<double> temp2 = (*dataset).ATx(temp.data(), 1);
     // for (int i=0; i<temp2.size(); i++)
     //    temp2[i] *= gamw;
-    DKL2 += inner_prod(bernu, temp2, 1) / 2;
+    DKL2 += gamw * inner_prod(bernu, temp2, 1) / 2;
 
     // quadratic form component
     //std::vector<double> z2 = (*dataset).Ax(x2_hat.data());
@@ -913,9 +916,11 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     DKL2 += inner_prod(y,y,0) * gamw * alpha / 2;
     DKL2 += (-1) * Mt / 2 * log(gamw * alpha);
 
+    /*
     if (verbose_obj_func == 1)
-        if (rank == 0)
+       if (rank == 0)
             std::cout << "[vamp_obj_func] DKL2 = " << DKL2 / Mt << std::endl;
+    */
     //for (int i = 0; i < M; i++)
         //u[i] = 2*bern(rd) - 1;
     //DKL2 -= inner_prod(u, CG_solver(u, gamw, dataset), 1);
@@ -925,8 +930,7 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
     
     double DKL3 = 0;
 
-    int max_iter_obj_MC=1e5;
-    max_iter_obj_MC=3;
+    int max_iter_obj_MC=1e4;
     std::vector<double> vars_plus_gam = vars;
     for (int i=0; i<vars_plus_gam.size(); i++)
         vars_plus_gam[i] = vars[i] + 1/gam;
@@ -939,12 +943,13 @@ double vamp::vamp_obj_func(double eta, double gam, std::vector<double> invQu, st
         double x = generate_mixture_gaussians(vars_plus_gam.size(), vars_plus_gam, pi);
         double log_mix_gauss_ratio = log_mix_gauss_pdf_ratio(x, vars_plus_gam, vars_wo0, pi, pi_wo0);
         DKL3 += log_mix_gauss_ratio;
-        std::cout << "DKL3 = " << DKL3 << std::endl;
     }    
     DKL3 /= max_iter_obj_MC;
+    /*
     if (verbose_obj_func == 1)
         if (rank == 0)
             std::cout << "[vamp_obj_func] DKL3 = " << DKL3 / Mt << std::endl;
+    */
 
     return (Hq + DKL2 + DKL3) / Mt;
 
