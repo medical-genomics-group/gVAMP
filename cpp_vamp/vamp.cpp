@@ -146,10 +146,19 @@ std::vector<double> vamp::infere_linear(data* dataset){
         //updatePrior(); -> moved to after iteration
         // if (it == 1)
         //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
+        
+        double start_cond_expe= MPI_Wtime();
         for (int i = 0; i < M; i++)
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
+        double end_cond_expe= MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to calculate conditional expectation = " << end_cond_expe - start_cond_expe << " seconds" <<  std::endl;
 
+        double start_z1= MPI_Wtime();
         z1 = (*dataset).Ax(x1_hat.data(), normal);
+        double end_z1= MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to calculate z1 = " << end_z1 - start_z1 << " seconds" <<  std::endl;
 
         // we start adaptive damping
         if (use_adap_damp == 1 && it > 1){
@@ -183,6 +192,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         else if (normal == 2)
             scale = 1;
 
+        double start_saving = MPI_Wtime();
         // saving x1_hat
         std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + ".bin";
         int S = (*dataset).get_S();
@@ -201,7 +211,11 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 r1_stored[i0] =  r1[i0] / scale;
             mpi_store_vec_to_file(filepath_out_r1, r1_stored, S, M);
         }
+        double end_saving = MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to save beta1 to an external file = " << end_saving - start_saving << " seconds" <<  std::endl;
 
+        double start_onsager1 = MPI_Wtime();
         // Onsager correction calculation 
         x1_hat_d_prev = x1_hat_d;
         double sum_d = 0;
@@ -230,6 +244,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "eta1 = " << eta1 << std::endl;
             std::cout << "gam2 = " << gam2 << std::endl;
         }
+        double end_onsager1 = MPI_Wtime();
+        if (rank == 0)
+            std::cout << "denoising onsager calculation took " << end_onsager1 - start_onsager1 << " seconds" << std::endl;
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
 
@@ -244,8 +261,13 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << "true gam2 = " << Mt / se_dev_total << std::endl;
 
+        
+        double start_prior_up = MPI_Wtime();
         // new place for prior update
         updatePrior();
+        double end_prior_up = MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to calculate conditional expectation = " << end_prior_up - start_prior_up << " seconds" <<  std::endl;
     
         err_measures(dataset, 1);
 
@@ -348,13 +370,19 @@ std::vector<double> vamp::infere_linear(data* dataset){
         }
         
         if (rank == 0)
+            std::cout << "total iteration time = " << end_denoising - start_denoising + end_lmmse_step - start_lmmse_step << std::endl;
+        
+        if (rank == 0)
             std::cout << std::endl << std::endl;
     }
 
     if (store_pvals == 1){
         std::vector<double> pvals = pvals_calc(dataset);
+        std::cout << "after pvals calc" << std::endl;
         // saving pvals vector
         std::string filepath_out_pvals = out_dir + out_name + "_pvals.bin";
+        if (rank == 0)
+            std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
         int S = (*dataset).get_S();
         mpi_store_vec_to_file(filepath_out_pvals, pvals, S, M);
     }
@@ -1002,24 +1030,57 @@ std::vector<double> vamp::pvals_calc(data* dataset){
         y_mod[i] -= z1[i];
     double df = N-2;
     boost::math::students_t tdist(df);
-    for (int k=0; k<M; k++){
-        std::vector<double> y_mark = y_mod;
-        int mbytes = (*dataset).get_mbytes();
-        unsigned char* bed_data = (*dataset).get_bed_data();
-        unsigned char* bed = &bed_data[k * mbytes];
-        double sumx = 0, sumsqx = 0, sumxy = 0;
-        for (int i=0; i<mbytes; i++) {
-            #ifdef _OPENMP
-            #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
-            #endif
-            for (int j=0; j<4; j++) {
-                y_mark[4*i+j] = dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
-                sumx += dotp_lut_a[bed[i] * 4 + j];
-                sumsqx += dotp_lut_a[bed[i] * 4 + j]*dotp_lut_a[bed[i] * 4 + j];
-                sumxy += dotp_lut_a[bed[i] * 4 + j]*y_mark[4*i+j];
+    std::string type_data = (*dataset).get_type_data();
+    if (type_data == "bed"){
+        for (int k=0; k<M; k++){
+            std::vector<double> y_mark = y_mod;
+            int mbytes = (*dataset).get_mbytes();
+            unsigned char* bed_data = (*dataset).get_bed_data();
+            unsigned char* bed = &bed_data[k * mbytes];
+
+            double sumx = 0, sumsqx = 0, sumxy = 0;
+            for (int i=0; i<mbytes; i++) {
+                #ifdef _OPENMP
+                #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32) reduction(+:sumx, sumsqx, sumxy)
+                #endif
+                for (int j=0; j<4; j++) {
+                    y_mark[4*i+j] += dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
+                    sumx += dotp_lut_a[bed[i] * 4 + j];
+                    sumsqx += dotp_lut_a[bed[i] * 4 + j]*dotp_lut_a[bed[i] * 4 + j];
+                    sumxy += dotp_lut_a[bed[i] * 4 + j]*y_mark[4*i+j];
+                }
             }
+            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
+        }  
+    }
+    else if (type_data == "meth"){
+        for (int k=0; k<M; k++){
+            std::vector<double> y_mark = y_mod;
+            double* meth_data = (*dataset).get_meth_data();
+            double* meth = &meth_data[k * N];
+
+            double sumx = 0, sumsqx = 0, sumxy = 0;
+            #ifdef _OPENMP
+                #pragma omp simd
+            #endif
+            for (int i=0; i<N; i++) 
+                y_mark[i] += meth[i] * x1_hat[k];
+            
+            #ifdef _OPENMP
+                #pragma omp simd reduction(+:sumx, sumsqx, sumxy)
+            #endif
+            for (int i=0; i<N; i++) {
+                sumx += meth[i];
+                sumsqx += meth[i]*meth[i];
+                sumxy += meth[i]*y_mark[i];
+            }
+
+            sumx = 0.0;
+            for (int i=0; i<N; i++) {
+                sumx += meth[i];
+            }
+            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
         }
-        pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
     }
     return pvals;
 }

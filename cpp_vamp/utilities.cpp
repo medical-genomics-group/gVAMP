@@ -264,9 +264,9 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
     double s2y = (sumsqy - sumy*sumy/n) / (n-1);
     double s2x = (sumsqx - sumx*sumx/n) / (n-1);
     double sxy = (sumxy - sumx*sumy/n) / (n-1);
-    double rxy = sxy / (s2x*s2y);
+    double rxy = sxy / sqrt(s2x*s2y);
 
-    double beta = rxy * s2y / s2x;
+    // double beta = rxy * s2y / s2x;
     double t = rxy * sqrt( (n-2) / (1-rxy*rxy) ); // t-statistics
     boost::math::students_t dist(n-2);
     double pvalue = 2.0*boost::math::cdf(boost::math::complement(dist,t>0 ? t:(0-t)));

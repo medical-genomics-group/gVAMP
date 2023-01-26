@@ -26,8 +26,8 @@ private:
     int CG_max_iter; // = 10;
     int use_adap_damp = 0;
     int calc_state_evo = 0;
-    int numb_adap_damp_hist = 2;
-    int poly_deg_apr_vamp_obj = 5;
+    int numb_adap_damp_hist = 3;
+    int poly_deg_apr_vamp_obj = 7;
     double damp_inc_fact = 1.10;
     double damp_dec_fact = 0.90;
     double damp_max = 1;

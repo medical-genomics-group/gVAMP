@@ -269,7 +269,6 @@ void data::compute_markers_statistics() {
 
     const std::vector<unsigned char> mask4 = get_mask4();
     const int im4 = get_im4();
-
     double* mave = get_mave();
     double* msig = get_msig();
 
@@ -328,7 +327,6 @@ void data::compute_markers_statistics() {
                     double suma = 0.0;
                     double sumb = 0.0;
                     for (int j=0; j<im4; j++) {
-
                         for (int k=0; k<4; k++) {
                             //suma += p_luts[perm_idxs[i]-1][bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                             suma += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
@@ -363,14 +361,11 @@ void data::compute_markers_statistics() {
                     // currently only non-missing methylation data is allowed 
                     for (int j=0; j<(im4-1); j++) {
                         #ifdef _OPENMP
-                        #pragma omp simd
+                        #pragma omp simd reduction(+:suma)
                         #endif
                         for (int k=0; k<4; k++) 
                             suma += methm[4*j + k] * na_lut[mask4[j] * 4 + k];
                     }  
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
                     for (int k=0; k<4; k++) {
                         if (4*im4m1 + k < N){
                             suma += methm[4*im4m1 + k] * na_lut[mask4[im4m1] * 4 + k];
@@ -382,16 +377,13 @@ void data::compute_markers_statistics() {
                     double sumsqr = 0.0;
                     for (int j=0; j<(im4-1); j++) {
                         #ifdef _OPENMP
-                        #pragma omp simd
+                        #pragma omp simd reduction(+:sumsqr)
                         #endif
                         for (int k=0; k<4; k++) {
                             double val = (methm[4*j + k] - mave[i]) * na_lut[mask4[j] * 4 + k];
                             sumsqr += val * val;
                         }
                     }
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
                     for (int k=0; k<4; k++) {
                         if (4*im4m1 + k < N){
                             double val = (methm[4*im4m1 + k] - mave[i]) * na_lut[mask4[im4m1] * 4 + k];
@@ -725,9 +717,9 @@ if (type_data == "bed"){
                 #pragma omp parallel for shared(Ax_temp)
             #endif
             for (int j=0; j<mbytes; j++) {
-                //#ifdef _OPENMP
-                //#pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
-                //#endif
+                #ifdef _OPENMP
+                #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
+                #endif
                 for (int k=0; k<4; k++) {
                     // because msig[i] is the precision of the i-th marker
                     Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k]; 
@@ -744,9 +736,9 @@ if (type_data == "bed"){
                 #pragma omp parallel for shared(Ax_temp)
             #endif
             for (int j=0; j<mbytes; j++) {
-                //#ifdef _OPENMP
-                //#pragma omp simd aligned(dotp_lut_a:32)
-                //#endif
+                #ifdef _OPENMP
+                #pragma omp simd aligned(dotp_lut_a:32)
+                #endif
                 for (int k=0; k<4; k++) {
                     Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * phen_i;
                 }

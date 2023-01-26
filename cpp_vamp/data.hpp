@@ -63,7 +63,8 @@ public:
     int     get_nonas()       { return nonas; }
     void    set_nonas(int num){ nonas = num; }
     int     get_S()     const { return S; }
-    int     get_normal_data()   const {return normal_data; }
+    int     get_normal_data()   const { return normal_data; }
+    std::string get_type_data() const { return type_data; }
     std::vector<double> get_xL() { return xL; }
     std::vector<double> get_xR() { return xR; }
 
