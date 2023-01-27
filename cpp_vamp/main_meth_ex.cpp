@@ -62,7 +62,7 @@ int main(int argc, char** argv)
     data dataset(y, opt.get_bed_file(), N, M, Mt, S, normal, rank, type_data);
 
     // simulating data for realistic values of parameters
-    std::vector<double> vars{0, 1e-1};
+    std::vector<double> vars{0, 1e-3};
     std::vector<double> vars_init{0, 1e-2};
     if (normal == 1){
         for (int i=0; i<vars_init.size(); i++)

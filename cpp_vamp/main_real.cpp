@@ -86,8 +86,7 @@ int main(int argc, char** argv)
     else if (opt.get_run_mode() == "test") // just analyzing the result on the test data
     {   
 
-        normal = 1;
-        std::cout << "test normal = " << normal << std::endl;
+        // std::cout << "test normal = " << normal << std::endl;
         // reading test set
         //const std::string bedfp_HTtest = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/cpp_VAMP/testing/bed_files/ukb22828_UKB_EST_v3_all_prunned_080_test.bed";
         //const std::string pheno_HTtest = "/nfs/scistore13/robingrp/human_data/pheno/continuous/ukb_test_HT.phen";
@@ -113,44 +112,47 @@ int main(int argc, char** argv)
         std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
         std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
 
-        std::vector<double> x_est;
-        if (end_est_file_name == "bin")
-            x_est = mpi_read_vec_from_file(est_file_name, M_test, S_test);
-        else
-            x_est = read_vec_from_file(est_file_name, M_test, S_test);
+        int pos_it = est_file_name.find("it");
+        std::vector<int> iter_range = opt.get_test_iter_range();
+        int min_it = iter_range[0];
+        int max_it = iter_range[1];
 
-        if (rank == 0){
-            std::cout << "x_est[0] = " << x_est[0] << std::endl;
-            std::cout << "x_est[1] = " << x_est[1] << std::endl;
-            std::cout << "x_est[2] = " << x_est[2] << std::endl;
-            std::cout << "x_est[3] = " << x_est[3] << std::endl;
-            std::cout << "x_est[4] = " << x_est[4] << std::endl;
-            std::cout << "x_est[5] = " << x_est[5] << std::endl;
+        for (int it = min_it; it <= max_it; it++){
+            std::vector<double> x_est;
+            std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
+            if (rank == 0)
+                std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
+            if (end_est_file_name == "bin")
+                x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
+            else
+                x_est = read_vec_from_file(est_file_name_it, M_test, S_test);
+
+            if (normal == 1)
+                for (int i0 = 0; i0 < x_est.size(); i0++)
+                    x_est[i0] *= sqrt( (double) N_test );
+
+            std::vector<double> z_test = dataset_test.Ax(x_est.data(), normal);
+
+            //if (normal == 2){
+            //    int N = opt.get_N();
+            //    for (int i0 = 0; i0 < z_test.size(); i0++)
+            //        z_test[i0] *= sqrt( (double) N_test / (double) N );
+            //}
+
+            double l2_pred_err2 = 0;
+            for (int i0 = 0; i0 < N_test; i0++){
+                // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
+                l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
+            }  
+
+            double stdev = calc_stdev(y_test);
+            if (rank == 0){
+                std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
+                std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
+                std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+            }
         }
-        if (normal == 1)
-            for (int i0 = 0; i0 < x_est.size(); i0++)
-                x_est[i0] *= sqrt( (double) N_test );
-
-        std::vector<double> z_test = dataset_test.Ax(x_est.data(), normal);
-
-        //if (normal == 2){
-        //    int N = opt.get_N();
-        //    for (int i0 = 0; i0 < z_test.size(); i0++)
-        //        z_test[i0] *= sqrt( (double) N_test / (double) N );
-        //}
-
-        double l2_pred_err2 = 0;
-        for (int i0 = 0; i0 < N_test; i0++){
-            // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
-            l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
-        }  
-
-        double stdev = calc_stdev(y_test);
-        if (rank == 0){
-            std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-            std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-            std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
-        }
+        
     }
     else if (opt.get_run_mode() == "both")
     {
@@ -177,7 +179,7 @@ int main(int argc, char** argv)
         // dataset.read_genotype_data();
         // dataset.compute_markers_statistics();
 
-        double gam1 = 1e-6; //, gamw = 2.112692482840060;
+        double gam1 = 1e-6; 
         double gamw = 2;
         vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
         std::vector<double> x_est = emvamp.infere(&dataset);
@@ -230,6 +232,64 @@ int main(int argc, char** argv)
             std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
             std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
         }
+    }
+    else if (opt.get_run_mode() == "pvals-calc")
+    {
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // setting blocks of markers 
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        size_t Mt = opt.get_Mt();
+        size_t N = opt.get_N();
+
+        std::vector<double> MS = divide_work(Mt);
+        int M = MS[0];
+        int S = MS[1];
+        int Mm = MS[2];
+        
+        std::string phenfp = (opt.get_phen_files())[0];
+        std::string type_data = "bed";
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, normal, rank, type_data);
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // reading an estimate file 
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        std::string est_file_name = opt.get_estimate_file();
+        int pos_dot = est_file_name.find(".");
+        std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
+        std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
+
+        std::vector<double> x_est;
+        if (end_est_file_name == "bin")
+            x_est = mpi_read_vec_from_file(est_file_name, M, S);
+        else
+            x_est = read_vec_from_file(est_file_name, M, S);
+
+        if (rank == 0){
+            std::cout << "x_est[0] = " << x_est[0] << std::endl;
+            std::cout << "x_est[1] = " << x_est[1] << std::endl;
+            std::cout << "x_est[2] = " << x_est[2] << std::endl;
+        }
+        if (normal == 1)
+            for (int i0 = 0; i0 < x_est.size(); i0++)
+                x_est[i0] *= sqrt( (double) N );
+
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        //   obtaining p-values 
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        std::vector<double> z1 = dataset.Ax(x_est.data(), normal);
+        std::vector<double> y =  dataset.filter_pheno();
+        std::vector<double> pvals = dataset.pvals_calc(z1, y, x_est);
+        // saving pvals vector
+        std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_pvals.bin";
+        if (rank == 0)
+            std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
+        mpi_store_vec_to_file(filepath_out_pvals, pvals, S, M);
+
     }
 
     MPI_Finalize();

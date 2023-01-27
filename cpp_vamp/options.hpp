@@ -40,6 +40,7 @@ public:
     unsigned int get_store_pvals() const { return store_pvals; }
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
+    std::vector<int> get_test_iter_range() const { return test_iter_range; }
     const std::vector<std::string>& get_phen_files() const { return phen_files; }
     const std::vector<std::string>& get_phen_files_test() const { return phen_files_test; }
     void list_phen_files() const;
@@ -82,6 +83,7 @@ private:
     // unsigned int meth_imp = 0;
     std::vector<double> vars;
     std::vector<double> probs;
+    std::vector<int> test_iter_range;
     double rho = 0.98;
     //int verbosity = 0;
     unsigned int iterations = 1;

@@ -15,7 +15,7 @@
 #include "utilities.hpp"
 #include <immintrin.h>
 #include <bits/stdc++.h>
-
+#include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
 
 
 // constructors for class data
@@ -1125,3 +1125,64 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
 
     return lambda;
  }
+
+ 
+// finding p-values from t-test on regression coefficient = 0 
+// in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
+std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat){
+    std::vector<double> pvals(M, 0.0);
+    std::vector<double> y_mod = y;
+    for (int i=0; i<N; i++)
+        y_mod[i] -= z1[i];
+    double df = N-2;
+    boost::math::students_t tdist(df);
+    if (type_data == "bed"){
+        for (int k=0; k<M; k++){
+            std::vector<double> y_mark = y_mod;
+            unsigned char* bed = &bed_data[k * mbytes];
+
+            double sumx = 0, sumsqx = 0, sumxy = 0;
+            for (int i=0; i<mbytes; i++) {
+                #ifdef _OPENMP
+                #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32) reduction(+:sumx, sumsqx, sumxy)
+                #endif
+                for (int j=0; j<4; j++) {
+                    y_mark[4*i+j] += dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
+                    sumx += dotp_lut_a[bed[i] * 4 + j];
+                    sumsqx += dotp_lut_a[bed[i] * 4 + j]*dotp_lut_a[bed[i] * 4 + j];
+                    sumxy += dotp_lut_a[bed[i] * 4 + j]*y_mark[4*i+j];
+                }
+            }
+            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
+        }  
+    }
+    else if (type_data == "meth"){
+        for (int k=0; k<M; k++){
+            std::vector<double> y_mark = y_mod;
+            double* meth = &meth_data[k * N];
+
+            double sumx = 0, sumsqx = 0, sumxy = 0;
+            #ifdef _OPENMP
+                #pragma omp simd
+            #endif
+            for (int i=0; i<N; i++) 
+                y_mark[i] += meth[i] * x1_hat[k];
+            
+            #ifdef _OPENMP
+                #pragma omp simd reduction(+:sumx, sumsqx, sumxy)
+            #endif
+            for (int i=0; i<N; i++) {
+                sumx += meth[i];
+                sumsqx += meth[i]*meth[i];
+                sumxy += meth[i]*y_mark[i];
+            }
+
+            sumx = 0.0;
+            for (int i=0; i<N; i++) {
+                sumx += meth[i];
+            }
+            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
+        }
+    }
+    return pvals;
+}

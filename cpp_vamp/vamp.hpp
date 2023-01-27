@@ -41,6 +41,7 @@ private:
     int normal = 1;
     int store_pvals = 1;
     double largest_sing_val2;
+    double total_comp_time=0;
 
 public:
 
@@ -67,5 +68,5 @@ public:
     double update_probit_var(double v, std::vector<double> y);
     std::vector<double> precondCG_solver(std::vector<double> v, double tau, int save, data* dataset);
     std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);    
-    std::vector<double> pvals_calc(data* dataset);
+    // std::vector<double> pvals_calc(data* dataset);
 };

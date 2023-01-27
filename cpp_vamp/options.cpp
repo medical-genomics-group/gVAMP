@@ -109,6 +109,16 @@ void Options::read_command_line_options(int argc, char** argv) {
                 probs.push_back(atof(value.c_str()));
             }
         }
+        else if (!strcmp(argv[i], "--test-iter-range")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            std::string cslist = argv[++i];
+            ss << "--test-iter-range " << cslist << "\n";
+            std::stringstream sslist(cslist);
+            std::string value;
+            while (getline(sslist, value, ',')) {
+                test_iter_range.push_back(atoi(value.c_str()));
+            }
+        }
         /* 
         else if (!strcmp(argv[i], "--group-index-file")) {
             if (i == argc - 1) fail_if_last(argv, i);

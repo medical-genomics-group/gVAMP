@@ -186,6 +186,7 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
         double sum_total = 0;
         double sq_sum_total = 0;
         MPI_Allreduce(&sum, &sum_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); 
+        MPI_Allreduce(&sq_sum, &sq_sum_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); 
         sum = sum_total;
         sq_sum = sq_sum_total; 
     }

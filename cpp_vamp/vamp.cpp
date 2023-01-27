@@ -11,6 +11,7 @@
 #include "na_lut.hpp"
 #include "dotp_lut.hpp"
 #include "vamp.hpp"
+#include "data.hpp"
 #include "vamp_probit.cpp"
 #include "utilities.hpp"
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
@@ -120,11 +121,15 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
     // Gaussian noise start
     r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+    //r1 = std::vector<double> (M, 0.0);
 
     // linear estimator
-    // r1 = (*dataset).ATx(y.data());
-    // for (int i0=0; i0<M; i0++)
+    //r1 = (*dataset).ATx(y.data(), normal);
+    //for (int i0=0; i0<M; i0++)
 	//  r1[i0] = r1[i0]*M/N;
+
+    //gam1 = 1 / pow(calc_stdev(r1, 1), 2);
+    //std::cout << "gam1 init = " << gam1 << std::endl;
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -150,6 +155,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
         double start_cond_expe= MPI_Wtime();
         for (int i = 0; i < M; i++)
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
+        //for (int i = 0; i < M; i++)
+        //    x1_hat[i] = g1(r1[i], gam1);
         double end_cond_expe= MPI_Wtime();
         if (rank == 0)
             std::cout << "time needed to calculate conditional expectation = " << end_cond_expe - start_cond_expe << " seconds" <<  std::endl;
@@ -222,7 +229,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
         for (int i=0; i<M; i++)
         {
             // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
-            x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i]; 
+            x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i];
+            //x1_hat_d[i] = g1d(r1[i], gam1); 
             sum_d += x1_hat_d[i];
         }
 
@@ -330,7 +338,36 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "alpha2 = " << alpha2 << std::endl;
         eta2 = gam2 / alpha2;
         gam_before = gam1;
-        gam1 = rho * std::min( std::max( eta2 - gam2, gamma_min ), gamma_max ) + (1 - rho) * gam1; 
+        // gam1 = rho * std::min( std::max( eta2 - gam2, gamma_min ), gamma_max ) + (1 - rho) * gam1;
+        //if (rank == 0)
+        //    std::cout << "old gam1 = " << std::min( std::max( eta2 - gam2, gamma_min ), gamma_max ) << std::endl;
+
+        // adaptive VAMP
+        if (it < 0){
+            std::vector<double> r1mx1hat = r1;
+            for (int i=0; i<M; i++)
+                r1mx1hat[i] -= x1_hat[i];
+
+            std::cout << "l2_norm2(r1mx1hat, 1) / Mt = " << l2_norm2(r1mx1hat, 1) / Mt << std::endl;
+            std::cout << "1/eta1 = " << 1/eta1 << std::endl;
+
+            gam1 = std::min( std::max( 1 / ( l2_norm2(r1mx1hat, 1) / Mt + 1/eta1 ), gamma_min ), gamma_max );
+        }
+        else
+        {
+            std::vector<double> r1mx1hat = r1;
+            for (int i=0; i<M; i++)
+                r1mx1hat[i] -= x1_hat[i];
+            double gam1ML = 1 / ( l2_norm2(r1mx1hat, 1) / Mt + 1/eta1 );
+            std::cout << "gam1ML = " << gam1ML << std::endl;
+            gam1 = std::min( std::max( eta2 - gam2, gamma_min ), gamma_max );
+            if (gam1ML >= gam1)
+                rho = std::min(rho*damp_inc_fact, damp_max);
+            else 
+                rho = std::max(rho*damp_dec_fact, damp_min);
+        }
+            
+            
         if (rank == 0)
             std::cout << "gam1 = " << gam1 << std::endl;
 
@@ -371,14 +408,18 @@ std::vector<double> vamp::infere_linear(data* dataset){
         
         if (rank == 0)
             std::cout << "total iteration time = " << end_denoising - start_denoising + end_lmmse_step - start_lmmse_step << std::endl;
+        total_comp_time += end_denoising - start_denoising + end_lmmse_step - start_lmmse_step;
+        if (rank == 0)
+            std::cout << "total computation time so far = " << total_comp_time << std::endl;
         
         if (rank == 0)
             std::cout << std::endl << std::endl;
     }
 
     if (store_pvals == 1){
-        std::vector<double> pvals = pvals_calc(dataset);
-        std::cout << "after pvals calc" << std::endl;
+        // std::vector<double> pvals = pvals_calc(dataset);
+        std::vector<double> pvals = (*dataset).pvals_calc(z1, y, x1_hat);
+        //std::cout << "after pvals calc" << std::endl;
         // saving pvals vector
         std::string filepath_out_pvals = out_dir + out_name + "_pvals.bin";
         if (rank == 0)
@@ -523,7 +564,7 @@ void vamp::updateNoisePrec(data* dataset){
 void vamp::updatePrior() {
     
         //double max_sigma = *(std::max_element( vars ) ); 
-        double max_sigma = *std::max_element(vars.begin(), vars.end()); // std::max_element returns iterators, not values
+        //double max_sigma = *std::max_element(vars.begin(), vars.end()); // std::max_element returns iterators, not values
         double noise_var = 1 / gam1;
         double lambda = 1 - probs[0];
         std::vector<double> omegas = probs;
@@ -538,6 +579,8 @@ void vamp::updatePrior() {
         int it;
         for (it = 0; it < EM_max_iter; it++){
 
+            double max_sigma = *std::max_element(vars.begin(), vars.end()); // std::max_element returns iterators, not values
+
             std::vector<double> probs_prev = probs;
             std::vector<double> vars_prev = vars;
             std::vector< std::vector<double> > gammas;
@@ -550,11 +593,21 @@ void vamp::updatePrior() {
                 std::vector<double> temp_gammas;
                 for (int j = 1; j < probs.size(); j++ ){
                     double num = lambda * exp( - pow(r1[i], 2) / 2 * (max_sigma - vars[j]) / (vars[j] + noise_var) / (max_sigma + noise_var) ) / sqrt(vars[j] + noise_var) / sqrt(2 * M_PI) * omegas[j];
-                    double num_gammas = gam1 * r1[i] / ( 1 / vars[j] + gam1 );                    
+                    //if (i > 1998){
+                    //    std::cout << "(vars[" << j << "] + noise_var) / (max_sigma + noise_var) = " << (vars[j] + noise_var) * (max_sigma + noise_var) << std::endl;
+                    //    std::cout << "- pow(r1[i], 2) = " << - pow(r1[i], 2) << std::endl;
+                    //    std::cout << "(max_sigma - vars[j]) = " << (max_sigma - vars[j])  << std::endl;
+                    //    std::cout << "- pow(r1[i], 2) / 2 * (max_sigma - vars[j]) / (vars[j] + noise_var) / (max_sigma + noise_var)  = " << - pow(r1[i], 2) / 2 * (max_sigma - vars[j]) / (vars[j] + noise_var) / (max_sigma + noise_var)  << std::endl;
+                    //    std::cout << "num = " << num << std::endl;
+                    //}
+                    double num_gammas = gam1 * r1[i] / ( 1 / vars[j] + gam1 );  
+                    //std::cout << "num_gammas = " << num_gammas << std::endl;                  
                     temp.push_back(num);
                     temp_gammas.push_back(num_gammas);
                 }
                 double sum_of_elems = std::accumulate(temp.begin(), temp.end(), decltype(temp)::value_type(0));
+                //if (i > 1990)
+                //    std::cout << "sum_of_elems = " << sum_of_elems << std::endl;
                 //for_each(temp.begin(), temp.end(), [sum_of_elems](int &c){ c /= sum_of_elems; });
                 for (int j = 0; j < temp.size(); j++ ){
                     temp[j] /= sum_of_elems;
@@ -562,6 +615,7 @@ void vamp::updatePrior() {
                 beta.push_back(temp);
                 gammas.push_back(temp_gammas);
                 pin[i] = 1 / ( 1 + (1-lambda) / sqrt(2 * M_PI * noise_var) * exp( - pow(r1[i], 2) / 2 * max_sigma / noise_var / (noise_var + max_sigma) ) / sum_of_elems );
+                //std::cout << "pin[" << i << "] = " << pin[i] << std::endl;
             } 
             for (int j = 1; j < probs.size(); j++){
                 v.push_back( 1 / ( 1 / vars[j] + gam1 ) ); // v is of size (L-1) in the end
@@ -604,7 +658,8 @@ void vamp::updatePrior() {
 
                 //if (rank==0 && it%10 == 0)
                 //    std::cout << "j=" << j+1 << ", res_gammas_total = " << res_gammas_total << ", res_total = " << res_total << ", sum_of_pin =" << sum_of_pin << std::endl;
-                 vars[j+1] = res_gammas_total / res_total;
+                vars[j+1] = res_gammas_total / res_total;
+                //std::cout << "vars[" << j+1 << "] = "<< vars[j+1] << std::endl;
                 omegas[j+1] = res_total / sum_of_pin;
                 probs[j+1] = lambda * omegas[j+1];
 
@@ -613,24 +668,23 @@ void vamp::updatePrior() {
             }
             probs[0] = 1 - lambda;
         
-        double distance_probs = 0, norm_probs = 0;
-        double distance_vars = 0, norm_vars = 0;
-        for (int j = 0; j < probs.size(); j++){
-            distance_probs += ( probs[j] - probs_prev[j] ) * ( probs[j] - probs_prev[j] );
-            norm_probs += probs[j] * probs[j];
-            distance_vars += ( vars[j] - vars_prev[j] ) * ( vars[j] - vars_prev[j] );
-            norm_vars += vars[j] * vars[j];
-        }
-        double dist_probs = sqrt(distance_probs / norm_probs);
-        double dist_vars = sqrt(distance_vars / norm_vars);
-        if (rank == 0)
-            std::cout << "it = " << it << ": dist_probs = " << dist_probs << " & dist_vars = " << dist_vars << std::endl;
-        if ( dist_probs < EM_err_thr  && dist_vars < EM_err_thr ){
+            double distance_probs = 0, norm_probs = 0;
+            double distance_vars = 0, norm_vars = 0;
+            for (int j = 0; j < probs.size(); j++){
+                distance_probs += ( probs[j] - probs_prev[j] ) * ( probs[j] - probs_prev[j] );
+                norm_probs += probs[j] * probs[j];
+                distance_vars += ( vars[j] - vars_prev[j] ) * ( vars[j] - vars_prev[j] );
+                norm_vars += vars[j] * vars[j];
+            }
+            double dist_probs = sqrt(distance_probs / norm_probs);
+            double dist_vars = sqrt(distance_vars / norm_vars);
             if (rank == 0)
-                std::cout << "EM error threshold satisfied." << std::endl;
-            break;   
-        }
-
+                std::cout << "it = " << it << ": dist_probs = " << dist_probs << " & dist_vars = " << dist_vars << std::endl;
+            if ( dist_probs < EM_err_thr  && dist_vars < EM_err_thr ){
+                if (rank == 0)
+                    std::cout << "EM error threshold satisfied." << std::endl;
+                break;   
+            }
         }
         //else
             //if (rank ==0)
@@ -1023,6 +1077,7 @@ std::tuple<double, double, double> vamp::state_evo(int ind, double gam_prev, dou
 
 // finding p-values from t-test on regression coefficient = 0 
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
+/*
 std::vector<double> vamp::pvals_calc(data* dataset){
     std::vector<double> pvals(M, 0.0);
     std::vector<double> y_mod = y;
@@ -1084,3 +1139,4 @@ std::vector<double> vamp::pvals_calc(data* dataset){
     }
     return pvals;
 }
+*/
