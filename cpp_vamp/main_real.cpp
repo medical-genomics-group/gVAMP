@@ -117,15 +117,52 @@ int main(int argc, char** argv)
         int min_it = iter_range[0];
         int max_it = iter_range[1];
 
-        for (int it = min_it; it <= max_it; it++){
+        if (min_it != -1){
+            for (int it = min_it; it <= max_it; it++){
+                std::vector<double> x_est;
+                std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
+                if (rank == 0)
+                    std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
+                if (end_est_file_name == "bin")
+                    x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
+                else
+                    x_est = read_vec_from_file(est_file_name_it, M_test, S_test);
+
+                if (normal == 1)
+                    for (int i0 = 0; i0 < x_est.size(); i0++)
+                        x_est[i0] *= sqrt( (double) N_test );
+
+                std::vector<double> z_test = dataset_test.Ax(x_est.data(), normal);
+
+                //if (normal == 2){
+                //    int N = opt.get_N();
+                //    for (int i0 = 0; i0 < z_test.size(); i0++)
+                //        z_test[i0] *= sqrt( (double) N_test / (double) N );
+                //}
+
+                double l2_pred_err2 = 0;
+                for (int i0 = 0; i0 < N_test; i0++){
+                    // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
+                    l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
+                }  
+
+                double stdev = calc_stdev(y_test);
+                if (rank == 0){
+                    std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
+                    std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
+                    std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+                }
+            }
+        }
+        else 
+        {
             std::vector<double> x_est;
-            std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
             if (rank == 0)
-                std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
+                std::cout << "est_file_name = " << est_file_name << std::endl;
             if (end_est_file_name == "bin")
-                x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
+                x_est = mpi_read_vec_from_file(est_file_name, M_test, S_test);
             else
-                x_est = read_vec_from_file(est_file_name_it, M_test, S_test);
+                x_est = read_vec_from_file(est_file_name, M_test, S_test);
 
             if (normal == 1)
                 for (int i0 = 0; i0 < x_est.size(); i0++)
@@ -133,15 +170,8 @@ int main(int argc, char** argv)
 
             std::vector<double> z_test = dataset_test.Ax(x_est.data(), normal);
 
-            //if (normal == 2){
-            //    int N = opt.get_N();
-            //    for (int i0 = 0; i0 < z_test.size(); i0++)
-            //        z_test[i0] *= sqrt( (double) N_test / (double) N );
-            //}
-
             double l2_pred_err2 = 0;
             for (int i0 = 0; i0 < N_test; i0++){
-                // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
                 l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
             }  
 

@@ -359,11 +359,12 @@ std::vector<double> vamp::infere_linear(data* dataset){
             for (int i=0; i<M; i++)
                 r1mx1hat[i] -= x1_hat[i];
             double gam1ML = 1 / ( l2_norm2(r1mx1hat, 1) / Mt + 1/eta1 );
+            if (rank == 0)
             std::cout << "gam1ML = " << gam1ML << std::endl;
             gam1 = std::min( std::max( eta2 - gam2, gamma_min ), gamma_max );
-            if (gam1ML >= gam1)
+            if (gam1ML >= 1.05 * gam1)
                 rho = std::min(rho*damp_inc_fact, damp_max);
-            else 
+            else if (gam1ML <= 0.95 * gam1)
                 rho = std::max(rho*damp_dec_fact, damp_min);
         }
             

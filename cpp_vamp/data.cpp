@@ -1131,27 +1131,39 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
 std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat){
     std::vector<double> pvals(M, 0.0);
-    std::vector<double> y_mod = y;
+    std::vector<double> y_mod = std::vector<double> (N, 0.0);
     for (int i=0; i<N; i++)
-        y_mod[i] -= z1[i];
+        y_mod[i] = y[i] - z1[i];
     double df = N-2;
     boost::math::students_t tdist(df);
     if (type_data == "bed"){
         for (int k=0; k<M; k++){
-            std::vector<double> y_mark = y_mod;
-            unsigned char* bed = &bed_data[k * mbytes];
+            std::vector<double> y_mark = std::vector<double> (4*mbytes, 0.0);
+            for (int i=0; i<N; i++)
+                y_mark[i] = y_mod[i];
 
+            unsigned char* bed = &bed_data[k * mbytes];
             double sumx = 0, sumsqx = 0, sumxy = 0;
+            
+            #ifdef _OPENMP
+            #pragma omp parallel for
+            #endif
             for (int i=0; i<mbytes; i++) {
+                #ifdef _OPENMP
+                #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
+                #endif
+                for (int j=0; j<4; j++) 
+                    y_mark[4*i+j] += dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
+
                 #ifdef _OPENMP
                 #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32) reduction(+:sumx, sumsqx, sumxy)
                 #endif
                 for (int j=0; j<4; j++) {
-                    y_mark[4*i+j] += dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
                     sumx += dotp_lut_a[bed[i] * 4 + j];
                     sumsqx += dotp_lut_a[bed[i] * 4 + j]*dotp_lut_a[bed[i] * 4 + j];
                     sumxy += dotp_lut_a[bed[i] * 4 + j]*y_mark[4*i+j];
                 }
+
             }
             pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
         }  

@@ -83,7 +83,7 @@ private:
     // unsigned int meth_imp = 0;
     std::vector<double> vars;
     std::vector<double> probs;
-    std::vector<int> test_iter_range;
+    std::vector<int> test_iter_range = std::vector<int>(2, -1);
     double rho = 0.98;
     //int verbosity = 0;
     unsigned int iterations = 1;
