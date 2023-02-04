@@ -15,7 +15,7 @@ private:
     std::vector<double> r1, r2;
     std::vector<double> p1, p2;
     std::vector<double> p_CG_last, mu_CG_last;
-    double gam1, gam2, eta1, eta2, rho, gamw, gam_before, tau1, tau2;
+    double gam1, gam2, eta1, eta2, rho, gamw, gam_before, tau1, tau2, alpha1, alpha2;
     std::vector<double> probs, probs_before;
     std::vector<double> vars, vars_before;
     double gamma_min = 1e-11;
@@ -42,6 +42,7 @@ private:
     int store_pvals = 1;
     double largest_sing_val2;
     double total_comp_time=0;
+    int reverse = 0;
 
 public:
 
@@ -56,11 +57,16 @@ public:
     double g1d(double x, double gam1);
     double g1d_bin_class(double p, double tau1, double y);
     double g2d_onsager(double gam2, double tau, data* dataset);
+    double g2d_onsagerAAT(double gam2, double tau, data* dataset);
     void updatePrior();
     void updateNoisePrec(data* dataset);
+    void updateNoisePrecAAT(data* dataset);
     std::vector<double> lmmse_mult(std::vector<double> v, double tau, data* dataset);
+    std::vector<double> lmmse_multAAT(std::vector<double> u, double tau, data* dataset);
+    std::vector<double> lmmse_denoiserAAT(std::vector<double> r, std::vector<double> mu_CG_AAT_last, data* dataset);
     std::vector<double> CG_solver(std::vector<double> v, double tau, data* dataset);
     std::vector<double> CG_solver(std::vector<double> v, std::vector<double> mu_start, std::vector<double> p_start, double tau, data* dataset);
+    std::vector<double> CG_solverAAT(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);
     double vamp_obj_func(double eta, double gam, std::vector<double> invQu, std::vector<double> bernu, std::vector<double> vars, std::vector<double> pi, data* dataset);
     void err_measures(data * dataset, int ind);
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);
@@ -68,5 +74,4 @@ public:
     double update_probit_var(double v, std::vector<double> y);
     std::vector<double> precondCG_solver(std::vector<double> v, double tau, int save, data* dataset);
     std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);    
-    // std::vector<double> pvals_calc(data* dataset);
 };

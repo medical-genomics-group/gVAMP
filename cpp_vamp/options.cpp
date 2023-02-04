@@ -115,8 +115,10 @@ void Options::read_command_line_options(int argc, char** argv) {
             ss << "--test-iter-range " << cslist << "\n";
             std::stringstream sslist(cslist);
             std::string value;
+            int nit = 0;
             while (getline(sslist, value, ',')) {
-                test_iter_range.push_back(atoi(value.c_str()));
+                test_iter_range[nit] = atoi(value.c_str());
+                nit++;
             }
         }
         /* 

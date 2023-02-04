@@ -110,19 +110,22 @@ int main(int argc, char** argv)
         std::string est_file_name = opt.get_estimate_file();
         int pos_dot = est_file_name.find(".");
         std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
-        std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
+        if (rank == 0)
+            std::cout << "est_file_name = " << est_file_name << std::endl;
 
         int pos_it = est_file_name.find("it");
         std::vector<int> iter_range = opt.get_test_iter_range();
         int min_it = iter_range[0];
         int max_it = iter_range[1];
+        if (rank == 0)
+            std::cout << "iter range = [" << min_it << ", " << max_it << "]" << std::endl;
 
         if (min_it != -1){
             for (int it = min_it; it <= max_it; it++){
                 std::vector<double> x_est;
                 std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
-                if (rank == 0)
-                    std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
+                //if (rank == 0)
+                    //std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
                 if (end_est_file_name == "bin")
                     x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
                 else
@@ -148,9 +151,10 @@ int main(int argc, char** argv)
 
                 double stdev = calc_stdev(y_test);
                 if (rank == 0){
-                    std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-                    std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-                    std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+                    //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
+                    //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
+                    // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+                    std::cout << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << ", ";
                 }
             }
         }
