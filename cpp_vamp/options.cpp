@@ -137,6 +137,24 @@ void Options::read_command_line_options(int argc, char** argv) {
             verbosity = atoi(argv[++i]);
             ss << "--verbosity " << verbosity << "\n";
         } */
+        else if (!strcmp(argv[i], "--use-lmmse-damp")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --iterations has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            use_lmmse_damp = (unsigned int) atoi(argv[++i]);
+            ss << "--use-lmmse-damp " << use_lmmse_damp << "\n";
+        }
+        else if (!strcmp(argv[i], "--use-XXT-denoiser")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --iterations has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            use_XXT_denoiser = (unsigned int) atoi(argv[++i]);
+            ss << "--use-XXT-denoiser " << use_XXT_denoiser << "\n";
+        }
         else if (!strcmp(argv[i], "--iterations")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 1) {

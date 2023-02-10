@@ -13,6 +13,7 @@ private:
     std::vector<double> obj_fun_vals = std::vector<double> (1, std::numeric_limits<double>::min());
     std::vector<double> z1;
     std::vector<double> r1, r2;
+    std::vector<double> r2_prev;
     std::vector<double> p1, p2;
     std::vector<double> p_CG_last, mu_CG_last;
     double gam1, gam2, eta1, eta2, rho, gamw, gam_before, tau1, tau2, alpha1, alpha2;
@@ -42,7 +43,8 @@ private:
     int store_pvals = 1;
     double largest_sing_val2;
     double total_comp_time=0;
-    int reverse = 0;
+    int reverse = 1;
+    int use_lmmse_damp = 0;
 
 public:
 

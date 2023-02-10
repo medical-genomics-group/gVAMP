@@ -36,6 +36,9 @@ private:
     std::vector<unsigned char> mask4;
     double* mave     = nullptr;
     double* msig     = nullptr;
+    std::vector<double> mave_people;
+    std::vector<double> msig_people;
+    std::vector<double> numb_people;
     unsigned char* bed_data = nullptr;
     double* meth_data = nullptr;
     size_t mbytes;
@@ -59,6 +62,9 @@ public:
     std::vector<unsigned char>& get_mask4() { return mask4; }
     double* get_mave()        { return mave; }
     double* get_msig()        { return msig; }
+    std::vector<double> get_mave_people() { return mave_people; };
+    std::vector<double> get_msig_people() { return msig_people; };
+    std::vector<double> get_numb_people() { return numb_people; };
     int     get_im4()   const { return im4; }
     int     get_nonas()       { return nonas; }
     void    set_nonas(int num){ nonas = num; }
@@ -81,6 +87,8 @@ public:
     void read_phen();   // reading phenotype file
 
     void compute_markers_statistics(); 
+
+    void compute_people_statistics();
 
     double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal);
 

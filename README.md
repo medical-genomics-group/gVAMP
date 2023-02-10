@@ -55,5 +55,8 @@ Currently supported input options to C++ version of the code:
 | `use-adap-damp` | indicates wheather or not the algorithm uses adaptive damping procedure (0 or 1) |
 | `store-pvals` | indicates wheather or not the algorithm stores p-values from association tests of each of the markers |
 | `test-iter-range` | indicates the iteration range for which R2 on a test set is calculated |
+| `use_XXT_denoiser` | indicates whether or not a denoiser should be calculated based on formula with inversion of NxN matrix or not |
+| `use_lmmse_damp` | indicates whether or not damping should be used in LMMSE step calculation |
+
 
 

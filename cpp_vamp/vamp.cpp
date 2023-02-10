@@ -13,6 +13,7 @@
 #include "vamp.hpp"
 #include "data.hpp"
 #include "vamp_probit.cpp"
+#include "denoiserXXT.cpp"
 #include "utilities.hpp"
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
 
@@ -45,6 +46,8 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     EM_max_iter = opt.get_EM_max_iter();
     EM_err_thr = opt.get_EM_err_thr();
     CG_max_iter = opt.get_CG_max_iter();
+    reverse = opt.get_use_XXT_denoiser();
+    use_lmmse_damp = opt.get_use_lmmse_damp();
     //std::cout<< "CG_max_iter = " << CG_max_iter << std::endl;
     stop_criteria_thr = opt.get_stop_criteria_thr();
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
@@ -66,7 +69,9 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     true_signal(true_signal),
     model(opt.get_model()),
     store_pvals(opt.get_store_pvals()),
-    rank(rank)  {
+    rank(rank),
+    reverse(opt.get_use_XXT_denoiser()),
+    use_lmmse_damp(opt.get_use_lmmse_damp())  {
     N = opt.get_N();
     Mt = opt.get_Mt();
     max_iter = opt.get_iterations();
@@ -97,6 +102,8 @@ std::vector<double> vamp::infere( data* dataset ){
             vars[i] *= N;
     if (use_adap_damp == 1)
         largest_sing_val2 = (*dataset).largest_sing_val2();
+    if (reverse == 1)
+        (*dataset).compute_people_statistics();
     
     if (!strcmp(model.c_str(), "linear"))
         return infere_linear(dataset);
@@ -110,6 +117,8 @@ std::vector<double> vamp::infere( data* dataset ){
 
 std::vector<double> vamp::infere_linear(data* dataset){
 
+    if (rank == 0)
+        std::cout << "use_lmmse_damp = " << use_lmmse_damp << std::endl;
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
     std::vector<double> x1_hat_stored(M, 0.0);
@@ -254,14 +263,24 @@ std::vector<double> vamp::infere_linear(data* dataset){
         double end_onsager1 = MPI_Wtime();
         if (rank == 0)
             std::cout << "denoising onsager calculation took " << end_onsager1 - start_onsager1 << " seconds" << std::endl;
+        if (use_lmmse_damp == 1)
+            r2_prev = r2;
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
-
+        if (use_lmmse_damp == 1){
+            double xi = std::min(2 * std::min(alpha1, alpha2), 1.0);
+            if (rank == 0)
+                std::cout << "xi = " << xi << std::endl;
+            if (it == 1)
+                xi = 1;
+            for (int i = 0; i < M; i++)
+                r2[i] = xi * r2[i] + (1-xi) * r2_prev[i];
+        }
 
         // if the true value of the signal is known, we print out the true gam2
         double se_dev = 0;
         for (int i0=0; i0<M; i0++){
-            se_dev += (r2[i0]- scale*true_signal[i0])*(r2[i0]- scale*true_signal[i0]);
+            se_dev += (r2[i0] - scale*true_signal[i0])*(r2[i0] - scale*true_signal[i0]);
         }
         double se_dev_total = 0;
         MPI_Allreduce(&se_dev, &se_dev_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -301,7 +320,6 @@ std::vector<double> vamp::infere_linear(data* dataset){
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
         if (reverse == 0){
-
             //gamw = 1 / ( 1 - inner_prod(z1, z1, 0) );
             std::vector<double> v = (*dataset).ATx(y.data(), normal);
             for (int i = 0; i < M; i++)
@@ -335,10 +353,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
         */
 
         double start_onsager = MPI_Wtime();
-        if (reverse == 0)
+        //if (reverse == 0)
             alpha2 = g2d_onsager(gam2, gamw, dataset);
-        else if (reverse == 1)
-            alpha2 = g2d_onsagerAAT(gam2, gamw, dataset);
+        //else if (reverse == 1)
+        //    alpha2 = g2d_onsagerAAT(gam2, gamw, dataset);
         double end_onsager = MPI_Wtime();
 
         if (rank == 0)
@@ -396,10 +414,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "true gam1 = " << Mt / se_dev_total1 << std::endl; 
 
         // learning a noise precision parameter
-        if (reverse == 0)
+        //if (reverse == 0)
             updateNoisePrec(dataset);
-        else if (reverse == 1)
-            updateNoisePrecAAT(dataset);
+        //else if (reverse == 1)
+        //    updateNoisePrecAAT(dataset);
    
         // printing out error measures
         err_measures(dataset, 2);
@@ -527,21 +545,6 @@ double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared bet
 }
 
 
-double vamp::g2d_onsagerAAT(double gam2, double tau, data* dataset) { // shared between linear and binary classification model
-    
-    std::random_device rd;
-    std::bernoulli_distribution bern(0.5);
-
-    bern_vec = std::vector<double> (M, 0.0);
-    for (int i = 0; i < M; i++)
-        bern_vec[i] = (2*bern(rd) - 1) / sqrt(Mt); // Bernoulli variables are sampled independently
-    std::vector<double> res = (*dataset).Ax(bern_vec.data(), normal);
-    invQ_bern_vec = CG_solverAAT(res, std::vector<double> (4*(*dataset).get_mbytes(), 0.0), tau, 0, dataset); // precond_change
-    res = (*dataset).ATx(invQ_bern_vec.data(), normal);
-    double onsager = gam2 * inner_prod(bern_vec, res, 1) * gamw; 
-    return 1 + onsager;    
-}
-
 void vamp::updateNoisePrec(data* dataset){
 
     /*
@@ -586,24 +589,6 @@ void vamp::updateNoisePrec(data* dataset){
         std::cout << "trace_correction / N = " << trace_corr / N << std::endl;
         //std::cout << "var(y) = " << inner_prod(y, y, 0) / N << std::endl;
         //std::cout << "alternative gamw = " << 1 / ( 1 - inner_prod(z1, z1, 0) ) << std::endl;
-    }
-    gamw = (double) N / (temp_norm2 + trace_corr);
-     
-}
-
-void vamp::updateNoisePrecAAT(data* dataset){
-
-    std::vector<double> temp = (*dataset).Ax(x2_hat.data(), normal);
-    // std::vector<double> y = (*dataset).get_phen();
-
-    for (int i = 0; i < N; i++)  // because length(y) = N
-        temp[i] -= y[i];
-    
-    double temp_norm2 = l2_norm2(temp, 0); 
-    double trace_corr = Mt * (alpha2-1) / gamw;
-    if (rank == 0){
-        std::cout << "l2_norm2(temp) / N = " << temp_norm2 / N << std::endl;
-        std::cout << "trace_correction / N = " << trace_corr / N << std::endl;
     }
     gamw = (double) N / (temp_norm2 + trace_corr);
      
@@ -760,79 +745,6 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
 }
 
 
-std::vector<double> vamp::lmmse_multAAT(std::vector<double> u, double tau, data* dataset){ // multiplying with (tau*AA^Tv + gam2*v)
-
-    if (u == std::vector<double>(N, 0.0))
-        return std::vector<double>(N, 0.0);
-    size_t phen_size = 4 * (*dataset).get_mbytes();
-    std::vector<double> res(phen_size, 0.0);
-    std::vector<double> res_temp(M, 0.0);
-    res_temp = (*dataset).ATx(u.data(), normal);
-    res = (*dataset).Ax(res_temp.data(), normal);
-    for (int i = 0; i < N; i++){
-        res[i] *= tau;
-        res[i] += gam2 * u[i];
-    }
-    return res;
-}
-
-std::vector<double> vamp::lmmse_denoiserAAT(std::vector<double> r2, std::vector<double> mu_CG_AAT_last, data* dataset){
-    std::vector<double> z2 = (*dataset).Ax(r2.data(), 1);
-    std::vector<double> v = std::vector<double> (N, 0.0);
-    for (int i=0; i<N; i++)
-        v[i] = y[i] - z2[i];
-    v = CG_solverAAT(v, mu_CG_AAT_last, gamw, 1, dataset);
-    std::vector<double> res = (*dataset).ATx(v.data(), 1);
-    for (int i=0; i<N; i++)
-        res[i] = gamw * res[i] + r2[i];
-    return res;
-}
-
-std::vector<double> vamp::CG_solverAAT(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset){
-    
-    std::vector<double> mu = mu_start;
-    std::vector<double> d;
-    std::vector<double> r = lmmse_multAAT(mu, tau, dataset);
-    for (int i0=0; i0<r.size(); i0++)
-        r[i0] = v[i0] - r[i0];
-    std::vector<double> p = r;
-    int mbytes4 = 4*(*dataset).get_mbytes();
-    std::vector<double> p_temp(mbytes4, 0.0);
-    std::vector<double> palpha(mbytes4, 0.0);
-    double alpha, beta;
-    for (int i = 0; i < CG_max_iter; i++){
-        double start_lmmse = MPI_Wtime();
-        // d = A*p
-        d = lmmse_multAAT(p, tau, dataset);
-        double end_lmmse = MPI_Wtime();
-        alpha = l2_norm2(r, 1) / inner_prod(d, p, 1);
-        
-        for (int j = 0; j < N; j++)
-            palpha[j] = alpha * p[j];
-        std::transform (mu.begin(), mu.end(), palpha.begin(), mu.begin(), std::plus<double>());
-        for (int j = 0; j < p.size(); j++)
-            p_temp[j] = d[j] * alpha;
-        beta = pow( l2_norm2(r, 1), -1 );
-        std::transform (r.begin(), r.end(), p_temp.begin(), r.begin(), std::minus<double>());
-        double l2_norm2_r = l2_norm2(r, 1);
-        beta *= l2_norm2_r;
-        for (int j = 0; j < p.size(); j++)
-            p[j] = r[j] + beta * p[j];
-
-        // stopping criteria
-        double rel_err = sqrt( l2_norm2_r / l2_norm2(v, 1) );
-        double err_tol = 1e-4;
-        if (rank == 0)
-            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << std::endl;
-        if (rel_err < err_tol) 
-            break;
-    }
-
-    mu_CG_last = mu;
-    return mu;
- }
-
-
 std::vector<double> vamp::CG_solver(std::vector<double> v, double tau, data* dataset){
     // we start with approximation x0 = 0
     std::vector<double> mu(M, 0.0);
@@ -892,8 +804,6 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
     // tau = gamw
     // preconditioning part
     std::vector<double> diag(M, 1.0);
-    double* mave = (*dataset).get_mave();
-    double* msig = (*dataset).get_msig();
     if (normal == 1){
         //for (int j=0; j<M; j++)
         //    diag[j] = tau * ((N-1) / msig[j] / msig[j] + mave[j] * mave[j] * N) + gam2;
@@ -1052,16 +962,16 @@ void vamp::err_measures(data *dataset, int ind){
             std::cout << vars[i] << ' ';
     }
     if (rank == 0) {
-    std::cout << std::endl;
-    std::cout << "prior probabilities = ";
+        std::cout << std::endl;
+        std::cout << "prior probabilities = ";
     }
     for (int i = 0; i < probs.size(); i++){
         if (rank == 0)
             std::cout << probs[i] << ' ';
     }
     if (rank == 0){
-    std::cout << std::endl;
-    std::cout << "gamw = " << gamw << std::endl;
+        std::cout << std::endl;
+        std::cout << "gamw = " << gamw << std::endl;
     }
     
 }

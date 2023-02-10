@@ -416,6 +416,143 @@ void data::compute_markers_statistics() {
             std::cout << "rank = " << rank << ": statistics took " << end - start << " seconds to run." << std::endl;
 }
 
+
+// Compute mean and associated standard deviation for people
+// ! one byte of bed  contains information for 4 individuals
+// ! one byte of phen contains information for 8 individuals
+// we modify vectors of length 4*mbytes to contain to contain 
+// average value and inverse standard deviation per individual
+// (0 if phenotype is missing)
+void data::compute_people_statistics() {
+
+    if (rank == 0)
+        std::cout << "inside compute_people_statistics" << std::endl;
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    const std::vector<unsigned char> mask4 = get_mask4();
+    const int im4 = get_im4();
+    mave_people = std::vector<double> (4 * mbytes, 0.0);
+    msig_people = std::vector<double> (4 * mbytes, 0.0);
+    numb_people = std::vector<double> (4 * mbytes, 0.0);
+
+    double start = MPI_Wtime();
+
+    if (type_data == "bed"){
+
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (int i=0; i<M; i++) {
+            size_t bedix = size_t(i) * size_t(mbytes);
+            const unsigned char* bedm = &bed_data[bedix];
+            for (int j=0; j<im4; j++) {
+                for (int k=0; k<4; k++) {
+                    mave_people[4*j + k] += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
+                    numb_people[4*j + k] += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                    msig_people[4*j + k] += dotp_lut_a[bedm[j] * 4 + k] * dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                }
+            }
+        }
+
+        // collecting results from different nodes
+        std::vector<double> mave_people_total(4 * mbytes, 0.0);
+        std::vector<double> msig_people_total(4 * mbytes, 0.0);
+        std::vector<double> numb_people_total(4 * mbytes, 0.0);
+        MPI_Allreduce(mave_people.data(), mave_people_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(numb_people.data(), numb_people_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(msig_people.data(), msig_people_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        for (int j=0; j<im4; j++)
+            for (int k=0; k<4; k++)
+                if (4*j + k < N)
+                    if (na_lut[mask4[j] * 4 + k] == 1){
+                        mave_people_total[4*j+k] /= numb_people_total[4*j+k];
+                        msig_people_total[4*j+k] = (numb_people_total[4*j+k] - 1) / (msig_people_total[4*j+k] - numb_people_total[4*j+k] * mave_people_total[4*j+k] * mave_people_total[4*j+k]);
+                    }
+                    else {
+                        mave_people_total[4*j+k] = 0;
+                        msig_people_total[4*j+k] = 0;
+                        std::cout << "mave = 0 & 4*j+k = " << 4*j+k << std::endl;
+                    }
+        
+        mave_people = mave_people_total;
+        msig_people = msig_people_total;
+        for (int i=0; i<N; i++) 
+            msig_people[i] = sqrt(msig_people[i]);  
+
+        if (rank == 0){
+            std::cout << "msig_people[0] = " << msig_people[0] << std::endl;
+            std::cout << "msig_people[1] = " << msig_people[1] << std::endl;
+        }
+    }
+    else if (type_data == "meth"){
+        
+        int im4m1 = im4-1;
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (int i=0; i<M; i++) {
+            size_t methix = size_t(i) * size_t(N);
+            const double* methm = &meth_data[methix];
+
+            // calculating marker mean in 2 step process since size(phen) = 4*mbytes and size(methm) = N
+            // currently only non-missing methylation data is allowed 
+            for (int j=0; j<(im4-1); j++) {
+                #ifdef _OPENMP
+                #pragma omp simd
+                #endif
+                for (int k=0; k<4; k++){
+                    mave_people[4*j + k] += methm[4*j + k] * na_lut[mask4[j] * 4 + k]; 
+                    numb_people[4*j + k] += na_lut[mask4[j] * 4 + k];
+                    msig_people[4*j + k] += methm[4*j + k] * methm[4*j + k] * na_lut[mask4[j] * 4 + k];
+                }
+            }  
+            for (int k=0; k<4; k++) {
+                if (4*im4m1 + k < N){
+                    mave_people[4*im4m1 + k] += methm[4*im4m1 + k] * na_lut[mask4[im4m1] * 4 + k]; 
+                    numb_people[4*im4m1 + k] += na_lut[mask4[im4m1] * 4 + k];
+                    msig_people[4*im4m1 + k] += methm[4*im4m1 + k] * methm[4*im4m1 + k] * na_lut[mask4[im4m1] * 4 + k];
+                } 
+            }
+        }
+
+        // collecting results from different nodes
+        std::vector<double> mave_people_total(4 * mbytes, 0.0);
+        std::vector<double> msig_people_total(4 * mbytes, 0.0);
+        std::vector<double> numb_people_total(4 * mbytes, 0.0);
+        MPI_Allreduce(mave_people.data(), mave_people_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(numb_people.data(), numb_people_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(msig_people.data(), msig_people_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        for (int j=0; j<im4; j++)
+            for (int k=0; k<4; k++)
+                if (4*j + k < N)
+                    if (na_lut[mask4[j] * 4 + k] == 1){
+                        mave_people_total[4*j+k] /= numb_people_total[4*j+k];
+                        msig_people_total[4*j+k] = (numb_people_total[4*j+k] - 1) / (msig_people_total[4*j+k] - numb_people_total[4*j+k] * mave_people_total[4*j+k] * mave_people_total[4*j+k]);
+                    }
+                    else {
+                        mave_people_total[4*j+k] = 0;
+                        msig_people_total[4*j+k] = 0;
+                    }
+
+        mave_people = mave_people_total;
+        msig_people = msig_people_total;
+        for (int i=0; i<N; i++) 
+            msig_people[i] = sqrt(msig_people[i]);   
+
+        if (rank == 0){
+            std::cout << "msig_people[0] = " << msig_people[0] << std::endl;
+            std::cout << "msig_people[1] = " << msig_people[1] << std::endl;
+        }
+    }
+    double end = MPI_Wtime();
+        if (rank == 0)
+            std::cout << "rank = " << rank << ": statistics took " << end - start << " seconds to run." << std::endl;
+}
+
+
 double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, int normal) {
 // __restrict__ means that phen is the only pointer pointing to that data
 
