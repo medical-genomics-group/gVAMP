@@ -40,7 +40,7 @@ double calc_stdev(std::vector<double> vec, int sync = 0);
 
 std::vector<double> divide_work(int Mt);
 
-double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, std::vector<double> y_mark);
+double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, double sumy, double sumsqy, int n);
 
 //EO: this to allow reduction on avx256 pd4 datatype with OpenMP
 #ifdef _OPENMP

@@ -55,17 +55,22 @@ std::vector<double> vamp::CG_solverAAT(std::vector<double> v, std::vector<double
     std::vector<double> mave_people = (*dataset).get_mave_people();
     std::vector<double> msig_people = (*dataset).get_msig_people();
     std::vector<double> numb_people = (*dataset).get_numb_people();
-    if (rank == 0){
-        std::cout << "mave_people[0] = " << mave_people[0] << std::endl;
-        std::cout << "msig_people[0] = " << msig_people[0] << std::endl;
-    }
 
     // constructing preconditioner
     std::vector<double> diag(N, 1.0);
-    for (int i=0; i<N; i++)
-        //diag[i] = tau * ((numb_people[i]-1) / msig_people[i] / msig_people[i] + mave_people[i] * mave_people[i] * numb_people[i]) / N + gam2;
-        diag[i] = 1;
+    for (int i=0; i<N; i++){
+        diag[i] = tau * ((numb_people[i]-1) / msig_people[i] / msig_people[i] + mave_people[i] * mave_people[i] * numb_people[i]) / N + gam2;
+        if (diag[i] == 0 || msig_people[i] < 0){
+            std::cout << "diag[i] == 0, i = " << i << ", numb_people[i] = " << numb_people[i] << ", msig_people[i] = " << msig_people[i] << std::endl;
+        }
+    }
 
+    if (rank == 0){
+        std::cout << "diag[0] = " << diag[0] << std::endl;
+        std::cout << "diag[1] = " << diag[1] << std::endl;
+        std::cout << "diag[2] = " << diag[2] << std::endl;
+    }
+    
     std::vector<double> mu = mu_start;
     std::vector<double> d; // d = Ap
     std::vector<double> r = lmmse_multAAT(mu, tau, dataset); // r = residual
@@ -112,9 +117,10 @@ std::vector<double> vamp::CG_solverAAT(std::vector<double> v, std::vector<double
         double l2_norm2_r = l2_norm2(r, 0);
         double rel_err = sqrt( l2_norm2_r / l2_norm2(v, 0) );
         double norm_mu = sqrt( l2_norm2(mu, 0) );
+        double norm_z = sqrt( l2_norm2(z,0) );
         double err_tol = 1e-4;
         if (rank == 0)
-            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << std::endl;
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  l2_norm2(v, 0) << std::endl;
         if (rel_err < err_tol) 
             break;
     }

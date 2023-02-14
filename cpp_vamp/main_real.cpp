@@ -293,7 +293,8 @@ int main(int argc, char** argv)
         std::string est_file_name = opt.get_estimate_file();
         int pos_dot = est_file_name.find(".");
         std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
-        std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
+        if (rank == 0)
+            std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
 
         std::vector<double> x_est;
         if (end_est_file_name == "bin")

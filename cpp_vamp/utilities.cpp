@@ -253,14 +253,7 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
     return vec;
  }
 
- double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, std::vector<double> y_mark){
-    double sumy = 0, sumsqy = 0;
-    int n = y_mark.size();
-    std::vector<double> pvals(n, 0.0);
-    for (int i = 0; i<n; i++){
-        sumy += y_mark[i];
-        sumsqy += y_mark[i]*y_mark[i];
-    }
+ double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, double sumy, double sumsqy, int n){
 
     double s2y = (sumsqy - sumy*sumy/n) / (n-1);
     double s2x = (sumsqx - sumx*sumx/n) / (n-1);

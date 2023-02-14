@@ -70,6 +70,8 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     model(opt.get_model()),
     store_pvals(opt.get_store_pvals()),
     rank(rank),
+    out_dir(opt.get_out_dir()),
+    out_name(opt.get_out_name()),
     reverse(opt.get_use_XXT_denoiser()),
     use_lmmse_damp(opt.get_use_lmmse_damp())  {
     N = opt.get_N();

@@ -432,6 +432,9 @@ void data::compute_people_statistics() {
 
     const std::vector<unsigned char> mask4 = get_mask4();
     const int im4 = get_im4();
+    double* mave = get_mave();
+    double* msig = get_msig();
+
     mave_people = std::vector<double> (4 * mbytes, 0.0);
     msig_people = std::vector<double> (4 * mbytes, 0.0);
     numb_people = std::vector<double> (4 * mbytes, 0.0);
@@ -440,20 +443,22 @@ void data::compute_people_statistics() {
 
     if (type_data == "bed"){
 
-        #ifdef _OPENMP
-        #pragma omp parallel for
-        #endif
         for (int i=0; i<M; i++) {
             size_t bedix = size_t(i) * size_t(mbytes);
             const unsigned char* bedm = &bed_data[bedix];
+            #ifdef _OPENMP
+            #pragma omp parallel for
+            #endif
             for (int j=0; j<im4; j++) {
                 for (int k=0; k<4; k++) {
-                    mave_people[4*j + k] += dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
+                    double value = (dotp_lut_a[bedm[j] * 4 + k] - mave[i]) * msig[i] * dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                    mave_people[4*j + k] += value; 
                     numb_people[4*j + k] += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
-                    msig_people[4*j + k] += dotp_lut_a[bedm[j] * 4 + k] * dotp_lut_a[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
+                    msig_people[4*j + k] += value * value;
                 }
             }
         }
+
 
         // collecting results from different nodes
         std::vector<double> mave_people_total(4 * mbytes, 0.0);
@@ -473,46 +478,46 @@ void data::compute_people_statistics() {
                     else {
                         mave_people_total[4*j+k] = 0;
                         msig_people_total[4*j+k] = 0;
-                        std::cout << "mave = 0 & 4*j+k = " << 4*j+k << std::endl;
+                        //std::cout << "mave = 0 & 4*j+k = " << 4*j+k << std::endl;
                     }
         
         mave_people = mave_people_total;
         msig_people = msig_people_total;
+        numb_people = numb_people_total;
+
         for (int i=0; i<N; i++) 
             msig_people[i] = sqrt(msig_people[i]);  
 
-        if (rank == 0){
-            std::cout << "msig_people[0] = " << msig_people[0] << std::endl;
-            std::cout << "msig_people[1] = " << msig_people[1] << std::endl;
-        }
     }
     else if (type_data == "meth"){
         
         int im4m1 = im4-1;
-        #ifdef _OPENMP
-        #pragma omp parallel for
-        #endif
+        double* mave = get_mave();
+        double* msig = get_msig();
+
         for (int i=0; i<M; i++) {
             size_t methix = size_t(i) * size_t(N);
             const double* methm = &meth_data[methix];
 
             // calculating marker mean in 2 step process since size(phen) = 4*mbytes and size(methm) = N
             // currently only non-missing methylation data is allowed 
+            #ifdef _OPENMP
+            #pragma omp parallel for
+            #endif
             for (int j=0; j<(im4-1); j++) {
-                #ifdef _OPENMP
-                #pragma omp simd
-                #endif
                 for (int k=0; k<4; k++){
-                    mave_people[4*j + k] += methm[4*j + k] * na_lut[mask4[j] * 4 + k]; 
-                    numb_people[4*j + k] += na_lut[mask4[j] * 4 + k];
-                    msig_people[4*j + k] += methm[4*j + k] * methm[4*j + k] * na_lut[mask4[j] * 4 + k];
+                    double value = (methm[4*j + k] - mave[i]) * msig[i] * na_lut[mask4[j] * 4 + k]; // only non-missing methylation data is allowed 
+                    mave_people[4*j + k] += value; 
+                    numb_people[4*j + k] += na_lut[mask4[j] * 4 + k]; // only non-missing methylation data is allowed 
+                    msig_people[4*j + k] += value * value;
                 }
             }  
             for (int k=0; k<4; k++) {
                 if (4*im4m1 + k < N){
-                    mave_people[4*im4m1 + k] += methm[4*im4m1 + k] * na_lut[mask4[im4m1] * 4 + k]; 
+                    double value = (methm[4*im4m1 + k] - mave[i]) * msig[i];
+                    mave_people[4*im4m1 + k] += value * na_lut[mask4[im4m1] * 4 + k]; 
                     numb_people[4*im4m1 + k] += na_lut[mask4[im4m1] * 4 + k];
-                    msig_people[4*im4m1 + k] += methm[4*im4m1 + k] * methm[4*im4m1 + k] * na_lut[mask4[im4m1] * 4 + k];
+                    msig_people[4*im4m1 + k] += value * value * na_lut[mask4[im4m1] * 4 + k];
                 } 
             }
         }
@@ -539,13 +544,11 @@ void data::compute_people_statistics() {
 
         mave_people = mave_people_total;
         msig_people = msig_people_total;
+        numb_people = numb_people_total;
+
         for (int i=0; i<N; i++) 
             msig_people[i] = sqrt(msig_people[i]);   
 
-        if (rank == 0){
-            std::cout << "msig_people[0] = " << msig_people[0] << std::endl;
-            std::cout << "msig_people[1] = " << msig_people[1] << std::endl;
-        }
     }
     double end = MPI_Wtime();
         if (rank == 0)
@@ -846,9 +849,8 @@ if (type_data == "bed"){
         for (int i=0; i<M; i++){
             bed = &bed_data[i * mbytes];
             double ave = mave[i];
-            double sig = msig[i];
             double phen_i = phen[i];
-            double sig_phen_i = sig * phen_i;
+            double sig_phen_i = msig[i] * phen_i;
             
             #ifdef _OPENMP
                 #pragma omp parallel for shared(Ax_temp)
@@ -859,7 +861,7 @@ if (type_data == "bed"){
                 #endif
                 for (int k=0; k<4; k++) {
                     // because msig[i] is the precision of the i-th marker
-                    Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k]; 
+                    Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
                 }
             } 
         }
@@ -877,7 +879,7 @@ if (type_data == "bed"){
                 #pragma omp simd aligned(dotp_lut_a:32)
                 #endif
                 for (int k=0; k<4; k++) {
-                    Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * phen_i;
+                    Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * phen_i * na_lut[mask4[j] * 4 + k];
                 }
             } 
         }
@@ -895,7 +897,7 @@ if (type_data == "bed"){
                 //#pragma omp simd aligned(dotp_lut_a,Ax_temp:32)
                 //#endif
                 for (int k=0; k<4; k++) {
-                    Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * xRphen_i;
+                    Ax_temp[j * 4 + k] += dotp_lut_a[bed[j] * 4 + k] * xRphen_i * na_lut[mask4[j] * 4 + k];
                 }
             } 
         }
@@ -1268,44 +1270,58 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
 std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat){
     std::vector<double> pvals(M, 0.0);
-    std::vector<double> y_mod = std::vector<double> (N, 0.0);
+    std::vector<double> y_mod = std::vector<double> (4*mbytes, 0.0);
     for (int i=0; i<N; i++)
         y_mod[i] = y[i] - z1[i];
-    double df = N-2;
-    boost::math::students_t tdist(df);
+    double* mave = get_mave();
+    double* msig = get_msig();
+
     if (type_data == "bed"){
+
         for (int k=0; k<M; k++){
+            if (rank == 0 && k % 1000 == 0)
+                std::cout << "so far " << k << " pvals have been calc."<< std::endl;
             std::vector<double> y_mark = std::vector<double> (4*mbytes, 0.0);
             for (int i=0; i<N; i++)
                 y_mark[i] = y_mod[i];
 
             unsigned char* bed = &bed_data[k * mbytes];
-            double sumx = 0, sumsqx = 0, sumxy = 0;
+            double sumx = 0, sumsqx = 0, sumxy = 0, sumy = 0, sumsqy = 0;
+            int count = 0;
             
             #ifdef _OPENMP
-            #pragma omp parallel for
+            #pragma omp parallel for reduction(+ : sumx, sumsqx, sumxy, sumy, sumsqy, count)
             #endif
             for (int i=0; i<mbytes; i++) {
                 #ifdef _OPENMP
                 #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
                 #endif
                 for (int j=0; j<4; j++) 
-                    y_mark[4*i+j] += dotp_lut_a[bed[i] * 4 + j] * x1_hat[k];
+                    y_mark[4*i+j] += (dotp_lut_a[bed[i] * 4 + j] - mave[k]) * msig[k] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] * x1_hat[k] / sqrt(N);
 
-                #ifdef _OPENMP
-                #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32) reduction(+:sumx, sumsqx, sumxy)
-                #endif
+                //#ifdef _OPENMP
+                //#pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32) reduction(+:sumx, sumsqx, sumxy)
+                //#endif
                 for (int j=0; j<4; j++) {
-                    sumx += dotp_lut_a[bed[i] * 4 + j];
-                    sumsqx += dotp_lut_a[bed[i] * 4 + j]*dotp_lut_a[bed[i] * 4 + j];
-                    sumxy += dotp_lut_a[bed[i] * 4 + j]*y_mark[4*i+j];
+                    double value = (dotp_lut_a[bed[i] * 4 + j] - mave[k]) * msig[k] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                    sumx += value;
+                    sumsqx += value * value;
+                    sumxy += value * y_mark[4*i+j];   
+                    sumy += y_mark[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                    sumsqy += y_mark[4*i+j] * y_mark[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                    count += dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
                 }
-
             }
-            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
+
+            sumx /= sqrt(N);
+            sumsqx /= sqrt(N);
+            sumxy /= sqrt(N);
+
+            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, sumy, sumsqy, count);
         }  
     }
-    else if (type_data == "meth"){
+    else if (type_data == "meth"){ // add normalization to expressions & take into account scaling & account for missing data points & reduction 
+        // not yet properly implemented
         for (int k=0; k<M; k++){
             std::vector<double> y_mark = y_mod;
             double* meth = &meth_data[k * N];
@@ -1330,7 +1346,7 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
             for (int i=0; i<N; i++) {
                 sumx += meth[i];
             }
-            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark);
+            //pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, y_mark, N);
         }
     }
     return pvals;
