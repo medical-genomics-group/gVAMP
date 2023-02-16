@@ -118,7 +118,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // LMMSE estimation of x
         //************************
 
-        std::vector<double> v = (*dataset).ATx(p2.data(), normal);
+        std::vector<double> v = (*dataset).ATx(p2.data());
 
         for (int i = 0; i < M; i++)
             v[i] = tau2 * v[i] + gam2 * r2[i];
@@ -144,7 +144,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // LMMSE estimation of x
         //************************
         
-        z2_hat = (*dataset).Ax(x2_hat.data(), normal);
+        z2_hat = (*dataset).Ax(x2_hat.data());
         double beta2 = N / M * (1-alpha2);
 
         for (int i=0; i<M; i++)

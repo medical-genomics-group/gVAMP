@@ -19,8 +19,8 @@ std::vector<double> vamp::lmmse_multAAT(std::vector<double> u, double tau, data*
         return std::vector<double>(phen_size, 0.0);
     std::vector<double> res(phen_size, 0.0);
     std::vector<double> res_temp(M, 0.0);
-    res_temp = (*dataset).ATx(u.data(), normal);
-    res = (*dataset).Ax(res_temp.data(), normal);
+    res_temp = (*dataset).ATx(u.data());
+    res = (*dataset).Ax(res_temp.data());
     for (int i = 0; i < N; i++){
         res[i] *= tau;
         res[i] += gam2 * u[i];
@@ -32,7 +32,7 @@ std::vector<double> vamp::lmmse_denoiserAAT(std::vector<double> r2, std::vector<
     double norm_r2 = sqrt(l2_norm2(r2,1));
     if (rank == 0)
         std::cout << "||r2|| = " << norm_r2 << std::endl;
-    std::vector<double> z2 = (*dataset).Ax(r2.data(), normal);
+    std::vector<double> z2 = (*dataset).Ax(r2.data());
     if (rank == 0)
         std::cout << "||z2|| = " << sqrt(l2_norm2(z2,0)) << std::endl;
     if (rank == 0)
@@ -43,7 +43,7 @@ std::vector<double> vamp::lmmse_denoiserAAT(std::vector<double> r2, std::vector<
     if (rank == 0)
         std::cout << "||v|| = " << sqrt(l2_norm2(v,0)) << std::endl;
     std::vector<double> u = CG_solverAAT(v, mu_CG_AAT_last, gamw, 1, dataset);
-    std::vector<double> res = (*dataset).ATx(u.data(), normal);
+    std::vector<double> res = (*dataset).ATx(u.data());
     for (int i=0; i<M; i++)
         res[i] = gamw * res[i] + r2[i];
     return res;
@@ -120,7 +120,7 @@ std::vector<double> vamp::CG_solverAAT(std::vector<double> v, std::vector<double
         double norm_z = sqrt( l2_norm2(z,0) );
         double err_tol = 1e-4;
         if (rank == 0)
-            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  l2_norm2(v, 0) << std::endl;
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  sqrt(l2_norm2(v, 0)) << std::endl;
         if (rel_err < err_tol) 
             break;
     }
@@ -138,9 +138,9 @@ double vamp::g2d_onsagerAAT(double gam2, double tau, data* dataset) { // shared 
     bern_vec = std::vector<double> (M, 0.0);
     for (int i = 0; i < M; i++)
         bern_vec[i] = (2*bern(rd) - 1) / sqrt(Mt); // Bernoulli variables are sampled independently
-    std::vector<double> res = (*dataset).Ax(bern_vec.data(), normal);
+    std::vector<double> res = (*dataset).Ax(bern_vec.data());
     invQ_bern_vec = CG_solverAAT(res, std::vector<double> (4*(*dataset).get_mbytes(), 0.0), tau, 0, dataset); // precond_change
-    res = (*dataset).ATx(invQ_bern_vec.data(), normal);
+    res = (*dataset).ATx(invQ_bern_vec.data());
     double onsager = inner_prod(bern_vec, res, 1) * gamw; 
     return gam2 * (1 + onsager);    
 }
@@ -148,7 +148,7 @@ double vamp::g2d_onsagerAAT(double gam2, double tau, data* dataset) { // shared 
 
 void vamp::updateNoisePrecAAT(data* dataset){
 
-    std::vector<double> temp = (*dataset).Ax(x2_hat.data(), normal);
+    std::vector<double> temp = (*dataset).Ax(x2_hat.data());
     // std::vector<double> y = (*dataset).get_phen();
 
     for (int i = 0; i < N; i++)  // because length(y) = N
