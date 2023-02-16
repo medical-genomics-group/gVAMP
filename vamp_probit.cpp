@@ -24,11 +24,17 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     std::vector<double> x1_hat_prev(M, 0.0);
     tau1 = gam1; // hardcoding initial variability
 
+    // Gaussian noise start
+    r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+    p1 = simulate(N, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+
     for (int it = 1; it <= max_iter; it++)
     {    
 
         //************************
-        //      Denoising x
+        //************************
+        //      DENOISING X
+        //************************
         //************************
 
         if (rank == 0)
@@ -36,19 +42,21 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         x1_hat_prev = x1_hat;
 
-        // updating parameters of prior distribution
-        probs_before = probs;
-        vars_before = vars;
-        updatePrior();
-
         for (int i = 0; i < M; i++ )
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
 
+
+        // storing current estimate of the signal
         std::string filepath_out = out_dir + out_name + "_bin_class_" + "_it_" + std::to_string(it) + "_rank_" + std::to_string(rank) + ".txt"; 
         if (rank == 0)
             std::cout << "filepath_out is " << filepath_out << std::endl;
 
-        store_vec_to_file(filepath_out, x1_hat);
+        double scale = sqrt(N);
+        for (int i0=0; i0<x1_hat_stored.size(); i0++)
+            x1_hat_stored[i0] =  x1_hat[i0] / scale;
+
+        mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
+
 
         x1_hat_d_prev = x1_hat_d;
         double sum_d = 0;
@@ -61,42 +69,40 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         double alpha1;
         MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        //std::cout << "alpha1 after MPI_Allreduce() = "<< alpha1 << std::endl;
         alpha1 /= Mt;
+
         if (rank == 0)
             std::cout << "alpha1 = " << alpha1 << std::endl;
+
         eta1 = gam1 / alpha1;
+
         gam_before = gam2;
+
         gam2 = std::min( std::max( eta1 - gam1, gamma_min ), gamma_max );
+
         if (rank == 0){
             std::cout << "eta1 = " << eta1 << std::endl;
             std::cout << "gam2 = " << gam2 << std::endl;
         }
+
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
 
 
+        // updating parameters of prior distribution
+        probs_before = probs;
+        vars_before = vars;
+        updatePrior();
+
+
 
         //************************
-        //      Denoising z
+        //************************
+        //      DENOISING Z
+        //************************
         //************************
                 
-        std::vector<double> y = (*dataset).get_phen();
-        std::vector<unsigned char> mask4 = (*dataset).get_mask4();
-        for (int j=0;j<(*dataset).get_mbytes();j++)
-            for(int k=0;k<4;k++)
-                if (4*j+k < N && na_lut[mask4[j] * 4 + k]==0)
-                    y[4*j + k] = 0;
-
-        // updating probit_var
-        if (rank == 0){
-            probit_var = update_probit_var(probit_var, y);
-            for (int ran = 1; ran < nranks; ran++)
-                MPI_Send(&probit_var, 1, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
-        }
-        else
-            MPI_Recv(&probit_var, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
+        std::vector<double> y = (*dataset).filter_pheno();
 
         // denoising part
         for (int i=0; i<N; i++)
@@ -112,10 +118,22 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             p2[i] = (z1_hat[i] - beta1*p1[i]) / (1-beta1);
         tau2 = tau1 * (1-beta1) / beta1;
 
+        // updating probit_var
+        if (rank == 0){
+            probit_var = update_probit_var(probit_var, y);
+            for (int ran = 1; ran < nranks; ran++)
+                MPI_Send(&probit_var, 1, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+        }
+        else
+            MPI_Recv(&probit_var, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+
 
 
         //************************
+        //************************
         // LMMSE estimation of x
+        //************************
         //************************
 
         std::vector<double> v = (*dataset).ATx(p2.data());
@@ -140,6 +158,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
         
+
         //************************
         // LMMSE estimation of x
         //************************
@@ -157,13 +176,6 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
 
-        /*
-        if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
-            if (rank == 0)
-                std::cout << "stopping criteria fulfilled" << std::endl;
-            //break;
-        }
-        */
     }
     
     return x1_hat;
@@ -174,26 +186,25 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 double vamp::g1_bin_class(double p, double tau1, double y){
 
     double c = p / sqrt(probit_var + 1/tau1);
-    double temp = p + exp(-0.5 * c * c) / tau1 / sqrt(2*M_PI) / sqrt(probit_var + 1/tau1) / (0.5 * erfc(-c * M_SQRT1_2));
-    if (y==1)
-        return temp;
-    else if (y==0)
-        return p-temp;
-    return 0;
+    double temp = p + (2*y-1) * exp(-0.5 * c * c) / sqrt(2*M_PI) / tau1 / sqrt(probit_var + 1/tau1) / normalCDF((2*y - 1)*c);
+
+    return temp;
+
 }
 
 
 double vamp::g1d_bin_class(double p, double tau1, double y){
     
     double c = p / sqrt(probit_var + 1/tau1);
+
     double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
-    double phic = 0.5 * erfc(-c * M_SQRT1_2);
-    double temp = 1 -  Nc / (1 + tau1*probit_var) / phic * (c + Nc / phic);
-    if (y==1)
-        return temp;
-    else if (y==0)
-        return (1/tau1 + p*p) - temp;
-    return 0;
+
+    double phic = normalCDF((2*y-1)*c);
+
+    double temp = 1 -  Nc / (1 + tau1 * probit_var * probit_var) / phic * ((2*y-1)*c + c / phic); // because der = tau * Var
+
+    return temp;
+
 }
 
 double vamp::probit_var_EM_deriv(double v, std::vector<double> y){ // we'll do the update just before z1
