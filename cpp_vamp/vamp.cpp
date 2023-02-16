@@ -70,8 +70,6 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     model(opt.get_model()),
     store_pvals(opt.get_store_pvals()),
     rank(rank),
-    out_dir(opt.get_out_dir()),
-    out_name(opt.get_out_name()),
     reverse(opt.get_use_XXT_denoiser()),
     use_lmmse_damp(opt.get_use_lmmse_damp())  {
     N = opt.get_N();
@@ -451,15 +449,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
     }
 
     if (store_pvals == 1){
-        // std::vector<double> pvals = pvals_calc(dataset);
-        std::vector<double> pvals = (*dataset).pvals_calc(z1, y, x1_hat);
-        //std::cout << "after pvals calc" << std::endl;
-        // saving pvals vector
         std::string filepath_out_pvals = out_dir + out_name + "_pvals.bin";
+        std::vector<double> pvals = (*dataset).pvals_calc(z1, y, x1_hat, filepath_out_pvals);
         if (rank == 0)
             std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
-        int S = (*dataset).get_S();
-        mpi_store_vec_to_file(filepath_out_pvals, pvals, S, M);
     }
     
     return x1_hat_stored;          

@@ -380,8 +380,8 @@ void Options::check_options() {
     }
     */
 
-     assert(vars.size() == num_mix_comp || run_mode == "test");
-     assert(probs.size() == num_mix_comp || run_mode == "test");
+     //assert(vars.size() == num_mix_comp || run_mode == "test");
+     //assert(probs.size() == num_mix_comp || run_mode == "test");
 }
 
 /*

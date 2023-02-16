@@ -110,7 +110,7 @@ public:
     
     double largest_sing_val2();
 
-    std::vector<double> pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat);
+    std::vector<double> pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath);
 
     //double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi);
 

@@ -318,12 +318,11 @@ int main(int argc, char** argv)
         
         std::vector<double> z1 = dataset.Ax(x_est.data(), normal);
         std::vector<double> y =  dataset.filter_pheno();
-        std::vector<double> pvals = dataset.pvals_calc(z1, y, x_est);
         // saving pvals vector
         std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_pvals.bin";
         if (rank == 0)
             std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
-        mpi_store_vec_to_file(filepath_out_pvals, pvals, S, M);
+        std::vector<double> pvals = dataset.pvals_calc(z1, y, x_est, filepath_out_pvals);
 
     }
 

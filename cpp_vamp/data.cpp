@@ -1268,7 +1268,7 @@ void data::SinkhornKnopp(std::vector<double> &xL, std::vector<double> &xR, doubl
  
 // finding p-values from t-test on regression coefficient = 0 
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
-std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat){
+std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath){
     std::vector<double> pvals(M, 0.0);
     std::vector<double> y_mod = std::vector<double> (4*mbytes, 0.0);
     for (int i=0; i<N; i++)
@@ -1313,12 +1313,13 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
                 }
             }
 
-            sumx /= sqrt(N);
-            sumsqx /= sqrt(N);
-            sumxy /= sqrt(N);
+            //sumx /= sqrt(N);
+            //sumsqx /= sqrt(N);
+            //sumxy /= sqrt(N);
 
             pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, sumy, sumsqy, count);
         }  
+        mpi_store_vec_to_file(filepath, pvals, S, M);
     }
     else if (type_data == "meth"){ // add normalization to expressions & take into account scaling & account for missing data points & reduction 
         // not yet properly implemented
