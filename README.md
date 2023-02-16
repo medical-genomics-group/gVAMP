@@ -52,7 +52,6 @@ Currently supported input options to C++ version of the code:
 | `EM-max-iter` | maximal number of iterations of expectation maximization procedure |
 | `stop-criteria-thr` | relative error threshold within expectation maximization |
 | `model` | regression model that describes a relationship between effect sizes and phenotypes ('linear' or 'bin_class') |
-| `use-adap-damp` | indicates wheather or not the algorithm uses adaptive damping procedure (0 or 1) |
 | `store-pvals` | indicates wheather or not the algorithm stores p-values from association tests of each of the markers |
 | `test-iter-range` | indicates the iteration range for which R2 on a test set is calculated |
 | `use_XXT_denoiser` | indicates whether or not a denoiser should be calculated based on formula with inversion of NxN matrix or not |

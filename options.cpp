@@ -164,15 +164,6 @@ void Options::read_command_line_options(int argc, char** argv) {
             iterations = (unsigned int) atoi(argv[++i]);
             ss << "--iterations " << iterations << "\n";
         }
-        else if (!strcmp(argv[i], "--perm")) {
-            if (i == argc - 1) fail_if_last(argv, i);
-            if (atoi(argv[i + 1]) < 1) {
-                std::cout << "FATAL  : option --perm has to be a strictly positive integer! (" << argv[i + 1] << " was passed)" << std::endl;
-                exit(EXIT_FAILURE);
-            }
-            perm = (unsigned int) atoi(argv[++i]);
-            ss << "--perm " << perm << "\n";
-        }
         else if (!strcmp(argv[i], "--num-mix-comp")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 1) {
@@ -182,15 +173,6 @@ void Options::read_command_line_options(int argc, char** argv) {
             num_mix_comp = (unsigned int) atoi(argv[++i]);
             ss << "--num-mix-comp " << num_mix_comp << "\n";
         } 
-        else if (!strcmp(argv[i], "--use-adap-damp")){
-            if (i == argc - 1) fail_if_last(argv, i);
-            if (atoi(argv[i + 1]) < 0) {
-                std::cout << "FATAL  : option --use-adap-samp has to be an integer! (" << argv[i + 1] << " was passed)" << std::endl;
-                exit(EXIT_FAILURE);
-            }
-            use_adap_damp = (unsigned int) atoi(argv[++i]);
-            ss << "--use-adap-damp " << use_adap_damp << "\n";
-        }
         else if (!strcmp(argv[i], "--store-pvals")){
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 0) {
