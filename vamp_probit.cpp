@@ -52,6 +52,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             std::cout << "filepath_out is " << filepath_out << std::endl;
 
         double scale = sqrt(N);
+        int S = (*dataset).get_S();
+        std::vector<double> x1_hat_stored = x1_hat;
+
         for (int i0=0; i0<x1_hat_stored.size(); i0++)
             x1_hat_stored[i0] =  x1_hat[i0] / scale;
 
@@ -186,7 +189,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 double vamp::g1_bin_class(double p, double tau1, double y){
 
     double c = p / sqrt(probit_var + 1/tau1);
-    double temp = p + (2*y-1) * exp(-0.5 * c * c) / sqrt(2*M_PI) / tau1 / sqrt(probit_var + 1/tau1) / normalCDF((2*y - 1)*c);
+    double temp = p + (2*y-1) * exp(-0.5 * c * c) / sqrt(2*M_PI) / tau1 / sqrt(probit_var + 1/tau1) / normal_cdf((2*y - 1)*c);
 
     return temp;
 
@@ -199,7 +202,7 @@ double vamp::g1d_bin_class(double p, double tau1, double y){
 
     double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
 
-    double phic = normalCDF((2*y-1)*c);
+    double phic = normal_cdf((2*y-1)*c);
 
     double temp = 1 -  Nc / (1 + tau1 * probit_var * probit_var) / phic * ((2*y-1)*c + c / phic); // because der = tau * Var
 

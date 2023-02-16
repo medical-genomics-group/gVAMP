@@ -3,6 +3,7 @@
 #include <omp.h>
 #include <limits.h>
 #include <algorithm>
+#include <cmath>
 #include "utilities.hpp"
 #include<boost/math/distributions/students_t.hpp>
 
@@ -267,3 +268,8 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
 
     return pvalue;
  }
+
+double normal_cdf(double value)
+{
+   return 0.5 * erfc(-value * M_SQRT1_2);
+}

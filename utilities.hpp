@@ -42,10 +42,7 @@ std::vector<double> divide_work(int Mt);
 
 double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, double sumy, double sumsqy, int n);
 
-double normalCDF(double value)
-{
-   return 0.5 * erfc(-value * M_SQRT1_2);
-}
+double normal_cdf(double value);
 
 //EO: this to allow reduction on avx256 pd4 datatype with OpenMP
 #ifdef _OPENMP
