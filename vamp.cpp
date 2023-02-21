@@ -644,7 +644,7 @@ void vamp::updatePrior() {
         }
     
         if (rank == 0)  
-            std::cout << "Final number of prior EM iterations = " << it + 1 << " / " << EM_max_iter << std::endl;
+            std::cout << "Final number of prior EM iterations = " << std::min(it + 1, EM_max_iter) << " / " << EM_max_iter << std::endl;
 }
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset){ // multiplying with (tau*A^TAv + gam2*v)

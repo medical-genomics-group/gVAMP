@@ -54,7 +54,8 @@ int main(int argc, char** argv)
     double h2hat = 0.8 * h2;
     int L = opt.get_num_mix_comp();
     double prob_eq = (double) CVhat / Mt / (L-1) ;
-    double min_vars = 0.1 / CV;
+    prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-1));
+    double min_vars = 0.1 / CVhat;
 
     std::vector<double> vars_init {0};
     std::vector<double> probs_init {1 - (double) CVhat / Mt};
@@ -64,6 +65,7 @@ int main(int argc, char** argv)
         probs_init.push_back(prob_eq);
         vars_init.push_back(curr_var);
         curr_var *= 10;
+        prob_eq /= 2;
     }
 
 
@@ -72,9 +74,23 @@ int main(int argc, char** argv)
 
 
     //scaling variances
-    for (int i=0; i<vars_init.size(); i++)
-        vars_init[i] *= N;
+    if (rank == 0)
+        std::cout << "init scaled variances = ";
+    for (int i = 0; i < vars_init.size(); i++)
+        if (rank == 0)
+            std::cout << vars_init[i] * N << ' ';
 
+    if (rank ==0)
+        std::cout << std::endl;
+
+    if (rank == 0)
+        std::cout << "init probs = ";
+    for (int i = 0; i < probs_init.size(); i++)
+        if (rank == 0)
+            std::cout << probs_init[i] << ' ';
+            
+    if (rank ==0)
+        std::cout << std::endl;
 
     // simulating beta
     std::vector<double> beta_true(M, 0.0); 
@@ -192,7 +208,7 @@ int main(int argc, char** argv)
 
     double gam1 = 1e-6;
 
-    vamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model());
+    vamp emvamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model());
 
     //vamp emvamp(M, gam1, gamw_init, beta_true, rank, opt);
 

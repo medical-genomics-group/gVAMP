@@ -56,7 +56,7 @@ Currently supported input options to C++ version of the code:
 | `test-iter-range` | indicates the iteration range for which R2 on a test set is calculated |
 | `use_XXT_denoiser` | indicates whether or not a denoiser should be calculated based on formula with inversion of NxN matrix or not |
 | `use_lmmse_damp` | indicates whether or not damping should be used in LMMSE step calculation |
-| `h2` | heritability vale used in simulations  |
+| `h2` | heritability value used in simulations  |
 | `CV` | number of causal variants used in simulations |
 
 
