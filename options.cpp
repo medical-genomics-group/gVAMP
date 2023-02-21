@@ -239,6 +239,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             rho = atof(argv[++i]);
             ss << "--rho " << rho << "\n";
         }
+        else if (!strcmp(argv[i], "--h2")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            rho = atof(argv[++i]);
+            ss << "--h2 " << h2 << "\n";
+        }
         else if (!strcmp(argv[i], "--EM-max-iter")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 1) {
@@ -256,6 +261,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             }
             Mt = (unsigned int) atoi(argv[++i]);
             ss << "--Mt " << Mt << "\n";
+        }
+        else if (!strcmp(argv[i], "--CV")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --CV has to be a positive integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            CV = (unsigned int) atoi(argv[++i]);
+            ss << "--CV " << CV << "\n";
         }
         else if (!strcmp(argv[i], "--N")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);

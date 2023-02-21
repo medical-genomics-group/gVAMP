@@ -113,19 +113,25 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
         double beta1 = 0;
+
         for (int i=0; i<N; i++)
             beta1 += g1d_bin_class(p1[i], tau1, y[i]);
+
         beta1 /= N;
         
         for (int i=0; i<N; i++)
             p2[i] = (z1_hat[i] - beta1*p1[i]) / (1-beta1);
+
         tau2 = tau1 * (1-beta1) / beta1;
 
         // updating probit_var
         if (rank == 0){
-            probit_var = update_probit_var(probit_var, y);
+
+            probit_var = update_probit_var(probit_var, tau1 / beta1, z1_hat, y);
+
             for (int ran = 1; ran < nranks; ran++)
                 MPI_Send(&probit_var, 1, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+
         }
         else
             MPI_Recv(&probit_var, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -145,12 +151,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             v[i] = tau2 * v[i] + gam2 * r2[i];
 
         // running conjugate gradient solver to compute LMMSE
-        double start_CG = MPI_Wtime();
         x2_hat = precondCG_solver(v, tau2, 1, dataset); // precond_change!
-        double end_CG = MPI_Wtime();
-        
-        if (rank == 0)
-            std::cout << "CG took "  << end_CG - start_CG << " seconds." << std::endl;
+
 
         double alpha2 = g2d_onsager(gam2, tau2, dataset);
 
@@ -160,22 +162,27 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         gam1 = gam2 * (1-alpha2) / alpha2;
 
 
-        
 
+        
         //************************
-        // LMMSE estimation of x
+        //************************
+        // LMMSE estimation of z
+        //************************
         //************************
         
         z2_hat = (*dataset).Ax(x2_hat.data());
+        
         double beta2 = N / M * (1-alpha2);
 
         for (int i=0; i<M; i++)
             p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
+
         tau1 = tau2 * (1 - beta2) / beta2;
        
 
         // stopping criteria
         std::vector<double> x1_hat_diff(M, 0.0);
+
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
 
@@ -204,53 +211,86 @@ double vamp::g1d_bin_class(double p, double tau1, double y){
 
     double phic = normal_cdf((2*y-1)*c);
 
-    double temp = 1 -  Nc / (1 + tau1 * probit_var * probit_var) / phic * ((2*y-1)*c + c / phic); // because der = tau * Var
+    double temp = 1 -  Nc / (1 + tau1 * probit_var) / phic * ((2*y-1)*c + Nc / phic); // because der = tau * Var
 
     return temp;
 
 }
 
-double vamp::probit_var_EM_deriv(double v, std::vector<double> y){ // we'll do the update just before z1
+double vamp::probit_var_EM_deriv(double v, std::vector<double> z, std::vector<double> y){
 
-    double sqrt_v = sqrt(v);
-    double new_v;
+    double der = 0.0;
+
     for (int i=0; i<N; i++){
-        double c = z1_hat[i] / sqrt_v;
-        double phic = 0.5 * erfc(-c * M_SQRT1_2);
-        if (y[i] == 1)
-            new_v += exp(-c*c/2) / sqrt(2*M_PI) / phic * z1_hat[i];
-        else if (y[i] == 0)
-            new_v += - exp(-c*c/2) / sqrt(2*M_PI) / (1-phic) * z1_hat[i];  
+
+        double c = (2*y[i] - 1) * z[i] / v;
+        double phic = normal_cdf(c);
+
+        der += c * exp(-c*c/2) / sqrt(2*M_PI) * z[i] / v / phic;    
     }
-    double new_v_MPIsync;
-    MPI_Allreduce(&new_v, &new_v_MPIsync, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    return new_v_MPIsync / Mt;
+
+    double der_MPIsync;
+
+    MPI_Allreduce(&der, &der_MPIsync, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+    return der_MPIsync / N;
+
 }
 
-double vamp::update_probit_var(double v, std::vector<double> y){
+double vamp::expe_probit_var_EM_deriv(double v, double eta, std::vector<double> z_hat, std::vector<double> y){
 
-    double new_v=v, var_min=1/tau2, var_max=1e8; //z ~ N(p2, I/tau2)
+    // z ~ N(z_hat, I/eta)
 
-    // bisection method for finding the root of 'probit_var_EM_deriv' function
-    if (probit_var_EM_deriv(var_min,y)<0){
-        // solution must be <= var_min
-        new_v = var_min;
+    int miter_probit_expe_der = 1e3;
+
+    int it = 1;
+
+    double sum = 0;
+
+    std::vector<double> z = simulate(M, std::vector<double> {1.0/eta}, std::vector<double> {1});
+
+    std::transform (z.begin(), z.end(), z_hat.begin(), z.begin(), std::plus<double>());
+
+    for (; it < miter_probit_expe_der; it++){
+
+        sum +=  probit_var_EM_deriv(v, z, y);
+
     }
-    else if (probit_var_EM_deriv(var_max,y)>0){
-        // solution must be >= var_max
-        new_v = var_max;
-    }
-    else{
+
+    return  sum / miter_probit_expe_der;
+
+}
+
+double vamp::update_probit_var(double v, double eta, std::vector<double> z_hat, std::vector<double> y){
+
+    double new_v=v, var_min=1e-10, var_max=1e10; // z ~ N(z_hat, I/eta)
+
+    int max_iter_bisec = 50;
+
+    int it = 1;
+
+    assert(sgn(var_min)==-sgn(var_max));
+
+    for (; it<max_iter_bisec; it++){
+
+        double fv = expe_probit_var_EM_deriv(new_v, eta, z_hat, y);
+
+        if (abs(fv) < 1e-6)
+            break;
+
+        if (sgn(fv) == sgn(var_min))
+            var_min = v;
+        else if (sgn(fv) == sgn(var_max))
+            var_max = v;
+        
         // refine midpoint on a log scale
         new_v = exp(0.5*(log(var_min) + log(var_max)));
-        for (int it=0; it<20; it++){   
-            if (probit_var_EM_deriv(new_v,y)>0)
-                var_min = new_v;
-            else
-                var_max = new_v;
-        new_v = exp(0.5*(log(var_min) + log(var_max)));
-        }
+
     }
 
+    if (rank == 0)
+        std::cout << "bisection method finished after " << it << " / " << max_iter_bisec << "iterations" << std::endl;
+    
     return new_v;
+
 }

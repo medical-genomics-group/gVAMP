@@ -273,3 +273,7 @@ double normal_cdf(double value)
 {
    return 0.5 * erfc(-value * M_SQRT1_2);
 }
+
+int sgn(double val) {
+    return (0.0 < val) - (val < 0.0);
+}

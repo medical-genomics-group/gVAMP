@@ -70,12 +70,15 @@ public:
     std::vector<double> lmmse_denoiserAAT(std::vector<double> r, std::vector<double> mu_CG_AAT_last, data* dataset);
 
     std::vector<double> CG_solverAAT(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);
-    std::vector<double> precondCG_solver(std::vector<double> v, double tau, int save, data* dataset);
-    std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);    
+    std::vector<double> precondCG_solver(std::vector<double> v, double tau, int denoiser, data* dataset);
+    std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int denoiser, data* dataset);    
 
     void err_measures(data * dataset, int ind);
+
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);
-    double probit_var_EM_deriv(double v, std::vector<double> y);
-    double update_probit_var(double v, std::vector<double> y);
+
+    double probit_var_EM_deriv(double v, std::vector<double> z, std::vector<double> y); 
+    double expe_probit_var_EM_deriv(double v, double eta, std::vector<double> z, std::vector<double> y);
+    double update_probit_var(double v, double eta, std::vector<double> z_hat, std::vector<double> y);
     
    };

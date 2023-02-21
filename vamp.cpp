@@ -113,8 +113,8 @@ std::vector<double> vamp::infere( data* dataset ){
 
 std::vector<double> vamp::infere_linear(data* dataset){
 
-    if (rank == 0)
-        std::cout << "use_lmmse_damp = " << use_lmmse_damp << std::endl;
+    //if (rank == 0)
+    //    std::cout << "use_lmmse_damp = " << use_lmmse_damp << std::endl;
 
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
@@ -154,7 +154,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         //updatePrior(); -> moved to after iteration
         // if (it == 1)
         //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
-        
+
         double start_cond_expe= MPI_Wtime();
         for (int i = 0; i < M; i++)
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
@@ -670,17 +670,17 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
     return res;
 }
 
-std::vector<double> vamp::precondCG_solver(std::vector<double> v, double tau, int save, data* dataset){
+std::vector<double> vamp::precondCG_solver(std::vector<double> v, double tau, int denoiser, data* dataset){
 
     // we start with approximation x0 = 0
 
     std::vector<double> mu(M, 0.0);
 
-    return precondCG_solver(v, mu, tau, save, dataset);
+    return precondCG_solver(v, mu, tau, denoiser, dataset);
 
 }
 
-std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset){
+std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int denoiser, data* dataset){
 
     // tau = gamw
     // preconditioning part
@@ -709,6 +709,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
     std::vector<double> palpha(M, 0.0);
 
     double alpha, beta;
+    double prev_onsager = 0;
 
     for (int i = 0; i < CG_max_iter; i++){
 
@@ -721,6 +722,27 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
             palpha[j] = alpha * p[j];
 
         std::transform (mu.begin(), mu.end(), palpha.begin(), mu.begin(), std::plus<double>());
+
+        if (denoiser == 0){
+
+            double onsager = gam2 * inner_prod(v, mu, 1);
+
+            double rel_err;
+
+            if (onsager != 0)
+                rel_err = abs( (onsager - prev_onsager) / onsager ); 
+            else
+                rel_err = 1;
+
+            if (rel_err < 1e-6)
+                break;
+
+            prev_onsager = onsager;
+
+            if (rank == 0)
+                std::cout << "[CG onsager] it = " << i << ": relative error for onsager is " << rel_err << std::endl;
+
+        }
 
         for (int j = 0; j < p.size(); j++)
             Apalpha[j] = d[j] * alpha;
@@ -752,7 +774,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         if (rel_err < err_tol) 
             break;
     }
-    if (save == 1)
+    if (denoiser == 1)
         mu_CG_last = mu;
 
     return mu;

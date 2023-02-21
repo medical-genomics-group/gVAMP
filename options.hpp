@@ -43,6 +43,8 @@ public:
     unsigned int get_use_lmmse_damp() const { return use_lmmse_damp; }
     unsigned int get_use_XXT_denoiser() const { return use_XXT_denoiser; } 
     unsigned int get_store_pvals() const { return store_pvals; }
+    unsigned int get_CV() const { return CV; }
+    double get_h2() const { return h2; }
 
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
@@ -90,6 +92,8 @@ private:
     unsigned int store_pvals = 0;
     unsigned int use_lmmse_damp = 0;
     unsigned int use_XXT_denoiser = 0;
+    unsigned int CV;
+
 
     // unsigned int meth_imp = 0;
 
@@ -98,6 +102,7 @@ private:
     std::vector<int> test_iter_range = std::vector<int>(2, -1);
 
     double rho = 0.98;
+    double h2 = 0.5;
     //int verbosity = 0;
     unsigned int iterations = 1;
 
