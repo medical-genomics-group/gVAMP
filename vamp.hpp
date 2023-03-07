@@ -38,7 +38,6 @@ private:
     std::vector<double> bern_vec;
     std::vector<double> invQ_bern_vec;
 
-    int normal = 1;
     int store_pvals = 1;
     double total_comp_time=0;
     int reverse = 1;

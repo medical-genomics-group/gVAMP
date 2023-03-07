@@ -51,10 +51,15 @@ int main(int argc, char** argv)
     int CV = opt.get_CV();
     double h2 = opt.get_h2();
     int CVhat = 10*CV;
+    CVhat = CV;
     double h2hat = 0.8 * h2;
+    h2hat = h2;
+
     int L = opt.get_num_mix_comp();
+
     double prob_eq = (double) CVhat / Mt / (L-1) ;
     prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-1));
+    
     double min_vars = 0.1 / CVhat;
 
     std::vector<double> vars_init {0};
@@ -206,7 +211,10 @@ int main(int argc, char** argv)
 
     double gamw_init = 1 / (1 - h2hat);
 
-    double gam1 = 1e-6;
+    double gam1 = 1e-8;
+
+    vars_init = vars_true;
+    probs_init = probs_true;
 
     vamp emvamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model());
 

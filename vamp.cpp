@@ -559,7 +559,7 @@ void vamp::updatePrior() {
 
                 for (int j = 1; j < probs.size(); j++ ){
 
-                    double num = lambda * exp( - pow(r1[i], 2) / 2 * (max_sigma - vars[j]) / (vars[j] + noise_var) / (max_sigma + noise_var) ) / sqrt(vars[j] + noise_var) / sqrt(2 * M_PI) * omegas[j];
+                    double num = lambda * omegas[j] * exp( - pow(r1[i], 2) / 2 * (max_sigma - vars[j]) / (vars[j] + noise_var) / (max_sigma + noise_var) ) / sqrt(vars[j] + noise_var) / sqrt(2 * M_PI);
                     
                     double num_gammas = gam1 * r1[i] / ( 1 / vars[j] + gam1 );   
 
@@ -582,7 +582,7 @@ void vamp::updatePrior() {
             } 
 
             for (int j = 1; j < probs.size(); j++)
-                v.push_back( 1 / ( 1 / vars[j] + gam1 ) ); // v is of size (L-1) in the end
+                v.push_back( 1.0 / ( 1.0 / vars[j] + gam1 ) ); // v is of size (L-1) in the end
             
             lambda = accumulate(pin.begin(), pin.end(), 0.0); // / pin.size();
 
@@ -766,7 +766,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         double norm_z = sqrt(l2_norm2(z, 1));
         double rel_err = sqrt( l2_norm2(r, 1) ) / norm_v;
         double norm_mu = sqrt( l2_norm2(mu, 1) );
-        double err_tol = 1e-4;
+        double err_tol = 1e-3;
 
         if (rank == 0)
             std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  norm_v << std::endl;
