@@ -771,6 +771,9 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         if (rank == 0)
             std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  norm_v << std::endl;
         
+        if (rank == 0)
+            std::cout << "||RHS|| = " << norm_v << std::endl;
+
         if (rel_err < err_tol) 
             break;
     }

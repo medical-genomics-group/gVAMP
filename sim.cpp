@@ -100,16 +100,14 @@ int main(int argc, char** argv)
     // simulating beta
     std::vector<double> beta_true(M, 0.0); 
     
+    std::vector<double> beta_true_tmp;
+
     if (rank == 0){
         
-        std::vector<double> beta_true_tmp = simulate(Mt, vars_true, probs_true);
+        beta_true_tmp = simulate(Mt, vars_true, probs_true);
         
         for (int i0=S; i0<S+M; i0++)
             beta_true[i0-S] = beta_true_tmp[i0];
-
-        // storing true beta
-        std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
-        mpi_store_vec_to_file(filepath_out, beta_true_tmp, S, M);
         
         for (int ran = 1; ran < nranks; ran++)
             MPI_Send(beta_true_tmp.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
@@ -127,6 +125,10 @@ int main(int argc, char** argv)
    }
     
     MPI_Barrier(MPI_COMM_WORLD);
+
+     // storing true beta
+    std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
+    mpi_store_vec_to_file(filepath_out, beta_true_tmp, S, M);
 
     //printing out true variances
     if (rank == 0)
