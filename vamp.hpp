@@ -23,10 +23,11 @@ private:
 
     double gamma_min = 1e-11;
     double gamma_max = 1e11;
-    double probit_var = 1e-2; // hardcoded
+    double probit_var; // hardcoded
     int EM_max_iter; // = 1e5;
     double EM_err_thr; // = 1e-4;
     int CG_max_iter; // = 10;
+    int auto_var_max_iter = 100;
     int calc_state_evo = 0;
     double damp_max = 1;
     double damp_min = 0.05;
@@ -45,7 +46,8 @@ private:
 
 public:
 
-    vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model);
+
+    vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model, Options opt = Options());
     vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int rank, Options opt);
     std::vector<double> infere(data* dataset);
     std::vector<double> infere_linear(data* dataset);
@@ -60,7 +62,7 @@ public:
     double g2d_onsager(double gam2, double tau, data* dataset);
     double g2d_onsagerAAT(double gam2, double tau, data* dataset);
 
-    void updatePrior();
+    void updatePrior(int verbose);
     void updateNoisePrec(data* dataset);
     void updateNoisePrecAAT(data* dataset);
 
@@ -73,6 +75,7 @@ public:
     std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int denoiser, data* dataset);    
 
     void err_measures(data * dataset, int ind);
+    void probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name);
 
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);
 

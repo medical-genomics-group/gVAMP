@@ -50,15 +50,15 @@ int main(int argc, char** argv)
     //std::vector<double> probs_init = opt.get_probs();
     int CV = opt.get_CV();
     double h2 = opt.get_h2();
-    int CVhat = 10*CV;
-    CVhat = CV;
+    int CVhat = 2*CV;
+    //CVhat = CV;
     double h2hat = 0.8 * h2;
-    h2hat = h2;
+    //h2hat = h2;
 
     int L = opt.get_num_mix_comp();
 
     double prob_eq = (double) CVhat / Mt / (L-1) ;
-    prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-1));
+    // prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-1));
     
     double min_vars = 0.1 / CVhat;
 
@@ -66,6 +66,8 @@ int main(int argc, char** argv)
     std::vector<double> probs_init {1 - (double) CVhat / Mt};
 
     double curr_var = min_vars;
+    curr_var = h2hat / CVhat;
+
     for (int i = 1; i<L; i++){
         probs_init.push_back(prob_eq);
         vars_init.push_back(curr_var);
@@ -99,12 +101,10 @@ int main(int argc, char** argv)
 
     // simulating beta
     std::vector<double> beta_true(M, 0.0); 
-    
-    std::vector<double> beta_true_tmp;
 
     if (rank == 0){
         
-        beta_true_tmp = simulate(Mt, vars_true, probs_true);
+        std::vector<double> beta_true_tmp = simulate(Mt, vars_true, probs_true);
         
         for (int i0=S; i0<S+M; i0++)
             beta_true[i0-S] = beta_true_tmp[i0];
@@ -122,13 +122,14 @@ int main(int argc, char** argv)
 
         for (int i0=S; i0<S+M; i0++)
             beta_true[i0-S] = beta_true_full[i0];
+
    }
     
     MPI_Barrier(MPI_COMM_WORLD);
 
      // storing true beta
     std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
-    mpi_store_vec_to_file(filepath_out, beta_true_tmp, S, M);
+    mpi_store_vec_to_file(filepath_out, beta_true, S, M);
 
     //printing out true variances
     if (rank == 0)
@@ -214,9 +215,10 @@ int main(int argc, char** argv)
     double gamw_init = 1 / (1 - h2hat);
 
     double gam1 = 1e-8;
+    //gam1 = 1e-3;
 
-    vars_init = vars_true;
-    probs_init = probs_true;
+    //vars_init = vars_true;
+    //probs_init = probs_true;
 
     vamp emvamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model());
 

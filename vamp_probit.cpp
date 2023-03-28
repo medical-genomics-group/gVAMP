@@ -22,14 +22,17 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
     tau1 = gam1; // hardcoding initial variability
+    tau1 = 1e-4;
 
     // Gaussian noise start
     r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
-    p1 = simulate(N, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+    p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
 
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
     p2 = std::vector<double> (N, 0.0);
+
+    std::vector<double> true_g = (*dataset).Ax(true_signal.data());
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -47,6 +50,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         for (int i = 0; i < M; i++ )
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
+
+
+        probit_err_measures(dataset, 1, true_signal, x1_hat, "x1_hat");
 
 
         // storing current estimate of the signal
@@ -98,8 +104,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // updating parameters of prior distribution
         probs_before = probs;
         vars_before = vars;
-        updatePrior();
-
+        updatePrior(1);
 
 
         //************************
@@ -114,18 +119,26 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         for (int i=0; i<N; i++)
             z1_hat[i] = g1_bin_class(p1[i], tau1, y[i]);
 
+        probit_err_measures(dataset, 0, true_g, z1_hat, "z1_hat");
+
         double beta1 = 0;
 
         for (int i=0; i<N; i++)
             beta1 += g1d_bin_class(p1[i], tau1, y[i]);
 
         beta1 /= N;
+
+        if (rank == 0)
+            std::cout << "beta1 = " << beta1 << std::endl;
         
 
         for (int i=0; i<N; i++)
             p2[i] = (z1_hat[i] - beta1*p1[i]) / (1-beta1);
 
         tau2 = tau1 * (1-beta1) / beta1;
+
+        if (rank == 0)
+            std::cout << "tau2 = " << tau2 << std::endl;
 
         // updating probit_var
         //probit_var = update_probit_var(probit_var, tau1 / beta1, z1_hat, y);
@@ -145,6 +158,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         */
 
+        if (rank == 0)
+            std::cout << "probit_var = " << probit_var << std::endl;
+
 
 
         //************************
@@ -155,7 +171,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         
         if (rank == 0)
-                std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl << "->LMMMSE" << std::endl;
+                std::cout << std::endl << "->LMMMSE" << std::endl;
 
         std::vector<double> v = (*dataset).ATx(p2.data());
 
@@ -165,12 +181,19 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // running conjugate gradient solver to compute LMMSE
         x2_hat = precondCG_solver(v, std::vector<double> (M, 0.0), tau2, 1, dataset); // precond_change!
 
+        probit_err_measures(dataset, 1, true_signal, x2_hat, "x2_hat");
+
         double alpha2 = g2d_onsager(gam2, tau2, dataset);
+        if (rank == 0)
+            std::cout << "alpha2 = " << alpha2 << std::endl;
 
         for (int i=0; i<M; i++)
             r1[i] = (x2_hat[i] - alpha2*r2[i]) / (1-alpha2);
 
         gam1 = gam2 * (1-alpha2) / alpha2;
+
+        if (rank == 0)
+            std::cout << "gam1 = " << gam1 << std::endl;
 
 
 
@@ -183,12 +206,21 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         
         z2_hat = (*dataset).Ax(x2_hat.data());
         
+        probit_err_measures(dataset, 0, true_g, z2_hat, "z2_hat");
+        
         double beta2 = N / M * (1-alpha2);
+        beta2 = (double) Mt / N * (1 - alpha2);
+
+        if (rank == 0)
+            std::cout << "beta2 = " << beta2 << std::endl;
 
         for (int i=0; i<M; i++)
             p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
 
         tau1 = tau2 * (1 - beta2) / beta2;
+
+        if (rank == 0)
+            std::cout << "tau1 = " << tau1 << std::endl;
        
 
         // stopping criteria
@@ -196,6 +228,12 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
+        
+        if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
+            if (rank == 0)
+                std::cout << "probitVAMP stopping criteria fulfilled with threshold = " << stop_criteria_thr << "." << std::endl;
+            break;
+        }
 
     }
     
@@ -313,4 +351,50 @@ double vamp::update_probit_var(double v, double eta, std::vector<double> z_hat, 
     
     return new_v;
 
+}
+
+void vamp::probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name){
+
+    
+    double scale = 1.0 / (double) N;
+    
+    // correlation
+    double corr = inner_prod(est, true_signal, sync) / sqrt( l2_norm2(est, sync) * l2_norm2(true_signal, sync) );
+
+    if ( rank == 0 )
+        std::cout << "correlation " + var_name + " = " << corr << std::endl;  
+
+    
+    // l2 signal error
+    int len = (int) ( N + (M-N) * sync );
+    std::vector<double> temp(len, 0.0);
+    double l2_norm2_xhat;
+
+    for (int i = 0; i< len; i++)
+        temp[i] = sqrt(scale) * est[i] - true_signal[i];
+
+    l2_norm2_xhat = l2_norm2(est, 1) * scale;
+
+    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
+    if (rank == 0)
+        std::cout << "l2 signal error for " + var_name + " = " << l2_signal_err << std::endl;
+
+
+    // prior distribution parameters
+    if (rank == 0)
+        std::cout << "prior variances = ";
+
+    for (int i = 0; i < vars.size(); i++)
+        if (rank == 0)
+            std::cout << vars[i] << ' ';
+
+    if (rank == 0) {
+        std::cout << std::endl;
+        std::cout << "prior probabilities = ";
+    }
+
+    for (int i = 0; i < probs.size(); i++)
+        if (rank == 0)
+            std::cout << probs[i] << ' ';
+    
 }

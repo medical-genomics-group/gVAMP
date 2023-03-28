@@ -32,6 +32,8 @@ public:
     double get_stop_criteria_thr() const { return stop_criteria_thr; }
     double get_EM_err_thr() const { return EM_err_thr; }
     double get_rho() const { return rho; }
+    double get_probit_var() const { return probit_var; }
+    
 
     unsigned int get_EM_max_iter() const { return EM_max_iter; }
     unsigned int get_CG_max_iter() const { return CG_max_iter; }
@@ -66,6 +68,9 @@ public:
     //const std::vector<std::vector<double>>& get_cva()  const { return cva;  }
     //const std::vector<std::vector<double>>& get_cvai() const { return cvai; }
 
+    void set_probit_var(double v) { probit_var = v; }
+
+
 private:
     std::string bed_file = "";
     std::string bed_file_test = "";
@@ -93,6 +98,7 @@ private:
     unsigned int use_lmmse_damp = 0;
     unsigned int use_XXT_denoiser = 0;
     unsigned int CV;
+    double probit_var = 1;
 
 
     // unsigned int meth_imp = 0;

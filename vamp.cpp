@@ -18,7 +18,7 @@
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
 
 //constructor for class data
-vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model) :
+vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model, Options opt) :
     N(N),
     M(M),
     Mt(Mt),
@@ -42,13 +42,15 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     r2 = std::vector<double> (M, 0.0);
     p1 = std::vector<double> (N, 0.0);
 
-    Options opt;
+    
     EM_max_iter = opt.get_EM_max_iter();
     EM_err_thr = opt.get_EM_err_thr();
     CG_max_iter = opt.get_CG_max_iter();
     reverse = opt.get_use_XXT_denoiser();
     use_lmmse_damp = opt.get_use_lmmse_damp();
     stop_criteria_thr = opt.get_stop_criteria_thr();
+    probit_var = opt.get_probit_var();
+    
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 }
 
@@ -84,6 +86,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     stop_criteria_thr = opt.get_stop_criteria_thr();
     vars = opt.get_vars();
     // we scale the signal prior with N since X -> X / sqrt(N)
+    probit_var = opt.get_probit_var();
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 }
 
@@ -220,6 +223,55 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << "alpha1 = " << alpha1 << std::endl;
         eta1 = gam1 / alpha1;
+
+        // re-estimating the error variance
+        if (it > 1){
+
+            double gam1_reEst_prev;
+            int it_revar = 1;
+
+            for (; it_revar <= auto_var_max_iter; it_revar++){
+
+                std::vector<double> x1_hat_m_r1 = x1_hat;
+                for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
+                    x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
+
+                gam1_reEst_prev = gam1;
+                gam1 = std::min( std::max(  1 / (1/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
+
+                if (rank == 0 && it_revar % 5 == 0)
+                    std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
+
+                // new signal estimate
+                for (int i = 0; i < M; i++)
+                    x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
+
+                // new MMSE estimate
+                sum_d = 0;
+                for (int i=0; i<M; i++)
+                {
+                    // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
+                    x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i];
+                    sum_d += x1_hat_d[i];
+                }
+
+                alpha1 = 0;
+                MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+                alpha1 /= Mt;
+                eta1 = gam1 / alpha1;
+
+                updatePrior(0);
+
+                if ( abs(gam1 - gam1_reEst_prev) < 1e-4 )
+                    break;
+                
+            }
+
+            if (rank == 0)
+                std::cout << "A total of " << std::max(it_revar - 1,1) << " variance and prior tuning iterations were performed" << std::endl;
+
+        }
+
         gam_before = gam2;
         gam2 = std::min(std::max(eta1 - gam1, gamma_min), gamma_max);
         if (rank == 0){
@@ -227,12 +279,16 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "gam2 = " << gam2 << std::endl;
         }
         double end_onsager1 = MPI_Wtime();
+
         if (rank == 0)
             std::cout << "denoising onsager calculation took " << end_onsager1 - start_onsager1 << " seconds" << std::endl;
+
         if (use_lmmse_damp == 1)
             r2_prev = r2;
+
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
+
         if (use_lmmse_damp == 1){
             double xi = std::min(2 * std::min(alpha1, alpha2), 1.0);
             if (rank == 0)
@@ -242,6 +298,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
             for (int i = 0; i < M; i++)
                 r2[i] = xi * r2[i] + (1-xi) * r2_prev[i];
         }
+
+        // we try with larger rhos if damping criteria allows it
+        double xi = std::min(2 * std::min(alpha1, alpha2), 1.0);
+        rho = std::max(rho, xi);
 
         // if the true value of the signal is known, we print out the true gam2
         double se_dev = 0;
@@ -256,7 +316,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         
         double start_prior_up = MPI_Wtime();
         // new place for prior update
-        updatePrior();
+        // updatePrior();
         double end_prior_up = MPI_Wtime();
         if (rank == 0)
             std::cout << "time needed to calculate conditional expectation = " << end_prior_up - start_prior_up << " seconds" <<  std::endl;
@@ -328,6 +388,16 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
         eta2 = gam2 / alpha2;
+
+        // re-estimating gam2 <- new
+        std::vector<double> x2_hat_m_r2 = x2_hat;
+        for (int i0 = 0; i0 < x2_hat_m_r2.size(); i0++)
+            x2_hat_m_r2[i0] = x2_hat_m_r2[i0] - r2[i0];
+        gam2 = std::min( std::max(  1 / (1/eta2 + l2_norm2(x2_hat_m_r2, 1)/Mt), gamma_min ), gamma_max );
+
+        if (rank == 0)
+            std::cout << "gam2ML = " << gam2 << std::endl;
+
         gam_before = gam1;
         // gam1 = rho * std::min( std::max( eta2 - gam2, gamma_min ), gamma_max ) + (1 - rho) * gam1;
        
@@ -494,7 +564,7 @@ double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared bet
 
     invQ_bern_vec = precondCG_solver(bern_vec, tau, 0, dataset); // precond_change
 
-    double onsager = gam2 * inner_prod(bern_vec, invQ_bern_vec, 1); // because we want to calculate gam2 * Tr[(gamw * X^TX + gam2 * I)] / Mt
+    double onsager = gam2 * inner_prod(bern_vec, invQ_bern_vec, 1); // because we want to calculate gam2 * Tr[(gamw * X^TX + gam2 * I)^(-1)] / Mt
 
     return onsager;    
 }
@@ -527,7 +597,7 @@ void vamp::updateNoisePrec(data* dataset){
 
 }
 
-void vamp::updatePrior() {
+void vamp::updatePrior(int verbose = 1) {
     
         double noise_var = 1 / gam1;
 
@@ -637,14 +707,16 @@ void vamp::updatePrior() {
             double dist_probs = sqrt(distance_probs / norm_probs);
             double dist_vars = sqrt(distance_vars / norm_vars);
 
-            if (rank == 0)
-                std::cout << "it = " << it << ": dist_probs = " << dist_probs << " & dist_vars = " << dist_vars << std::endl;
+            if (verbose == 1)
+                if (rank == 0)
+                    std::cout << "it = " << it << ": dist_probs = " << dist_probs << " & dist_vars = " << dist_vars << std::endl;
             if ( dist_probs < EM_err_thr  && dist_vars < EM_err_thr )
                 break;   
         }
     
-        if (rank == 0)  
-            std::cout << "Final number of prior EM iterations = " << std::min(it + 1, EM_max_iter) << " / " << EM_max_iter << std::endl;
+        if (verbose == 1)
+            if (rank == 0)  
+                std::cout << "Final number of prior EM iterations = " << std::min(it + 1, EM_max_iter) << " / " << EM_max_iter << std::endl;
 }
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset){ // multiplying with (tau*A^TAv + gam2*v)
@@ -770,9 +842,6 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
 
         if (rank == 0)
             std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  norm_v << std::endl;
-        
-        if (rank == 0)
-            std::cout << "||RHS|| = " << norm_v << std::endl;
 
         if (rel_err < err_tol) 
             break;
@@ -846,7 +915,10 @@ void vamp::err_measures(data *dataset, int ind){
 
     std::vector<double> Axest;
     if (ind == 1)
-        Axest = z1;
+        if (z1.size() > 0)
+            Axest = z1;
+        else
+            Axest = (*dataset).Ax(x1_hat.data());
     else if (ind == 2)
        Axest = (*dataset).Ax(x2_hat.data());
 

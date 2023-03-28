@@ -239,6 +239,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             rho = atof(argv[++i]);
             ss << "--rho " << rho << "\n";
         }
+        else if (!strcmp(argv[i], "--probit-var")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            probit_var = atof(argv[++i]);
+            ss << "--probit-var" << probit_var << "\n";
+        }
         else if (!strcmp(argv[i], "--h2")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
             rho = atof(argv[++i]);
