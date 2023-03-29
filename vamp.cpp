@@ -190,7 +190,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
            std::cout << "filepath_out is " << filepath_out << std::endl;
 
-        if (it % 5 == 0){
+        if (it % 1 == 0){
             std::string filepath_out_r1 = out_dir + out_name + "_r1_it_" + std::to_string(it) + ".bin";
             std::vector<double> r1_stored = r1;
             for (int i0=0; i0<r1_stored.size(); i0++)
@@ -393,6 +393,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         std::vector<double> x2_hat_m_r2 = x2_hat;
         for (int i0 = 0; i0 < x2_hat_m_r2.size(); i0++)
             x2_hat_m_r2[i0] = x2_hat_m_r2[i0] - r2[i0];
+        // double gam2_before = gam2;
         gam2 = std::min( std::max(  1 / (1/eta2 + l2_norm2(x2_hat_m_r2, 1)/Mt), gamma_min ), gamma_max );
 
         if (rank == 0)
@@ -402,7 +403,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         // gam1 = rho * std::min( std::max( eta2 - gam2, gamma_min ), gamma_max ) + (1 - rho) * gam1;
        
         // adaptive VAMP
-        if (it < 0){
+        /*if (it < 0){
             std::vector<double> r1mx1hat = r1;
             for (int i=0; i<M; i++)
                 r1mx1hat[i] -= x1_hat[i];
@@ -412,17 +413,17 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
             gam1 = std::min( std::max( 1 / ( l2_norm2(r1mx1hat, 1) / Mt + 1/eta1 ), gamma_min ), gamma_max );
         }
-        else
-        {
-            std::vector<double> r1mx1hat = r1;
-            for (int i=0; i<M; i++)
-                r1mx1hat[i] -= x1_hat[i];
-            double gam1ML = 1 / ( l2_norm2(r1mx1hat, 1) / Mt + 1/eta1 );
-            if (rank == 0)
-                std::cout << "gam1ML = " << gam1ML << std::endl;
+        */
+        //else
+        //{
+            // std::vector<double> r1mx1hat = r1;
+            // for (int i=0; i<M; i++)
+            //    r1mx1hat[i] -= x1_hat[i];
+            // double gam1ML = 1 / ( l2_norm2(r1mx1hat, 1) / Mt + 1/eta1 );
+            // if (rank == 0)
+            //    std::cout << "gam1ML = " << gam1ML << std::endl;
             gam1 = std::min( std::max( eta2 - gam2, gamma_min ), gamma_max );
-        }
-            
+        //}
             
         if (rank == 0)
             std::cout << "gam1 = " << gam1 << std::endl;

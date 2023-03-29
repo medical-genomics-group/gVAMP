@@ -72,6 +72,23 @@ void Options::read_command_line_options(int argc, char** argv) {
                 }
             }
         }
+        else if (!strcmp(argv[i], "--true-signal-files")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            std::string cslist = argv[++i];
+            ss << "--true-signal-files " << cslist << "\n";
+            std::stringstream sslist(cslist);
+            std::string filepath;
+            while (getline(sslist, filepath, ',')) {
+                std::ifstream true_signal_file(filepath);
+                if (true_signal_file.is_open()) {
+                    true_signal_file.close();
+                    true_signal_files.push_back(filepath);
+                } else {
+                    std::cout << "FATAL: file " << filepath << " not found\n";
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
         else if (!strcmp(argv[i], "--phen-files-test")) {
             if (i == argc - 1) fail_if_last(argv, i);
             std::string cslist = argv[++i];

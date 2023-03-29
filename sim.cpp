@@ -99,38 +99,7 @@ int main(int argc, char** argv)
     if (rank ==0)
         std::cout << std::endl;
 
-    // simulating beta
-    std::vector<double> beta_true(M, 0.0); 
-
-    if (rank == 0){
         
-        std::vector<double> beta_true_tmp = simulate(Mt, vars_true, probs_true);
-        
-        for (int i0=S; i0<S+M; i0++)
-            beta_true[i0-S] = beta_true_tmp[i0];
-        
-        for (int ran = 1; ran < nranks; ran++)
-            MPI_Send(beta_true_tmp.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
-    }
-    else{
-
-        MPI_Status status;
-
-        std::vector<double> beta_true_full(Mt, 0.0);
-
-        MPI_Recv(beta_true_full.data(), Mt, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &status);
-
-        for (int i0=S; i0<S+M; i0++)
-            beta_true[i0-S] = beta_true_full[i0];
-
-   }
-    
-    MPI_Barrier(MPI_COMM_WORLD);
-
-     // storing true beta
-    std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
-    mpi_store_vec_to_file(filepath_out, beta_true, S, M);
-
     //printing out true variances
     if (rank == 0)
         std::cout << "true scaled variances = ";
@@ -155,57 +124,109 @@ int main(int argc, char** argv)
     if (rank == 0)
         std::cout << "true gamw = " << gamw << std::endl;
 
-    std::random_device rand_dev;
-    std::mt19937 generator(rand_dev());  
-    std::normal_distribution<double> gauss_beta_gen( 0, 1 / sqrt(gamw) ); //2nd parameter is stddev
-    std::vector<double> noise(N, 0.0);
 
-    for (int i = 0; i < N; i++)
-        noise[i] = gauss_beta_gen(generator);
-    
-    if (rank == 0){
+    std::vector<double> beta_true(M, 0.0); 
+    std::vector<double> y;
 
-        for (int ran = 1; ran < nranks; ran++)
-            MPI_Send(noise.data(), N, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+    // loading true signal and phenotype in case they are user-provided
+    std::string true_signal_file = (opt.get_true_signal_files())[0];
+    std::string phen_file = (opt.get_phen_files())[0];
 
-        std::cout << "noise prec = " << 1.0 / pow(calc_stdev(noise), 2) << std::endl;
+    if (!true_signal_file.empty()){
+
+        y= read_vec_from_file(phen_file, N, 0);
+
+        dataset.set_phen(y);
+
+        beta_true = mpi_read_vec_from_file(true_signal_file, M, S);
 
     }
+    else
+    {
 
-    double *noise_val = (double*) _mm_malloc(size_t(N) * sizeof(double), 32);
+        // simulating beta
+        if (rank == 0){
+            
+            std::vector<double> beta_true_tmp = simulate(Mt, vars_true, probs_true);
+            
+            for (int i0=S; i0<S+M; i0++)
+                beta_true[i0-S] = beta_true_tmp[i0];
+            
+            for (int ran = 1; ran < nranks; ran++)
+                MPI_Send(beta_true_tmp.data(), Mt, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+        }
+        else{
 
-    if (rank != 0)
-        MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Status status;
 
-    std::vector<double> beta_true_scaled = beta_true;
-    for (int i0=0; i0<M; i0++)
-        beta_true_scaled[i0] *= sqrt(N);
-    
-    std::vector<double> y = dataset.Ax(beta_true_scaled.data());
+            std::vector<double> beta_true_full(Mt, 0.0);
 
-    if (rank == 0)
-        std::cout << "Var(Ax) = " << pow(calc_stdev(y), 2) << std::endl;
+            MPI_Recv(beta_true_full.data(), Mt, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &status);
+
+            for (int i0=S; i0<S+M; i0++)
+                beta_true[i0-S] = beta_true_full[i0];
+
+    }
+        
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        // storing true beta
+        std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
+        mpi_store_vec_to_file(filepath_out, beta_true, S, M);
 
 
-    for (int i = 0; i < N; i++)
+        std::random_device rand_dev;
+        std::mt19937 generator(rand_dev());  
+        std::normal_distribution<double> gauss_beta_gen( 0, 1 / sqrt(gamw) ); //2nd parameter is stddev
+        std::vector<double> noise(N, 0.0);
+
+        for (int i = 0; i < N; i++)
+            noise[i] = gauss_beta_gen(generator);
+        
+        if (rank == 0){
+
+            for (int ran = 1; ran < nranks; ran++)
+                MPI_Send(noise.data(), N, MPI_DOUBLE, ran, 0, MPI_COMM_WORLD);
+
+            std::cout << "noise prec = " << 1.0 / pow(calc_stdev(noise), 2) << std::endl;
+
+        }
+
+        double *noise_val = (double*) _mm_malloc(size_t(N) * sizeof(double), 32);
+
         if (rank != 0)
-            y[i] += noise_val[i];    
-        else if (rank == 0)
-            y[i] += noise[i];
+            MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    dataset.set_phen(y);
+        std::vector<double> beta_true_scaled = beta_true;
+        for (int i0=0; i0<M; i0++)
+            beta_true_scaled[i0] *= sqrt(N);
+        
+        y = dataset.Ax(beta_true_scaled.data());
 
-    std::string filepath_out_y = opt.get_out_dir() + opt.get_out_name() + "_y.txt";
-    store_vec_to_file(filepath_out_y, y);
+        if (rank == 0)
+            std::cout << "Var(Ax) = " << pow(calc_stdev(y), 2) << std::endl;
 
-    if (rank == 0){
 
-        std::cout << "Var(y) = " << pow(calc_stdev(y), 2) << std::endl;
+        for (int i = 0; i < N; i++)
+            if (rank != 0)
+                y[i] += noise_val[i];    
+            else if (rank == 0)
+                y[i] += noise[i];
 
-        double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
+        dataset.set_phen(y);
 
-        std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
+        std::string filepath_out_y = opt.get_out_dir() + opt.get_out_name() + "_y.txt";
+        store_vec_to_file(filepath_out_y, y);
 
+        if (rank == 0){
+
+            std::cout << "Var(y) = " << pow(calc_stdev(y), 2) << std::endl;
+
+            double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
+
+            std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
+
+        }
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,12 +234,13 @@ int main(int argc, char** argv)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     double gamw_init = 1 / (1 - h2hat);
+    gamw_init = gamw;
 
     double gam1 = 1e-8;
     //gam1 = 1e-3;
 
-    //vars_init = vars_true;
-    //probs_init = probs_true;
+    vars_init = vars_true;
+    probs_init = probs_true;
 
     vamp emvamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model());
 
@@ -230,13 +252,13 @@ int main(int argc, char** argv)
         
         std::cout << "var(y) = " << pow(calc_stdev(y), 2) << std::endl;
 
-        double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
+        // double true_R2_tmp = calc_stdev(noise) / calc_stdev(y);
 
-        std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
+        // std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
 
         std::cout << "true gamw = " << gamw << std::endl;
 
-        std::cout << "noise prec = " << 1.0 / pow(calc_stdev(noise), 2) << std::endl;
+        // std::cout << "noise prec = " << 1.0 / pow(calc_stdev(noise), 2) << std::endl;
     }
 
     MPI_Finalize();

@@ -182,18 +182,22 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
 
     double sum = std::accumulate(vec.begin(), vec.end(), 0.0);
     double sq_sum = std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0);
+    int vec_len = vec.size();
     
     if (sync == 1){
         double sum_total = 0;
         double sq_sum_total = 0;
+        int vec_len_total = 0;
         MPI_Allreduce(&sum, &sum_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); 
         MPI_Allreduce(&sq_sum, &sq_sum_total, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); 
+        MPI_Allreduce(&vec_len, &vec_len_total, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD); 
         sum = sum_total;
         sq_sum = sq_sum_total; 
+        vec_len = vec_len_total;
     }
 
-    double mean = sum / vec.size();
-    double stdev = std::sqrt( (sq_sum - vec.size() * mean * mean) / (vec.size()-1) );
+    double mean = sum / vec_len;
+    double stdev = std::sqrt( (sq_sum - vec_len * mean * mean) / (vec_len-1) );
 
     return stdev;
  }

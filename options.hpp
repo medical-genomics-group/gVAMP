@@ -56,6 +56,8 @@ public:
     const std::vector<std::string>& get_phen_files() const { return phen_files; }
     const std::vector<std::string>& get_phen_files_test() const { return phen_files_test; }
 
+    const std::vector<std::string>& get_true_signal_files() const { return true_signal_files; }
+
     void list_phen_files() const;
     int  count_phen_files() const { return phen_files.size(); }
     int  count_phen_files_test() const { return phen_files_test.size(); }
@@ -115,6 +117,7 @@ private:
     void fail_if_last(char** argv, const int i);
     std::vector<std::string> phen_files;
     std::vector<std::string> phen_files_test;
+    std::vector<std::string> true_signal_files;
     //int ngroups = 0;
     //void _set_ngroups(const int i) { ngroups = i; }
     //int nmixtures = 0;

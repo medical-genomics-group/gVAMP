@@ -58,6 +58,7 @@ Currently supported input options to C++ version of the code:
 | `use_lmmse_damp` | indicates whether or not damping should be used in LMMSE step calculation |
 | `h2` | heritability value used in simulations  |
 | `CV` | number of causal variants used in simulations |
+| `true_signal_file` | path to file containing true value of the signal |
 
 
 

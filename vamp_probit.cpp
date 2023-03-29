@@ -22,17 +22,31 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
     tau1 = gam1; // hardcoding initial variability
-    tau1 = 1e-4;
+    tau1 = 1e1;
+
+
+    double sqrtN = sqrt(N);
+    std::vector<double> true_signal_s = true_signal;
+    for (int i=0; i<true_signal_s.size(); i++)
+        true_signal_s[i] = true_signal[i] * sqrtN;
+    std::vector<double> true_g = (*dataset).Ax(true_signal_s.data());
+
 
     // Gaussian noise start
     r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
     p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
 
+
+    // initializing under VAMP assumption
+    for (int i=0; i<r1.size(); i++)
+        r1[i] += true_signal[i];
+
+    for (int i=0; i<p1.size(); i++)
+        p1[i] += true_g[i];
+
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
     p2 = std::vector<double> (N, 0.0);
-
-    std::vector<double> true_g = (*dataset).Ax(true_signal.data());
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -52,7 +66,11 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
 
 
-        probit_err_measures(dataset, 1, true_signal, x1_hat, "x1_hat");
+        std::vector<double> x1_hat_s = x1_hat;
+        for (int i=0; i<x1_hat_s.size(); i++)
+            x1_hat_s[i] = x1_hat[i] / sqrt(N);
+
+        probit_err_measures(dataset, 1, true_signal, x1_hat_s, "x1_hat");
 
 
         // storing current estimate of the signal
@@ -100,11 +118,21 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
 
+        // true precision calcultion
+        std::vector<double> r2mtrue = r2;
+        for (int i=0; i<r2mtrue.size(); i++)
+            r2mtrue[i] -= true_signal[i];
+
+        //if (rank == 0)
+        //    std::cout << "r2mtrue[0] = " << r2mtrue[0] << std::endl;
+        double r2mtrue_std = calc_stdev(r2mtrue, 1);
+        if (rank == 0)
+            std::cout << "true gam2 = " << 1.0 / r2mtrue_std / r2mtrue_std / N << std::endl;
 
         // updating parameters of prior distribution
         probs_before = probs;
         vars_before = vars;
-        updatePrior(1);
+        // updatePrior(1);
 
 
         //************************
@@ -134,6 +162,13 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         for (int i=0; i<N; i++)
             p2[i] = (z1_hat[i] - beta1*p1[i]) / (1-beta1);
+
+        std::vector<double> p2mtrue = p2;
+        for (int i=0; i<p2mtrue.size(); i++)
+            p2mtrue[i] -= true_g[i];
+        double p2mtrue_std = calc_stdev(p2mtrue, 0);
+        if (rank == 0)
+            std::cout << "true tau2 = " << 1.0 / p2mtrue_std / p2mtrue_std << std::endl;
 
         tau2 = tau1 * (1-beta1) / beta1;
 
@@ -181,7 +216,11 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // running conjugate gradient solver to compute LMMSE
         x2_hat = precondCG_solver(v, std::vector<double> (M, 0.0), tau2, 1, dataset); // precond_change!
 
-        probit_err_measures(dataset, 1, true_signal, x2_hat, "x2_hat");
+        std::vector<double> x2_hat_s = x2_hat;
+        for (int i=0; i<x2_hat_s.size(); i++)
+            x2_hat_s[i] = x2_hat[i] / sqrt(N);
+
+        probit_err_measures(dataset, 1, true_signal, x2_hat_s, "x2_hat");
 
         double alpha2 = g2d_onsager(gam2, tau2, dataset);
         if (rank == 0)
@@ -189,6 +228,14 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         for (int i=0; i<M; i++)
             r1[i] = (x2_hat[i] - alpha2*r2[i]) / (1-alpha2);
+
+        // true precision calculation
+        std::vector<double> r1mtrue = r1;
+        for (int i=0; i<r1mtrue.size(); i++)
+            r1mtrue[i] -= true_signal[i];
+        double r1mtrue_std = calc_stdev(r1mtrue, 1);
+        if (rank == 0)
+            std::cout << "true gam1 = " << 1.0 / r1mtrue_std / r1mtrue_std << std::endl;
 
         gam1 = gam2 * (1-alpha2) / alpha2;
 
@@ -208,7 +255,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         
         probit_err_measures(dataset, 0, true_g, z2_hat, "z2_hat");
         
-        double beta2 = N / M * (1-alpha2);
+        double beta2 = (double) N / Mt * (1-alpha2);
         beta2 = (double) Mt / N * (1 - alpha2);
 
         if (rank == 0)
@@ -216,6 +263,15 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         for (int i=0; i<M; i++)
             p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
+
+        
+        // true precision calculation
+        std::vector<double> p1mtrue = p1;
+        for (int i=0; i<p1mtrue.size(); i++)
+            p1mtrue[i] -= true_g[i];
+        double p1mtrue_std = calc_stdev(p1mtrue, 0);
+        if (rank == 0)
+            std::cout << "true tau1 = " << 1.0 / p1mtrue_std / p1mtrue_std << std::endl;
 
         tau1 = tau2 * (1 - beta2) / beta2;
 
@@ -246,7 +302,25 @@ double vamp::g1_bin_class(double p, double tau1, double y){
 
     double c = p / sqrt(probit_var + 1.0/tau1);
 
-    double temp = p + (2*y-1) * exp(-0.5 * c * c) / sqrt(2*M_PI) / tau1 / sqrt(probit_var + 1/tau1) / normal_cdf((2*y - 1)*c);
+    double normalCdf = normal_cdf( (2*y - 1)*c );
+    double normalPdf = exp(-0.5 * c * c) / sqrt(2*M_PI);
+
+    /*
+    if (rank == 0)
+        if (abs(c) > 100)
+            std::cout << "c = " << c << ", exp(-0.5 * c * c) = " << exp(-0.5 * c * c) << ", normal_cdf((2*y - 1)*c) = " << normal_cdf((2*y - 1)*c) << std::endl;
+    */
+
+    double temp;
+    
+    double normalPdf_normalCdf;
+
+    if ( abs(normalCdf) < 1e-10 && abs(normalPdf) < 1e-10 )
+        normalPdf_normalCdf = abs(c);
+    else
+        normalPdf_normalCdf = normalPdf / normalCdf;        
+
+    temp = p + (2*y-1) * normalPdf_normalCdf / tau1 / sqrt(probit_var + 1.0/tau1);
 
     return temp;
 
@@ -259,9 +333,27 @@ double vamp::g1d_bin_class(double p, double tau1, double y){
 
     double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
 
-    double phic = normal_cdf((2*y-1)*c);
+    //double phic = normal_cdf(c);
 
-    double temp = 1 -  Nc / (1 + tau1 * probit_var) / phic * ((2*y-1)*c + Nc / phic); // because der = tau * Var
+    double phiyc = normal_cdf( (2*y-1)*c );
+
+    //double Nc_phic;
+
+    //if ( abs(phic) < 1e-10 && abs(Nc) < 1e-10 )
+    //    Nc_phic = abs(c);
+    //else 
+    //    Nc_phic = Nc / phic;
+
+    double Nc_phiyc;
+
+    if ( abs(phiyc) < 1e-10 && abs(Nc) < 1e-10 )
+        Nc_phiyc = abs(c);
+    else 
+        Nc_phiyc = Nc / phiyc;
+
+    double temp;
+
+    temp = 1 -  Nc_phiyc / (1 + tau1 * probit_var) * ( (2*y-1)*c + Nc_phiyc ); // because der = tau * Var
 
     return temp;
 
@@ -354,9 +446,6 @@ double vamp::update_probit_var(double v, double eta, std::vector<double> z_hat, 
 }
 
 void vamp::probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name){
-
-    
-    double scale = 1.0 / (double) N;
     
     // correlation
     double corr = inner_prod(est, true_signal, sync) / sqrt( l2_norm2(est, sync) * l2_norm2(true_signal, sync) );
@@ -368,33 +457,44 @@ void vamp::probit_err_measures(data *dataset, int sync, std::vector<double> true
     // l2 signal error
     int len = (int) ( N + (M-N) * sync );
     std::vector<double> temp(len, 0.0);
-    double l2_norm2_xhat;
 
-    for (int i = 0; i< len; i++)
-        temp[i] = sqrt(scale) * est[i] - true_signal[i];
+    for (int i = 0; i<len; i++)
+        temp[i] = est[i] - true_signal[i];
 
-    l2_norm2_xhat = l2_norm2(est, 1) * scale;
-
-    double l2_signal_err = sqrt( l2_norm2(temp, 1) / l2_norm2(true_signal, 1) );
+    double l2_signal_err = sqrt( l2_norm2(temp, sync) / l2_norm2(true_signal, sync) );
     if (rank == 0)
         std::cout << "l2 signal error for " + var_name + " = " << l2_signal_err << std::endl;
 
 
+    // precision calculation
+    //double std = calc_stdev(temp, sync);
+
+    //if (rank == 0)
+    //    std::cout << "true precision for " + var_name + " = " << 1.0 / N / std / std << std::endl;
+
+
     // prior distribution parameters
-    if (rank == 0)
+    if (sync == 1){
+
+        if (rank == 0)
         std::cout << "prior variances = ";
 
-    for (int i = 0; i < vars.size(); i++)
-        if (rank == 0)
-            std::cout << vars[i] << ' ';
+        for (int i = 0; i < vars.size(); i++)
+            if (rank == 0)
+                std::cout << vars[i] << ' ';
 
-    if (rank == 0) {
-        std::cout << std::endl;
-        std::cout << "prior probabilities = ";
+        if (rank == 0) {
+            std::cout << std::endl;
+            std::cout << "prior probabilities = ";
+        }
+
+        for (int i = 0; i < probs.size(); i++)
+            if (rank == 0)
+                std::cout << probs[i] << ' ';
+
+        if (rank == 0)
+            std::cout << std::endl;
     }
-
-    for (int i = 0; i < probs.size(); i++)
-        if (rank == 0)
-            std::cout << probs[i] << ' ';
+    
     
 }
