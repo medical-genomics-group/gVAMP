@@ -469,7 +469,7 @@ void data::compute_people_statistics() {
 }
 
 
-    double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv) {
+    double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, const int SB, const int LB) {
     // __restrict__ means that phen is the only pointer pointing to that data
 
     if (type_data == "bed"){
@@ -486,10 +486,12 @@ void data::compute_people_statistics() {
             //#pragma omp parallel for schedule(static) reduction(addpd4:suma,sumb)
             #pragma omp parallel for schedule(static) private(luta,lutab,p42) reduction(addpd8:sum42)
             #endif
-            for (int j=0; j<mbytes; j++){
+            //for (int j=0; j<mbytes; j++){
+            for (int j=SB; j<SB+LB; j++){
                 lutab = _mm512_load_pd(&dotp_lut_ab[bed[j] * 8]);
                 // broadcasts the 4 packed double-precision (64-bit) floating-point elements
-                p42 = _mm512_broadcast_f64x4(_mm256_load_pd(&phen[j * 4])); 
+                //p42 = _mm512_broadcast_f64x4(_mm256_load_pd(&phen[j * 4])); 
+                p42 = _mm512_broadcast_f64x4(_mm256_load_pd(&phen[(j-SB) * 4])); 
                 p42 = _mm512_mul_pd(p42, lutab);
                 sum42 = _mm512_add_pd(sum42, p42);
             }
@@ -503,15 +505,16 @@ void data::compute_people_statistics() {
             #ifdef _OPENMP
             #pragma omp parallel for schedule(static) reduction(+:dpa,dpb)
             #endif
-            for (int i=0; i<mbytes; i++) {
+            //for (int i=0; i<mbytes; i++) {
+            for (int i=SB; i<SB+LB; i++) {
 
                 #ifdef _OPENMP
                 #pragma omp simd aligned(dotp_lut_a,dotp_lut_b,phen:32)
                 #endif
                     for (int j=0; j<4; j++) {
 
-                        dpa += dotp_lut_a[bed[i] * 4 + j] * phen[i * 4 + j];
-                        dpb += dotp_lut_b[bed[i] * 4 + j] * phen[i * 4 + j];
+                        dpa += dotp_lut_a[bed[i] * 4 + j] * phen[(i-SB) * 4 + j];
+                        dpb += dotp_lut_b[bed[i] * 4 + j] * phen[(i-SB) * 4 + j];
 
                     }
                     
@@ -520,7 +523,7 @@ void data::compute_people_statistics() {
 
         #endif
     }
-    else if (type_data == "meth"){
+    else if (type_data == "meth"){ // always takes all individuals as their number is typically small in methylation studies
 
         double* meth = &meth_data[mloc * N];
 
@@ -542,6 +545,10 @@ void data::compute_people_statistics() {
 
 
 std::vector<double> data::ATx(double* __restrict__ phen) {
+    return ATx(phen, 0, mbytes);
+}
+
+std::vector<double> data::ATx(double* __restrict__ phen, int SB, int LB) {
 
     std::vector<double> ATx(M, 0.0);
 
@@ -549,15 +556,26 @@ std::vector<double> data::ATx(double* __restrict__ phen) {
         #pragma omp parallel for schedule(static)
     #endif
     for (int mloc=0; mloc < M; mloc++)
-         ATx[mloc] = dot_product(mloc, phen, mave[mloc], msig[mloc]);
+         ATx[mloc] = dot_product(mloc, phen, mave[mloc], msig[mloc], SB, LB);
 
-    for (int mloc=0; mloc < M; mloc++)
-        ATx[mloc] /= sqrt(N);
+    double scale;
+    if (SB == 0 && LB == mbytes)
+        scale = 1.0 / sqrt(N);
+    else
+        scale = 1.0 / sqrt(4 * LB);
+
+    for (int mloc=0; mloc<M; mloc++)
+        ATx[mloc] *= scale;
 
     return ATx;
 }
 
+
 std::vector<double> data::Ax(double* __restrict__ phen) {
+    return Ax(phen, 0, mbytes);
+}
+
+std::vector<double> data::Ax(double* __restrict__ phen, int SB, int LB) {
 
     if (type_data == "bed"){
     #ifdef MANVECT
@@ -566,7 +584,8 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
         //    std::cout << "MANCVECT is active!" << std::endl;
         double* mave = get_mave();
         double* msig = get_msig();
-        std::vector<double> Ax_temp(4 * mbytes, 0.0);
+        // std::vector<double> Ax_temp(4 * mbytes, 0.0);
+        std::vector<double> Ax_temp(4 * LB, 0.0);
 
         // #pragma omp declare reduction(reduction-identifier : typename-list : combiner) [initializer-clause] new-line, where:
 
@@ -610,7 +629,8 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
                 //#pragma omp for nowait schedule(static) // reduction(vec_add_d:Ax_temp)
             
             //#endif
-            for (int j=0; j<mbytes; j++) {
+            //for (int j=0; j<mbytes; j++) {
+            for (int j=SB; j<SB+LB; j++) {
                 luta = _mm256_load_pd(&dotp_lut_a[bedm[j] * 4]);
                 lutb = _mm256_load_pd(&dotp_lut_b[bedm[j] * 4]);
                 luta = _mm256_add_pd(luta, minave);
@@ -618,7 +638,8 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
                 luta = _mm256_mul_pd(luta, lutb); // because we need to multiply - mu / sigma with 0
                 suma = _mm256_load_pd(&Ax_temp[j * 4]);
                 suma = _mm256_fmadd_pd(luta, mmphen, suma);
-                _mm256_storeu_pd(&Ax_temp[j * 4], suma);
+                //_mm256_storeu_pd(&Ax_temp[j * 4], suma);
+                _mm256_storeu_pd(&Ax_temp[(j-SB) * 4], suma);
             }
             // #ifdef _OPENMP2
             //}
@@ -626,18 +647,30 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
         }
 
 
-        std::vector<double> Ax_total(4 * mbytes, 0.0);
+        // std::vector<double> Ax_total(4 * mbytes, 0.0);
+        std::vector<double> Ax_total(4 * LB, 0.0);
 
-        MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        // MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(Ax_temp.data(), Ax_total.data(), 4*LB, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        
+        double scale;
+        if (SB == 0 && LB == mbytes)
+            scale = 1.0 / sqrt(N);
+        else
+            scale = 1.0 / sqrt(4 * LB);
 
-        for(int i = 0; i < 4 * mbytes; i++)
-            Ax_total[i] /= sqrt(N);
+        for (int i=0; i<4*LB; i++)
+            Ax_total[i] *= scale;
+
+        //for(int i = 0; i < 4 * mbytes; i++)
+        //    Ax_total[i] /= sqrt(N);
 
         return Ax_total;
 
     #else
 
-        std::vector<double> Ax_temp(4 * mbytes, 0.0);
+        // std::vector<double> Ax_temp(4 * mbytes, 0.0);
+        std::vector<double> Ax_temp(4 * LB, 0.0);
         unsigned char* bed;
 
 
@@ -652,7 +685,8 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
             #ifdef _OPENMP
                 #pragma omp parallel for shared(Ax_temp)
             #endif
-            for (int j=0; j<mbytes; j++) {
+            for (int j=SB; j<SB+LB; j++) {
+            // for (int j=0; j<mbytes; j++) {
 
                 #ifdef _OPENMP
                 #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
@@ -660,20 +694,31 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
                 for (int k=0; k<4; k++) {
 
                     // because msig[i] is the precision of the i-th marker
-                    Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
+                    //Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
+                    Ax_temp[(j-SB) * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
 
                 }
             } 
         }
 
         // collecting results from different nodes
-        std::vector<double> Ax_total(4 * mbytes, 0.0);
+        // std::vector<double> Ax_total(4 * mbytes, 0.0);
+        std::vector<double> Ax_total(4 * LB, 0.0);
 
-        MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        // MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(Ax_temp.data(), Ax_total.data(), 4*LB, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
+        //for(int i = 0; i < 4 * mbytes; i++)
+        //    Ax_total[i] /= sqrt(N);
 
-        for(int i = 0; i < 4 * mbytes; i++)
-            Ax_total[i] /= sqrt(N);
+        double scale;
+        if (SB == 0 && LB == mbytes)
+            scale = 1.0 / sqrt(N);
+        else
+            scale = 1.0 / sqrt(4 * LB);
+
+        for (int i=0; i<4*LB; i++)
+            Ax_total[i] *= scale;
 
         return Ax_total;
 
@@ -681,7 +726,7 @@ std::vector<double> data::Ax(double* __restrict__ phen) {
 
     }
 
-    else if (type_data == "meth"){
+    else if (type_data == "meth"){ // always takes all individuals as their number is typically small in methylation studies
 
         double* mave = get_mave();
         double* msig = get_msig();

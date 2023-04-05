@@ -59,6 +59,10 @@ Currently supported input options to C++ version of the code:
 | `h2` | heritability value used in simulations  |
 | `CV` | number of causal variants used in simulations |
 | `true_signal_file` | path to file containing true value of the signal |
+| `alpha` | scaling factor applied in the normalization of a genotype matrix |
+| `learn-vars` | indicates wheather or not prior variances are learnt |
+
+
 
 
 

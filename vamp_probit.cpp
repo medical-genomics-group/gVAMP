@@ -21,8 +21,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     std::vector<double> x1_hat_d_prev(M, 0.0);
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
-    tau1 = gam1; // hardcoding initial variability
-    tau1 = 1e1;
+    // tau1 = gam1; // hardcoding initial variability
+    tau1 = 1e-1; // ideally sqrt( tau_10 / v ) approx 1, since it is to be composed with a gaussian CDF
 
 
     double sqrtN = sqrt(N);

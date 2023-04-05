@@ -90,14 +90,16 @@ public:
 
     void compute_people_statistics();
 
-    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv);
+    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, const int SB, const int LB);
 
     void read_genotype_data();
 
     void read_methylation_data();
 
+    std::vector<double> Ax(double* __restrict__ phen, int SB, int LB);
     std::vector<double> Ax(double* __restrict__ phen);
     
+    std::vector<double> ATx(double* __restrict__ phen, int SB, int LB);
     std::vector<double> ATx(double* __restrict__ phen);
 
     std::vector<double> filter_pheno();

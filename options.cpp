@@ -25,7 +25,7 @@ void Options::read_command_line_options(int argc, char** argv) {
 
     for (int i=1; i<argc; ++i) {
 
-        //std::cout << "input string = '" << argv[i] << "'"<< std::endl;
+        // std::cout << "input string = '" << argv[i] << "'"<< std::endl;
 
         if (!strcmp(argv[i], "--bed-file")) {
             if (i == argc - 1) fail_if_last(argv, i);
@@ -157,16 +157,25 @@ void Options::read_command_line_options(int argc, char** argv) {
         else if (!strcmp(argv[i], "--use-lmmse-damp")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 0) {
-                std::cout << "FATAL  : option --iterations has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                std::cout << "FATAL  : option --use-lmmse-damp has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
                 exit(EXIT_FAILURE);
             }
             use_lmmse_damp = (unsigned int) atoi(argv[++i]);
             ss << "--use-lmmse-damp " << use_lmmse_damp << "\n";
         }
+        else if (!strcmp(argv[i], "--learn-vars")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --learn-vars has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            learn_vars = (unsigned int) atoi(argv[++i]);
+            ss << "--learn-vars " << learn_vars << "\n";
+        }
         else if (!strcmp(argv[i], "--use-XXT-denoiser")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 0) {
-                std::cout << "FATAL  : option --iterations has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                std::cout << "FATAL  : option --use-XXT-denoiser has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
                 exit(EXIT_FAILURE);
             }
             use_XXT_denoiser = (unsigned int) atoi(argv[++i]);
@@ -198,6 +207,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             }
             store_pvals = (unsigned int) atoi(argv[++i]);
             ss << "--store-pvals " << store_pvals << "\n";
+        }
+        else if (!strcmp(argv[i], "--red")){
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --red has to be an integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            redglob = (unsigned int) atoi(argv[++i]);
+            ss << "--red " << redglob << "\n";
         }
         /*else if (!strcmp(argv[i], "--meth-imp")){
             if (i == argc - 1) fail_if_last(argv, i);
@@ -250,6 +268,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             if (i == argc - 1) fail_if_last(argv, i);
             EM_err_thr = atof(argv[++i]);
             ss << "--EM-err-thr " << EM_err_thr << "\n";
+        }
+        else if (!strcmp(argv[i], "--alpha")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            alpha = atof(argv[++i]);
+            ss << "--alpha " << alpha << "\n";
         }
         else if (!strcmp(argv[i], "--rho")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);

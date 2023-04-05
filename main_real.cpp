@@ -66,6 +66,52 @@ int main(int argc, char** argv)
         double gamw = 2;
         std::vector<double> beta_true = std::vector<double> (M, 0.0);
         vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
+
+        std::vector<double> vec(M, 1.0);
+        emvamp.set_LBglob((N/4)*4/5);
+        emvamp.set_LBglob((N/4)/10);
+        emvamp.set_SBglob(0);
+
+        std::vector<double> lm1 =  emvamp.lmmse_mult(vec, 1, &dataset, 0);
+        std::vector<double> lm2 =  emvamp.lmmse_mult(vec, 1, &dataset, 1);
+
+        double std1 = calc_stdev(lm1,1);
+        double std2 = calc_stdev(lm2,1);
+
+        if (rank == 0)
+            std::cout << "std1 = " << std1 << ", std2 = " << std2 << std::endl;
+        
+        std::vector<double> diff = lm1;
+        for (int i=0; i<M; i++)
+            diff[i] -= lm2[i];
+        
+        double l2norm2_diff = l2_norm2(diff, 1);
+        double l2norm2_true = l2_norm2(lm1, 1);
+
+        if (rank == 0)
+            std::cout << "sqrt( l2norm2_diff / l2norm2_true ) = " << sqrt( l2norm2_diff / l2norm2_true ) << std::endl; 
+
+        std::vector<double> xhat = emvamp.precondCG_solver(vec, std::vector<double>(M, 0.0), 2, 1, &dataset, 0);
+
+        std::vector<double> xhat_red = emvamp.precondCG_solver(vec, std::vector<double>(M, 0.0), 2, 1, &dataset, 1);
+
+        double stdx = calc_stdev(xhat,1);
+        double stdx_red = calc_stdev(xhat_red,1);
+
+        if (rank == 0)
+            std::cout << "stdx = " << stdx << ", stdx_red = " << stdx_red << std::endl;
+
+        
+        std::vector<double> diff_x = xhat;
+        for (int i=0; i<M; i++)
+            diff_x[i] -= xhat_red[i];
+
+        double l2norm2_diff_x = l2_norm2(diff_x, 1);
+        double l2norm2_true_x = l2_norm2(xhat, 1);
+
+        if (rank == 0)
+            std::cout << "sqrt( l2norm2_diff_x / l2norm2_true_x ) = " << sqrt( l2norm2_diff_x / l2norm2_true_x ) << std::endl; 
+
         std::vector<double> x_est = emvamp.infere(&dataset);
 
     }

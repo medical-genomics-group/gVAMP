@@ -27,8 +27,9 @@ private:
     int EM_max_iter; // = 1e5;
     double EM_err_thr; // = 1e-4;
     int CG_max_iter; // = 10;
-    int auto_var_max_iter = 100;
+    int auto_var_max_iter = 10;
     int calc_state_evo = 0;
+    int learn_vars;
     double damp_max = 1;
     double damp_min = 0.05;
     double stop_criteria_thr; // = 1e-5;
@@ -43,6 +44,8 @@ private:
     double total_comp_time=0;
     int reverse = 1;
     int use_lmmse_damp = 0;
+
+    int SBglob, LBglob, redglob;
 
 public:
 
@@ -66,13 +69,13 @@ public:
     void updateNoisePrec(data* dataset);
     void updateNoisePrecAAT(data* dataset);
 
-    std::vector<double> lmmse_mult(std::vector<double> v, double tau, data* dataset);
+    std::vector<double> lmmse_mult(std::vector<double> v, double tau, data* dataset, int red = 0);
     std::vector<double> lmmse_multAAT(std::vector<double> u, double tau, data* dataset);
     std::vector<double> lmmse_denoiserAAT(std::vector<double> r, std::vector<double> mu_CG_AAT_last, data* dataset);
 
     std::vector<double> CG_solverAAT(std::vector<double> v, std::vector<double> mu_start, double tau, int save, data* dataset);
-    std::vector<double> precondCG_solver(std::vector<double> v, double tau, int denoiser, data* dataset);
-    std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int denoiser, data* dataset);    
+    std::vector<double> precondCG_solver(std::vector<double> v, double tau, int denoiser, data* dataset, int red = 0);
+    std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int denoiser, data* dataset, int red = 0);    
 
     void err_measures(data * dataset, int ind);
     void probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name);
@@ -82,5 +85,9 @@ public:
     double probit_var_EM_deriv(double v, std::vector<double> z, std::vector<double> y); 
     double expe_probit_var_EM_deriv(double v, double eta, std::vector<double> z, std::vector<double> y);
     double update_probit_var(double v, double eta, std::vector<double> z_hat, std::vector<double> y);
+
+    void set_SBglob(int SB) { SBglob = SB; }
+    void set_LBglob(int LB) { LBglob = LB; }
+    void set_gam2 (double gam) { gam2 = gam; }
     
    };
