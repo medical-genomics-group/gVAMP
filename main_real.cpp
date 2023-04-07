@@ -64,9 +64,12 @@ int main(int argc, char** argv)
 
         double gam1 = 1e-6;
         double gamw = 2;
+        gamw = 1.0 / (1.0 - 0.57);
+        
         std::vector<double> beta_true = std::vector<double> (M, 0.0);
         vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
 
+        /*
         std::vector<double> vec(M, 1.0);
         emvamp.set_LBglob((N/4)*4/5);
         emvamp.set_LBglob((N/4)/10);
@@ -111,6 +114,8 @@ int main(int argc, char** argv)
 
         if (rank == 0)
             std::cout << "sqrt( l2norm2_diff_x / l2norm2_true_x ) = " << sqrt( l2norm2_diff_x / l2norm2_true_x ) << std::endl; 
+
+        */
 
         std::vector<double> x_est = emvamp.infere(&dataset);
 

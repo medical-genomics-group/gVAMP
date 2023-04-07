@@ -44,6 +44,8 @@ double linear_reg1d_pvals(double sumx, double sumsqx, double sumxy, double sumy,
 
 double normal_cdf(double value);
 
+double erfcx (double x);
+
 int sgn(double val);
 
 //EO: this to allow reduction on avx256 pd4 datatype with OpenMP

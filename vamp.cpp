@@ -229,7 +229,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         eta1 = gam1 / alpha1;
 
         // re-estimating the error variance
-        if (it > 1){
+        if (it > 4){
 
             double gam1_reEst_prev;
             int it_revar = 1;
@@ -353,7 +353,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
             x2_hat_m_r2[i0] = x2_hat_m_r2[i0] - r2[i0];
         // double gam2_before = gam2;
 
-        if (auto_var_max_iter >= 1 && it >= 1){
+        if (auto_var_max_iter >= 1 && it > 4){
             gam2 = std::min( std::max(  1 / (1/eta2 + l2_norm2(x2_hat_m_r2, 1)/Mt), gamma_min ), gamma_max );
         }
 
@@ -887,7 +887,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
             else
                 rel_err = 1;
 
-            if (rel_err < 1e-6)
+            if (rel_err < 1e-8)
                 break;
 
             prev_onsager = onsager;

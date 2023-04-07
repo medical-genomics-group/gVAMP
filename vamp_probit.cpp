@@ -22,8 +22,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     std::vector<double> r1_prev(M, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
     // tau1 = gam1; // hardcoding initial variability
-    tau1 = 1e-1; // ideally sqrt( tau_10 / v ) approx 1, since it is to be composed with a gaussian CDF
-
+    //tau1 = 1e-1; // ideally sqrt( tau_10 / v ) approx 1, since it is to be composed with a gaussian CDF
+    tau1 = gam1;
+    double tau2_prev = 0;
 
     double sqrtN = sqrt(N);
     std::vector<double> true_signal_s = true_signal;
@@ -33,16 +34,19 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
     // Gaussian noise start
-    r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
-    p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
+    //r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+    //p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
+
+    r1 = std::vector<double> (M, 0.0);
+    p1 = std::vector<double> (N, 0.0);
 
 
     // initializing under VAMP assumption
-    for (int i=0; i<r1.size(); i++)
-        r1[i] += true_signal[i];
+    //for (int i=0; i<r1.size(); i++)
+    //    r1[i] += true_signal_s[i];
 
-    for (int i=0; i<p1.size(); i++)
-        p1[i] += true_g[i];
+    //for (int i=0; i<p1.size(); i++)
+    //    p1[i] += true_g[i];
 
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
@@ -62,15 +66,20 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         x1_hat_prev = x1_hat;
 
+        double rho_it;
+        if (it > 1)
+            rho_it = rho;
+        else
+            rho_it = 1;
+
         for (int i = 0; i < M; i++ )
-            x1_hat[i] = rho * g1(r1[i], gam1) + (1 - rho) * x1_hat_prev[i];
+            x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
 
+        //std::vector<double> x1_hat_s = x1_hat;
+        //for (int i=0; i<x1_hat_s.size(); i++)
+        //    x1_hat_s[i] = x1_hat[i] / sqrt(N);
 
-        std::vector<double> x1_hat_s = x1_hat;
-        for (int i=0; i<x1_hat_s.size(); i++)
-            x1_hat_s[i] = x1_hat[i] / sqrt(N);
-
-        probit_err_measures(dataset, 1, true_signal, x1_hat_s, "x1_hat");
+        probit_err_measures(dataset, 1, true_signal_s, x1_hat, "x1_hat");
 
 
         // storing current estimate of the signal
@@ -121,13 +130,13 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // true precision calcultion
         std::vector<double> r2mtrue = r2;
         for (int i=0; i<r2mtrue.size(); i++)
-            r2mtrue[i] -= true_signal[i];
+            r2mtrue[i] -= true_signal_s[i];
 
         //if (rank == 0)
         //    std::cout << "r2mtrue[0] = " << r2mtrue[0] << std::endl;
         double r2mtrue_std = calc_stdev(r2mtrue, 1);
         if (rank == 0)
-            std::cout << "true gam2 = " << 1.0 / r2mtrue_std / r2mtrue_std / N << std::endl;
+            std::cout << "true gam2 = " << 1.0 / r2mtrue_std / r2mtrue_std << std::endl;
 
         // updating parameters of prior distribution
         probs_before = probs;
@@ -143,16 +152,24 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
       
         std::vector<double> y = (*dataset).filter_pheno();
 
+        probit_err_measures(dataset, 0, true_g, p1, "p1");
+
+        std::vector<double> z1_hat_prev = z1_hat;
+
         // denoising part
         for (int i=0; i<N; i++)
-            z1_hat[i] = g1_bin_class(p1[i], tau1, y[i]);
+            z1_hat[i] = rho_it * g1_bin_class(p1[i], tau1, y[i]) + (1-rho_it) * z1_hat_prev[i];
 
         probit_err_measures(dataset, 0, true_g, z1_hat, "z1_hat");
 
         double beta1 = 0;
 
-        for (int i=0; i<N; i++)
+        for (int i=0; i<N; i++){
             beta1 += g1d_bin_class(p1[i], tau1, y[i]);
+            //if (rank == 0 && i <= 10){
+            //    std::cout << " p1[i] = " << p1[i] << ", tau1 = " << tau1 << ", y[i] = " << y[i] << ", g1d_bin_class(p1[i], tau1, y[i]) = " << g1d_bin_class(p1[i], tau1, y[i]) << std::endl;
+            //}
+        }
 
         beta1 /= N;
 
@@ -170,7 +187,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "true tau2 = " << 1.0 / p2mtrue_std / p2mtrue_std << std::endl;
 
-        tau2 = tau1 * (1-beta1) / beta1;
+        tau2_prev = tau2;
+
+        tau2 = rho_it * tau1 * (1-beta1) / beta1 + (1 - rho_it) * tau2_prev;
 
         if (rank == 0)
             std::cout << "tau2 = " << tau2 << std::endl;
@@ -232,7 +251,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // true precision calculation
         std::vector<double> r1mtrue = r1;
         for (int i=0; i<r1mtrue.size(); i++)
-            r1mtrue[i] -= true_signal[i];
+            r1mtrue[i] -= true_signal_s[i];
         double r1mtrue_std = calc_stdev(r1mtrue, 1);
         if (rank == 0)
             std::cout << "true gam1 = " << 1.0 / r1mtrue_std / r1mtrue_std << std::endl;
@@ -261,7 +280,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "beta2 = " << beta2 << std::endl;
 
-        for (int i=0; i<M; i++)
+        for (int i=0; i<N; i++)
             p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
 
         
@@ -283,7 +302,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         std::vector<double> x1_hat_diff(M, 0.0);
 
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
-            x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat_diff[i0];
+            x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat[i0];
         
         if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
             if (rank == 0)
@@ -313,12 +332,14 @@ double vamp::g1_bin_class(double p, double tau1, double y){
 
     double temp;
     
-    double normalPdf_normalCdf;
+    double normalPdf_normalCdf = 2.0 /  sqrt(2*M_PI) / erfcx( - (2*y-1) * p / sqrt(2) ); 
 
-    if ( abs(normalCdf) < 1e-10 && abs(normalPdf) < 1e-10 )
+    /*
+    if ( abs(normalCdf) < 1e-50 && abs(normalPdf) < 1e-50 )
         normalPdf_normalCdf = abs(c);
     else
-        normalPdf_normalCdf = normalPdf / normalCdf;        
+        normalPdf_normalCdf = normalPdf / normalCdf;   
+    */     
 
     temp = p + (2*y-1) * normalPdf_normalCdf / tau1 / sqrt(probit_var + 1.0/tau1);
 
@@ -329,7 +350,7 @@ double vamp::g1_bin_class(double p, double tau1, double y){
 
 double vamp::g1d_bin_class(double p, double tau1, double y){
     
-    double c = p / sqrt(probit_var + 1/tau1);
+    double c = p / sqrt(probit_var + 1.0/tau1);
 
     double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
 
@@ -344,12 +365,14 @@ double vamp::g1d_bin_class(double p, double tau1, double y){
     //else 
     //    Nc_phic = Nc / phic;
 
-    double Nc_phiyc;
+    double Nc_phiyc = 2.0 /  sqrt(2*M_PI) / erfcx( - (2*y-1) * p / sqrt(2) );
 
-    if ( abs(phiyc) < 1e-10 && abs(Nc) < 1e-10 )
+    /*
+    if ( abs(phiyc) < 1e-50 && abs(Nc) < 1e-50 )
         Nc_phiyc = abs(c);
     else 
         Nc_phiyc = Nc / phiyc;
+    */
 
     double temp;
 
