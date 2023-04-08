@@ -764,6 +764,16 @@ std::vector<double> data::Ax(double* __restrict__ phen, int SB, int LB) {
     return std::vector<double>(4 * mbytes, 0.0);
 }
 
+std::vector<double> data::Zx(std::vector<double> phen){
+    
+    std::vector<double> Zx_temp(4 * mbytes, 0.0);
+
+    for (int i=0; i<N; i++)
+        Zx_temp[i] = inner_prod(covs[i], phen, 0);
+
+    return Zx_temp;
+}
+
 void data::read_genotype_data(){
 
     double ts = MPI_Wtime();

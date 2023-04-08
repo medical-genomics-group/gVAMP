@@ -107,6 +107,8 @@ public:
     std::vector<double> ATx(double* __restrict__ phen, int SB, int LB);
     std::vector<double> ATx(double* __restrict__ phen);
 
+    std::vector<double> Zx(std::vector<double> phen);
+
     std::vector<double> filter_pheno();
     
     std::vector<double> pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath);

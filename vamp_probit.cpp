@@ -510,7 +510,7 @@ double vamp::mlogL_probit(std::vector<double> y, std::vector<double> gg, double 
     return mlogL;
 }
 
-std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta, double step_size){
+std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta, double* grad_norm){
 
     std::vector<double> new_eta(C, 0.0);
 
@@ -518,9 +518,9 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
     
     double scale = 1;
 
-    double best_val = mlogL_probit(y, gg, probit_var, Z, eta);
+    double init_val = mlogL_probit(y, gg, probit_var, Z, eta);
 
-    for (int i = 1; i<20; i++){ // 0.8^20 = 0.01152922
+    for (int i = 1; i<200; i++){ // 0.8^20 = 0.01152922
 
         for (int j=0; j<C; j++)
             grad[j] *= scale;
@@ -531,13 +531,30 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
 
         double curr_val = mlogL_probit(y, gg, probit_var, Z, eta);
 
-        if (best_val < curr_val)
-            best_val = curr_val;
-        else
+        if (curr_val <= init_val + inner_prod(grad, eta, 0)/2 ){
+            *grad_norm = sqrt( l2_norm2(grad, 0) );
             break;
+        }
 
         eta = new_eta;
 
+    }
+
+    return new_eta;
+
+}
+
+std::vector<double> vamp::grad_desc_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta){
+
+    std::vector<double> new_eta(C, 0.0);
+
+    double grad_norm = 1;
+    int max_iter = 1e4;
+    int it = 1;
+
+    while (it <= max_iter && grad_norm > 1e-6){
+        new_eta = grad_desc_step_cov(y, gg, probit_var, Z, eta, &grad_norm);
+        it++;
     }
 
     return new_eta;
