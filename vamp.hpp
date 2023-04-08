@@ -7,7 +7,7 @@
 class vamp{
 
 private:
-    int N, M, Mt, max_iter, rank, nranks;
+    int N, M, Mt, C, max_iter, rank, nranks;
     double gam1, gam2, eta1, eta2, rho, gamw, gam_before, tau1, tau2, alpha1, alpha2;
 
     std::vector<double> x1_hat, x2_hat, true_signal, z1_hat, z2_hat;
@@ -85,6 +85,9 @@ public:
     double probit_var_EM_deriv(double v, std::vector<double> z, std::vector<double> y); 
     double expe_probit_var_EM_deriv(double v, double eta, std::vector<double> z, std::vector<double> y);
     double update_probit_var(double v, double eta, std::vector<double> z_hat, std::vector<double> y);
+    std::vector<double> grad_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta);
+    double mlogL_probit(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta);
+    std::vector<double> grad_desc_step_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta, double step_size);
 
     void set_SBglob(int SB) { SBglob = SB; }
     void set_LBglob(int LB) { LBglob = LB; }

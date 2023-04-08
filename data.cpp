@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <regex>
 #include <filesystem>
 #include <cassert> // contains assert
@@ -854,6 +855,31 @@ std::vector<double> data::filter_pheno(){
 
 }
 
+void data::read_covariates(){ // values should be separate with space delimiter
+
+    std::ifstream covf(covfp);
+    std::string line; 
+    while (std::getline(covf, line)) // read the current line
+    {
+        int Cobs = 0;
+        std::vector<double> entries;
+        std::regex re("\\S+");
+        for (auto it = std::sregex_iterator(line.begin(), line.end(), re); it != std::sregex_iterator(); it++) {
+            std::string token = (*it).str();
+            entries.push_back(std::stod(token));
+            Cobs++;      
+        }   
+
+        if (Cobs != C){
+            std::cout << "FATAL: number of covariates = " << Cobs << " does not match to the specified number of covariates = " << C << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        covs.push_back(entries);        
+    }
+
+}
+
  
 // finding p-values from t-test on regression coefficient = 0 
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
@@ -946,3 +972,4 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
 
     return pvals;
 }
+

@@ -46,6 +46,7 @@ public:
     unsigned int get_use_XXT_denoiser() const { return use_XXT_denoiser; } 
     unsigned int get_store_pvals() const { return store_pvals; }
     unsigned int get_CV() const { return CV; }
+    unsigned int get_C() const { return C; }
     unsigned int get_redglob() const { return redglob; }
     unsigned int get_learn_vars() const { return learn_vars; }
     double get_h2() const { return h2; }
@@ -79,6 +80,7 @@ private:
     std::string bed_file = "";
     std::string bed_file_test = "";
     std::string estimate_file = "";
+    std::string cov_file = "";
     //std::string dim_file = "";
     std::string run_mode = "";
     std::string bim_file = "";
@@ -105,6 +107,7 @@ private:
     double alpha = 1; 
     unsigned int CV;
     unsigned int redglob = 0;
+    unsigned int C = 0;
     double probit_var = 1;
 
 

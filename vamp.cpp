@@ -22,6 +22,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     N(N),
     M(M),
     Mt(Mt),
+    C(opt.get_C()),
     gam1(gam1),
     gamw(gamw),
     gam2(0),
@@ -59,6 +60,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
 //constructor for class data - with forwarded Options object
 vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int rank, Options opt):
     M(M),
+    C(opt.get_C()),
     gam1(gam1),
     gamw(gamw),
     gam2(0),

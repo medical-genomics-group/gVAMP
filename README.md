@@ -36,6 +36,7 @@ Currently supported input options to C++ version of the code:
 | `bed-file-test` | filepath to .bed file reserved for testing purposes |
 | `phen-files` | path to file containing phenotype of interest (only 1 phenotype supportet at the moment) |
 | `phen-files-test` | path to phenotype file reserved for testing purposes |
+| `cov-file` | filepath to .cov file including the .cov extension (covariates in a probit model) |
 | `N` | number of individuals included in the inference process |
 | `N-test` | number of individuals included in a testing dataset |
 | `Mt-test` | total number of markers included in a testing dataset |
@@ -61,6 +62,7 @@ Currently supported input options to C++ version of the code:
 | `true_signal_file` | path to file containing true value of the signal |
 | `alpha` | scaling factor applied in the normalization of a genotype matrix |
 | `learn-vars` | indicates wheather or not prior variances are learnt |
+| `C` | indicates the number of covariates in a probit model |
 
 
 

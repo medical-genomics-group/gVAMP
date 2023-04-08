@@ -32,6 +32,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             bed_file = argv[++i];
             ss << "--bed-file " << bed_file << "\n";
         }
+        else if (!strcmp(argv[i], "--cov-file")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            cov_file = argv[++i];
+            ss << "--cov-file " << cov_file << "\n";
+        }
         else if (!strcmp(argv[i], "--bed-file-test")) {
             if (i == argc - 1) fail_if_last(argv, i);
             bed_file_test = argv[++i];
@@ -315,6 +320,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             }
             CV = (unsigned int) atoi(argv[++i]);
             ss << "--CV " << CV << "\n";
+        }
+        else if (!strcmp(argv[i], "--C")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --C has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            C = (unsigned int) atoi(argv[++i]);
+            ss << "--C " << C << "\n";
         }
         else if (!strcmp(argv[i], "--N")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);

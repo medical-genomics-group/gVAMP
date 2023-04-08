@@ -321,8 +321,8 @@ double vamp::g1_bin_class(double p, double tau1, double y){
 
     double c = p / sqrt(probit_var + 1.0/tau1);
 
-    double normalCdf = normal_cdf( (2*y - 1)*c );
-    double normalPdf = exp(-0.5 * c * c) / sqrt(2*M_PI);
+    //double normalCdf = normal_cdf( (2*y - 1)*c );
+    //double normalPdf = exp(-0.5 * c * c) / sqrt(2*M_PI);
 
     /*
     if (rank == 0)
@@ -332,7 +332,7 @@ double vamp::g1_bin_class(double p, double tau1, double y){
 
     double temp;
     
-    double normalPdf_normalCdf = 2.0 /  sqrt(2*M_PI) / erfcx( - (2*y-1) * p / sqrt(2) ); 
+    double normalPdf_normalCdf = 2.0 /  sqrt(2*M_PI) / erfcx( - (2*y-1) * c / sqrt(2) ); 
 
     /*
     if ( abs(normalCdf) < 1e-50 && abs(normalPdf) < 1e-50 )
@@ -365,7 +365,7 @@ double vamp::g1d_bin_class(double p, double tau1, double y){
     //else 
     //    Nc_phic = Nc / phic;
 
-    double Nc_phiyc = 2.0 /  sqrt(2*M_PI) / erfcx( - (2*y-1) * p / sqrt(2) );
+    double Nc_phiyc = 2.0 /  sqrt(2*M_PI) / erfcx( - (2*y-1) * c / sqrt(2) );
 
     /*
     if ( abs(phiyc) < 1e-50 && abs(Nc) < 1e-50 )
@@ -465,6 +465,82 @@ double vamp::update_probit_var(double v, double eta, std::vector<double> z_hat, 
         std::cout << "bisection method finished after " << it << " / " << max_iter_bisec << "iterations" << std::endl;
     
     return new_v;
+
+}
+
+std::vector<double> vamp::grad_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta){ 
+    // gg = g_genetics, gc = g_covariates, eta = vector of covariate's effect sizes
+
+    std::vector<double> grad(C, 0.0);
+
+    for (int j=0; j<C; j++){
+
+        for (int i=0; i<N; i++){
+
+            double g_i = gg[i] + inner_prod(Z[i], eta, 0);
+
+            double arg = (2*y[i] - 1) / sqrt(probit_var) * g_i;
+
+            double ratio = 2.0 /  sqrt(2*M_PI) / erfcx( - arg / sqrt(2) );
+
+            grad[j] += ratio * (2*y[i]-1) / sqrt(probit_var) * Z[i][j];
+
+        }
+
+    }
+
+    return grad;
+}
+
+double vamp::mlogL_probit(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta){
+
+    double mlogL = 0;
+
+    for (int i=0; i<N; i++){
+
+        double g_i = gg[i] + inner_prod(Z[i], eta, 0);
+
+        double arg = (2*y[i] - 1) / sqrt(probit_var) * g_i;
+
+        double phi_arg = normal_cdf(arg);
+
+        mlogL -= log(phi_arg);
+    }
+
+    return mlogL;
+}
+
+std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta, double step_size){
+
+    std::vector<double> new_eta(C, 0.0);
+
+    std::vector<double> grad = grad_cov(y, gg, probit_var, Z, eta);
+    
+    double scale = 1;
+
+    double best_val = mlogL_probit(y, gg, probit_var, Z, eta);
+
+    for (int i = 1; i<20; i++){ // 0.8^20 = 0.01152922
+
+        for (int j=0; j<C; j++)
+            grad[j] *= scale;
+        
+        scale = 0.8;
+
+        std::transform (eta.begin(), eta.end(), grad.begin(), new_eta.begin(), std::minus<double>());
+
+        double curr_val = mlogL_probit(y, gg, probit_var, Z, eta);
+
+        if (best_val < curr_val)
+            best_val = curr_val;
+        else
+            break;
+
+        eta = new_eta;
+
+    }
+
+    return new_eta;
 
 }
 
