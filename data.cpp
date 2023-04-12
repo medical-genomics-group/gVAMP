@@ -865,20 +865,37 @@ std::vector<double> data::filter_pheno(){
 
 }
 
-void data::read_covariates(){ // values should be separate with space delimiter
+void data::read_covariates(std::string covfp, int C){ // values should be separate with space delimiter
+
+    if (C==0)
+        return;
+
+    double start = MPI_Wtime();
 
     std::ifstream covf(covfp);
     std::string line; 
+    //std::regex re("\\S+");
+    std::regex re("\\s+");
+
     while (std::getline(covf, line)) // read the current line
     {
         int Cobs = 0;
         std::vector<double> entries;
-        std::regex re("\\S+");
+        std::sregex_token_iterator iter(line.begin(), line.end(), re, -1);
+        std::sregex_token_iterator re_end;
+
+        for ( ; iter != re_end; ++iter){
+            entries.push_back(std::stod(*iter));
+            Cobs++;
+        }
+            
+        /*
         for (auto it = std::sregex_iterator(line.begin(), line.end(), re); it != std::sregex_iterator(); it++) {
             std::string token = (*it).str();
             entries.push_back(std::stod(token));
             Cobs++;      
         }   
+        */
 
         if (Cobs != C){
             std::cout << "FATAL: number of covariates = " << Cobs << " does not match to the specified number of covariates = " << C << std::endl;
@@ -887,6 +904,11 @@ void data::read_covariates(){ // values should be separate with space delimiter
 
         covs.push_back(entries);        
     }
+
+    double end = MPI_Wtime();
+
+    if (rank == 0)
+        std::cout << "rank = " << rank << ": reading covariates took " << end - start << " seconds to run." << std::endl;
 
 }
 

@@ -20,6 +20,7 @@ public:
     //std::string get_dim_file() const { return dim_file; }
     std::string get_bim_file() const { return bim_file; }
     std::string get_estimate_file() const { return estimate_file; }
+    std::string get_cov_file() const { return cov_file; }
     //std::string get_ref_bim_file() const { return ref_bim_file; }
     //std::string get_group_index_file() const { return group_index_file; }
     //std::string get_group_mixture_file() const { return group_mixture_file; }

@@ -51,9 +51,26 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
     p2 = std::vector<double> (N, 0.0);
+    std::vector<double> cov_eff(C, 0.0);
+
+    std::vector< std::vector<double> > Z = (*dataset).get_covs();
+    std::vector<double> gg;
 
     for (int it = 1; it <= max_iter; it++)
     {    
+
+        if (rank == 0){
+            std::cout << "Z[0][0] = " << Z[0][0] << std::endl;
+            std::cout << "Z[1][0] = " << Z[1][0] << std::endl;
+            std::cout << "Z[2][0] = " << Z[2][0] << std::endl;
+        }
+
+        gg = (*dataset).Ax(x1_hat.data());
+        cov_eff = grad_desc_cov(y, gg, probit_var, Z, cov_eff);
+
+        if (rank == 0)
+            std::cout << "cov_eff[0] = " << cov_eff[0] << std::endl;
+
 
         //************************
         //************************
@@ -157,18 +174,29 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         std::vector<double> z1_hat_prev = z1_hat;
 
         // denoising part
-        for (int i=0; i<N; i++)
-            z1_hat[i] = rho_it * g1_bin_class(p1[i], tau1, y[i]) + (1-rho_it) * z1_hat_prev[i];
+        for (int i=0; i<N; i++){
+
+            double m_cov = 0;
+
+            if (C>0)
+                m_cov = inner_prod(Z[i], cov_eff, 0);
+
+            z1_hat[i] = rho_it * g1_bin_class(p1[i], tau1, y[i], m_cov) + (1-rho_it) * z1_hat_prev[i];
+        }
 
         probit_err_measures(dataset, 0, true_g, z1_hat, "z1_hat");
 
         double beta1 = 0;
 
         for (int i=0; i<N; i++){
-            beta1 += g1d_bin_class(p1[i], tau1, y[i]);
-            //if (rank == 0 && i <= 10){
-            //    std::cout << " p1[i] = " << p1[i] << ", tau1 = " << tau1 << ", y[i] = " << y[i] << ", g1d_bin_class(p1[i], tau1, y[i]) = " << g1d_bin_class(p1[i], tau1, y[i]) << std::endl;
-            //}
+
+            double m_cov = 0;
+
+            if (C>0)
+                m_cov = inner_prod(Z[i], eta, 0);
+
+            beta1 += g1d_bin_class(p1[i], tau1, y[i], m_cov);
+           
         }
 
         beta1 /= N;
@@ -317,7 +345,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 }
 
 
-double vamp::g1_bin_class(double p, double tau1, double y){
+double vamp::g1_bin_class(double p, double tau1, double y, double m_cov = 0){
+
+    p = p + m_cov;
 
     double c = p / sqrt(probit_var + 1.0/tau1);
 
@@ -348,7 +378,9 @@ double vamp::g1_bin_class(double p, double tau1, double y){
 }
 
 
-double vamp::g1d_bin_class(double p, double tau1, double y){
+double vamp::g1d_bin_class(double p, double tau1, double y, double m_cov = 0){
+
+    p = p + m_cov;
     
     double c = p / sqrt(probit_var + 1.0/tau1);
 
@@ -483,11 +515,14 @@ std::vector<double> vamp::grad_cov(std::vector<double> y, std::vector<double> gg
 
             double ratio = 2.0 /  sqrt(2*M_PI) / erfcx( - arg / sqrt(2) );
 
-            grad[j] += ratio * (2*y[i]-1) / sqrt(probit_var) * Z[i][j];
+            grad[j] += (-1) * ratio * (2*y[i]-1) / sqrt(probit_var) * Z[i][j]; // because we take a gradient of -logL, not of logL
 
         }
 
     }
+
+    for (int j=0; j<C; j++)
+        grad[j] /= N;
 
     return grad;
 }
@@ -507,7 +542,7 @@ double vamp::mlogL_probit(std::vector<double> y, std::vector<double> gg, double 
         mlogL -= log(phi_arg);
     }
 
-    return mlogL;
+    return mlogL/N;
 }
 
 std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta, double* grad_norm){
@@ -520,7 +555,7 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
 
     double init_val = mlogL_probit(y, gg, probit_var, Z, eta);
 
-    for (int i = 1; i<200; i++){ // 0.8^20 = 0.01152922
+    for (int i=1; i<200; i++){ // 0.8^20 = 0.01152922
 
         for (int j=0; j<C; j++)
             grad[j] *= scale;
@@ -531,7 +566,7 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
 
         double curr_val = mlogL_probit(y, gg, probit_var, Z, eta);
 
-        if (curr_val <= init_val + inner_prod(grad, eta, 0)/2 ){
+        if (curr_val <= init_val - l2_norm2(grad,0)/2){
             *grad_norm = sqrt( l2_norm2(grad, 0) );
             break;
         }
@@ -540,7 +575,7 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
 
     }
 
-    return new_eta;
+    return eta;
 
 }
 
@@ -552,8 +587,11 @@ std::vector<double> vamp::grad_desc_cov(std::vector<double> y, std::vector<doubl
     int max_iter = 1e4;
     int it = 1;
 
-    while (it <= max_iter && grad_norm > 1e-6){
+    while (it <= max_iter && grad_norm > 1e-6 && C>0){
         new_eta = grad_desc_step_cov(y, gg, probit_var, Z, eta, &grad_norm);
+        if (rank == 0)
+            std::cout << "[grad_desc_cov] it = " << it << ", ||grad|| = " << grad_norm << std::endl;
+        eta = new_eta;
         it++;
     }
 

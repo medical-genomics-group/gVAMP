@@ -18,12 +18,12 @@ private:
     int M;          // number of markers attributed to the node
     int S;          // marker starting index 
     int rank;       // rank of MPI process
-    int C = 0;      // number of covariates (in a probit model)
+    // int C = 0;      // number of covariates (in a probit model)
 
     std::string phenfp;       // filepath to phenotypes
     std::string bedfp;          // filepath to .bed file
     std::string methfp;          // filepath to methylation data
-    std::string covfp;             // filepath to covariates (in a probit model)
+    // std::string covfp;             // filepath to covariates (in a probit model)
     std::vector<double> phen_data;   // vector of phenotype data
     std::string type_data;           // type of data used in inference("bed" or "meth")
 
@@ -61,6 +61,7 @@ public:
 
     unsigned char * get_bed_data() { return bed_data; }
     double * get_meth_data() { return meth_data; }
+    std::vector< std::vector<double> > get_covs() { return covs; }
 
     void set_phen(std::vector<double> new_data) { phen_data = new_data; }
 
@@ -97,7 +98,7 @@ public:
 
     void read_genotype_data();
 
-    void read_covariates();
+    void read_covariates(std::string covfp, int C = 0);
 
     void read_methylation_data();
 

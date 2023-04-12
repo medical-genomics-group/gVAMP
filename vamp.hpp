@@ -59,9 +59,9 @@ public:
     //std::vector<double> predict(std::vector<double> est, data* dataset);
 
     double g1(double x, double gam1);
-    double g1_bin_class(double p, double tau1, double y);
+    double g1_bin_class(double p, double tau1, double y, double m_cov);
     double g1d(double x, double gam1);
-    double g1d_bin_class(double p, double tau1, double y);
+    double g1d_bin_class(double p, double tau1, double y, double m_cov);
     double g2d_onsager(double gam2, double tau, data* dataset);
     double g2d_onsagerAAT(double gam2, double tau, data* dataset);
 
