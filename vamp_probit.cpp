@@ -59,17 +59,28 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     for (int it = 1; it <= max_iter; it++)
     {    
 
+        if (rank == 0)
+            std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl;
+        /*
         if (rank == 0){
             std::cout << "Z[0][0] = " << Z[0][0] << std::endl;
             std::cout << "Z[1][0] = " << Z[1][0] << std::endl;
             std::cout << "Z[2][0] = " << Z[2][0] << std::endl;
         }
+        */
 
-        gg = (*dataset).Ax(x1_hat.data());
-        cov_eff = grad_desc_cov(y, gg, probit_var, Z, cov_eff);
+        if (C>0){
 
-        if (rank == 0)
-            std::cout << "cov_eff[0] = " << cov_eff[0] << std::endl;
+            //gg = (*dataset).Ax(x1_hat.data());
+
+            gg = z1_hat;
+            cov_eff = grad_desc_cov(y, gg, probit_var, Z, cov_eff); // std::vector<double>(C, 0.0)
+            //cov_eff = std::vector<double> {0.5};
+
+            if (rank == 0)
+                std::cout << "cov_eff[0] = " << cov_eff[0] << std::endl;
+
+        }
 
 
         //************************
@@ -79,7 +90,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         //************************
 
         if (rank == 0)
-                std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl << "->DENOISING" << std::endl;
+                std::cout << "->DENOISING" << std::endl;
 
         x1_hat_prev = x1_hat;
 
@@ -193,7 +204,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             double m_cov = 0;
 
             if (C>0)
-                m_cov = inner_prod(Z[i], eta, 0);
+                m_cov = inner_prod(Z[i], cov_eff, 0);
 
             beta1 += g1d_bin_class(p1[i], tau1, y[i], m_cov);
            
@@ -347,9 +358,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 double vamp::g1_bin_class(double p, double tau1, double y, double m_cov = 0){
 
-    p = p + m_cov;
 
-    double c = p / sqrt(probit_var + 1.0/tau1);
+    double c = (p + m_cov) / sqrt(probit_var + 1.0/tau1);
 
     //double normalCdf = normal_cdf( (2*y - 1)*c );
     //double normalPdf = exp(-0.5 * c * c) / sqrt(2*M_PI);
@@ -380,9 +390,8 @@ double vamp::g1_bin_class(double p, double tau1, double y, double m_cov = 0){
 
 double vamp::g1d_bin_class(double p, double tau1, double y, double m_cov = 0){
 
-    p = p + m_cov;
     
-    double c = p / sqrt(probit_var + 1.0/tau1);
+    double c = (p + m_cov) / sqrt(probit_var + 1.0/tau1);
 
     double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
 
@@ -590,7 +599,7 @@ std::vector<double> vamp::grad_desc_cov(std::vector<double> y, std::vector<doubl
     while (it <= max_iter && grad_norm > 1e-6 && C>0){
         new_eta = grad_desc_step_cov(y, gg, probit_var, Z, eta, &grad_norm);
         if (rank == 0)
-            std::cout << "[grad_desc_cov] it = " << it << ", ||grad|| = " << grad_norm << std::endl;
+            std::cout << "[grad_desc_cov] it = " << it << ", ||grad||_2 = " << grad_norm << std::endl;
         eta = new_eta;
         it++;
     }
