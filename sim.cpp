@@ -37,8 +37,13 @@ int main(int argc, char** argv)
     int S = MS[1];
     int Mm = MS[2];
 
+    if (rank == 0)
+        std::cout << "before dataset call" << std::endl;
+
     data dataset(std::vector<double> (N, 0.0), opt.get_bed_file(), N, M, Mt, S, rank);
-        
+    
+    if (rank == 0)
+        std::cout << "after dataset call" << std::endl;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // running EM-VAMP algorithm on the data
@@ -129,10 +134,14 @@ int main(int argc, char** argv)
     std::vector<double> y;
 
     // loading true signal and phenotype in case they are user-provided
-    std::string true_signal_file = (opt.get_true_signal_files())[0];
-    std::string phen_file = (opt.get_phen_files())[0];
+    std::vector< std::string > true_signal_files = opt.get_true_signal_files();
+    
 
-    if (!true_signal_file.empty()){
+    if (!true_signal_files.empty()){
+
+        std::string true_signal_file = true_signal_files[0];
+    
+        std::string phen_file = (opt.get_phen_files())[0];
 
         y= read_vec_from_file(phen_file, N, 0);
 
