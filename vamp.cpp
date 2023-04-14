@@ -924,7 +924,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         double norm_z = sqrt(l2_norm2(z, 1));
         double rel_err = sqrt( l2_norm2(r, 1) ) / norm_v;
         double norm_mu = sqrt( l2_norm2(mu, 1) );
-        double err_tol = 1e-3;
+        double err_tol = 1e-5;
 
         if (rank == 0)
             std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  norm_v << std::endl;

@@ -81,14 +81,9 @@ data::data(std::vector<double> y, std::string genofp, const int N, const int M, 
     
     set_nonas(N);
 
-    if (rank == 0)
-        std::cout << "after mask" << std::endl;
-
     if (type_data == "bed"){
         bedfp = genofp;
         read_genotype_data();
-        if (rank == 0)
-            std::cout << "after reading geno data" << std::endl;
         compute_markers_statistics();
     }
     else if (type_data == "meth"){

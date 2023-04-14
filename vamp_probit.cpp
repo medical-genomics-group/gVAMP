@@ -20,11 +20,15 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
     std::vector<double> r1_prev(M, 0.0);
+    std::vector<double> p1_prev(N, 0.0);
     std::vector<double> x1_hat_prev(M, 0.0);
+
     // tau1 = gam1; // hardcoding initial variability
     //tau1 = 1e-1; // ideally sqrt( tau_10 / v ) approx 1, since it is to be composed with a gaussian CDF
     tau1 = gam1;
-    double tau2_prev = 0;
+    // double tau2_prev = 0;
+    double gam1_prev = gam1;
+    double tau1_prev = tau1;
 
     double sqrtN = sqrt(N);
     std::vector<double> true_signal_s = true_signal;
@@ -95,17 +99,44 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         x1_hat_prev = x1_hat;
 
         double rho_it;
-        if (it > 1)
+        if (it > 2)
             rho_it = rho;
         else
             rho_it = 1;
 
         for (int i = 0; i < M; i++ )
-            x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
+            x1_hat[i] = g1(r1[i], gam1);
+            //x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
 
         //std::vector<double> x1_hat_s = x1_hat;
         //for (int i=0; i<x1_hat_s.size(); i++)
         //    x1_hat_s[i] = x1_hat[i] / sqrt(N);
+
+        
+        // saving x1_hat
+        double start_saving = MPI_Wtime();
+        std::vector<double> x1_hat_stored;
+        double scale = 1.0 / sqrt(N);
+        std::string filepath_out = out_dir + out_name + "_probit_it_" + std::to_string(it) + ".bin";
+        int S = (*dataset).get_S();
+        for (int i0=0; i0<x1_hat_stored.size(); i0++)
+            x1_hat_stored[i0] =  x1_hat[i0] * scale;
+        mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
+
+        if (rank == 0)
+           std::cout << "filepath_out is " << filepath_out << std::endl;
+
+        if (it % 1 == 0){
+            std::string filepath_out_r1 = out_dir + out_name + "_probit_r1_it_" + std::to_string(it) + ".bin";
+            std::vector<double> r1_stored = r1;
+            for (int i0=0; i0<r1_stored.size(); i0++)
+                r1_stored[i0] =  r1[i0] * scale;
+            mpi_store_vec_to_file(filepath_out_r1, r1_stored, S, M);
+        }
+        double end_saving = MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to save beta1 to an external file = " << end_saving - start_saving << " seconds" <<  std::endl;
+
 
         probit_err_measures(dataset, 1, true_signal_s, x1_hat, "x1_hat");
 
@@ -130,7 +161,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         for (int i = 0; i < M; i++)
         {
             // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
-            x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i]; 
+            // x1_hat_d[i] = rho * g1d(r1[i], gam1) + (1 - rho) * x1_hat_d_prev[i]; 
+            x1_hat_d[i] = g1d(r1[i], gam1); 
             sum_d += x1_hat_d[i];
         }
 
@@ -169,7 +201,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         // updating parameters of prior distribution
         probs_before = probs;
         vars_before = vars;
-        // updatePrior(1);
+        updatePrior(1);
 
 
         //************************
@@ -192,7 +224,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             if (C>0)
                 m_cov = inner_prod(Z[i], cov_eff, 0);
 
-            z1_hat[i] = rho_it * g1_bin_class(p1[i], tau1, y[i], m_cov) + (1-rho_it) * z1_hat_prev[i];
+            z1_hat[i] = g1_bin_class(p1[i], tau1, y[i], m_cov);
+            //z1_hat[i] = rho_it * g1_bin_class(p1[i], tau1, y[i], m_cov) + (1-rho_it) * z1_hat_prev[i];
         }
 
         probit_err_measures(dataset, 0, true_g, z1_hat, "z1_hat");
@@ -226,9 +259,11 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "true tau2 = " << 1.0 / p2mtrue_std / p2mtrue_std << std::endl;
 
-        tau2_prev = tau2;
+        // tau2_prev = tau2;
 
-        tau2 = rho_it * tau1 * (1-beta1) / beta1 + (1 - rho_it) * tau2_prev;
+        // tau2 = rho_it * tau1 * (1-beta1) / beta1 + (1 - rho_it) * tau2_prev;
+
+        tau2 = tau1 * (1-beta1) / beta1;
 
         if (rank == 0)
             std::cout << "tau2 = " << tau2 << std::endl;
@@ -284,8 +319,12 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
 
+        //for (int i=0; i<M; i++)
+        //    r1[i] = (x2_hat[i] - alpha2*r2[i]) / (1-alpha2);
+
+        r1_prev = r1;
         for (int i=0; i<M; i++)
-            r1[i] = (x2_hat[i] - alpha2*r2[i]) / (1-alpha2);
+            r1[i] = rho_it * (x2_hat[i] - alpha2*r2[i]) / (1-alpha2) + (1-rho_it) * r1_prev[i];
 
         // true precision calculation
         std::vector<double> r1mtrue = r1;
@@ -295,7 +334,13 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "true gam1 = " << 1.0 / r1mtrue_std / r1mtrue_std << std::endl;
 
+
+        gam1_prev = gam1;
         gam1 = gam2 * (1-alpha2) / alpha2;
+
+        // apply damping 
+        // gam1 = 1.0 / ( (1-rho_it)*(1-rho_it) / gam1_prev + rho_it*rho_it / gam1 );
+        gam1 = rho_it * gam1 + (1-rho_it) * gam1_prev;
 
         if (rank == 0)
             std::cout << "gam1 = " << gam1 << std::endl;
@@ -319,8 +364,12 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "beta2 = " << beta2 << std::endl;
 
+        //for (int i=0; i<N; i++)
+        //    p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
+
+        p1_prev = p1;
         for (int i=0; i<N; i++)
-            p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
+            p1[i] = rho_it * (z2_hat[i] - beta2 * p2[i]) / (1-beta2) + (1-rho_it) * p1_prev[i];
 
         
         // true precision calculation
@@ -331,10 +380,14 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "true tau1 = " << 1.0 / p1mtrue_std / p1mtrue_std << std::endl;
 
+        tau1_prev = tau1;
         tau1 = tau2 * (1 - beta2) / beta2;
+        //  apply damping to z variance
+        // tau1 = 1.0 / ( (1-rho_it)*(1-rho_it) / tau1_prev + rho_it*rho_it / tau1 );
+        tau1 = rho_it * tau1 + (1-rho_it) * tau1_prev;
 
         if (rank == 0)
-            std::cout << "tau1 = " << tau1 << std::endl;
+            std::cout << "tau1 = " << tau1 << std::endl << "rho_it = " << rho_it << std::endl;
        
 
         // stopping criteria
