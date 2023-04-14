@@ -140,22 +140,6 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         probit_err_measures(dataset, 1, true_signal_s, x1_hat, "x1_hat");
 
-
-        // storing current estimate of the signal
-        std::string filepath_out = out_dir + out_name + "_bin_class_" + "_it_" + std::to_string(it) + "_rank_" + std::to_string(rank) + ".txt"; 
-        if (rank == 0)
-            std::cout << "filepath_out is " << filepath_out << std::endl;
-
-        double scale = sqrt(N);
-        int S = (*dataset).get_S();
-        std::vector<double> x1_hat_stored = x1_hat;
-
-        for (int i0=0; i0<x1_hat_stored.size(); i0++)
-            x1_hat_stored[i0] =  x1_hat[i0] / scale;
-
-        mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
-
-
         x1_hat_d_prev = x1_hat_d;
         double sum_d = 0;
         for (int i = 0; i < M; i++)

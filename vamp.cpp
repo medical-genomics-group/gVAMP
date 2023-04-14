@@ -245,20 +245,14 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
             for (; it_revar <= auto_var_max_iter; it_revar++){
 
-                std::vector<double> x1_hat_m_r1 = x1_hat;
-                for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
-                    x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
-
-                gam1_reEst_prev = gam1;
-                gam1 = std::min( std::max(  1 / (1/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
-
-                if (rank == 0 && it_revar % 1 == 0)
-                    std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
-
                 // new signal estimate
                 for (int i = 0; i < M; i++)
                     x1_hat[i] = g1(r1[i], gam1);
                     //x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
+
+                std::vector<double> x1_hat_m_r1 = x1_hat;
+                for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
+                    x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
 
                 // new MMSE estimate
                 sum_d = 0;
@@ -274,6 +268,12 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
                 alpha1 /= Mt;
                 eta1 = gam1 / alpha1;
+
+                gam1_reEst_prev = gam1;
+                gam1 = std::min( std::max(  1 / (1/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
+
+                if (rank == 0 && it_revar % 1 == 0)
+                    std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
 
                 updatePrior(0);
 
@@ -495,7 +495,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         r1_prev = r1;
         for (int i = 0; i < M; i++)
-            r1[i] = rho_it * (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1 + (1-rho_it) * r1_prev;
+            r1[i] = rho_it * (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1 + (1-rho_it) * r1_prev[i];
             // r1[i] = (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1;
 
         gam1 = rho_it * gam1 + (1-rho_it) * gam_before;
