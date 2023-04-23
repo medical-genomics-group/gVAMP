@@ -682,7 +682,7 @@ std::vector<double> data::Ax(double* __restrict__ phen, int SB, int LB) {
             double ave = mave[i];
             double phen_i = phen[i];
             double sig_phen_i = msig[i] * phen_i;
-            
+
             #ifdef _OPENMP
                 #pragma omp parallel for shared(Ax_temp)
             #endif

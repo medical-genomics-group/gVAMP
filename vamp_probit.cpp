@@ -29,6 +29,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     // double tau2_prev = 0;
     double gam1_prev = gam1;
     double tau1_prev = tau1;
+    double gam1_max = gam1;
 
     double sqrtN = sqrt(N);
     std::vector<double> true_signal_s = true_signal;
@@ -104,18 +105,70 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         else
             rho_it = 1;
 
-        for (int i = 0; i < M; i++ )
-            x1_hat[i] = g1(r1[i], gam1);
+        rho_it = 1;
+
+        double rho_it2 = rho;
+        double alpha1_prev = alpha1;
+
+        //for (int i = 0; i < M; i++ )
+        //    x1_hat[i] = g1(r1[i], gam1);
             //x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
 
-        //std::vector<double> x1_hat_s = x1_hat;
-        //for (int i=0; i<x1_hat_s.size(); i++)
-        //    x1_hat_s[i] = x1_hat[i] / sqrt(N);
+        double gam1_reEst_prev;
+        int it_revar = 1;
+
+        auto_var_max_iter = 50;
+
+        for (; it_revar <= auto_var_max_iter; it_revar++){
+
+            // new signal estimate
+            for (int i = 0; i < M; i++)
+                x1_hat[i] = g1(r1[i], gam1);
+
+            std::vector<double> x1_hat_m_r1 = x1_hat;
+            for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
+                x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
+
+            // new MMSE estimate
+            double sum_d = 0;
+            for (int i=0; i<M; i++)
+            {
+                x1_hat_d[i] = g1d(r1[i], gam1);
+                sum_d += x1_hat_d[i];
+            }
+
+            alpha1 = 0;
+            MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            alpha1 /= Mt;
+            eta1 = gam1 / alpha1;
+
+            if (it <= 1)
+                break;
+
+            gam1_reEst_prev = gam1;
+            gam1 = std::min( std::max(  1 / (1/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
+
+            if (rank == 0 && it_revar % 1 == 0)
+                std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
+
+            updatePrior(0);
+
+            if ( abs(gam1 - gam1_reEst_prev) < 1e-3 )
+                break;
+            
+        }
+
+        if (it > 1){ // damping on the level of x1
+            for (int i = 0; i < M; i++)
+                x1_hat[i] = rho_it2 * x1_hat[i] + (1-rho_it2) * x1_hat_prev[i];
+            
+            alpha1 = rho_it2 * alpha1 + (1-rho_it2) * alpha1_prev;
+        }
 
         
         // saving x1_hat
         double start_saving = MPI_Wtime();
-        std::vector<double> x1_hat_stored;
+        std::vector<double> x1_hat_stored = x1_hat;
         double scale = 1.0 / sqrt(N);
         std::string filepath_out = out_dir + out_name + "_probit_it_" + std::to_string(it) + ".bin";
         int S = (*dataset).get_S();
@@ -140,7 +193,28 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         probit_err_measures(dataset, 1, true_signal_s, x1_hat, "x1_hat");
 
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        // another stopping criteria based on gam1 estimation
+        if (gam1 > gam1_max){
+            if (rank == 0)
+                std::cout << "gam1_max = " << gam1_max << std::endl;
+            gam1_max = gam1;
+        }
+        else if (gam1 < 0.9 * gam1_max && it > 2){
+            if (rank == 0){
+                std::cout << "previous gam1 = " << gam1 << ", while gam1_max = " << gam1_max << std::endl;
+                std::cout << "stopping criteria fullfiled" << std::endl;
+            }
+            break;
+        }
+
+        if (rank == 0)
+            std::cout << "alpha1 = " << alpha1 << std::endl;
+
+        /*
         x1_hat_d_prev = x1_hat_d;
+
         double sum_d = 0;
         for (int i = 0; i < M; i++)
         {
@@ -158,6 +232,15 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             std::cout << "alpha1 = " << alpha1 << std::endl;
 
         eta1 = gam1 / alpha1;
+        */
+
+        // true precision calculation
+        std::vector<double> x1hatmtrue = x1_hat;
+        for (int i=0; i<x1hatmtrue.size(); i++)
+            x1hatmtrue[i] -= true_signal_s[i];
+        double x1hatmtrue_l2norm2 = l2_norm2(x1hatmtrue,1) / Mt;
+        if (rank == 0)
+            std::cout << "true eta1 = " << 1.0 / x1hatmtrue_l2norm2 << std::endl;
 
         gam_before = gam2;
 
@@ -168,8 +251,10 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             std::cout << "gam2 = " << gam2 << std::endl;
         }
 
+        std::vector<double> r2_prev = r2;
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
+
 
         // true precision calcultion
         std::vector<double> r2mtrue = r2;
@@ -183,9 +268,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             std::cout << "true gam2 = " << 1.0 / r2mtrue_std / r2mtrue_std << std::endl;
 
         // updating parameters of prior distribution
-        probs_before = probs;
-        vars_before = vars;
-        updatePrior(1);
+        //probs_before = probs;
+        //vars_before = vars;
+        //updatePrior(1);
 
 
         //************************
@@ -200,6 +285,76 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         std::vector<double> z1_hat_prev = z1_hat;
 
+
+
+
+
+        // **********************
+
+        double tau1_reEst_prev;
+        it_revar = 1;
+
+        auto_var_max_iter = 1;
+
+        double beta1;
+
+        for (; it_revar <= auto_var_max_iter; it_revar++){
+
+            // new signal estimate
+            for (int i=0; i<N; i++){
+
+                double m_cov = 0;
+
+                if (C>0)
+                    m_cov = inner_prod(Z[i], cov_eff, 0);
+
+                z1_hat[i] = g1_bin_class(p1[i], tau1, y[i], m_cov);
+            }
+
+            std::vector<double> z1_hat_m_p1 = z1_hat;
+            for (int i0 = 0; i0 < N; i0++)
+                z1_hat_m_p1[i0] = z1_hat_m_p1[i0] - p1[i0];
+
+            // new MMSE estimate
+            beta1 = 0;
+
+            for (int i=0; i<N; i++){
+
+                double m_cov = 0;
+
+                if (C>0)
+                    m_cov = inner_prod(Z[i], cov_eff, 0);
+
+                beta1 += g1d_bin_class(p1[i], tau1, y[i], m_cov);
+            
+            }
+
+            beta1 /= N;
+
+            double zeta1 = tau1 / beta1;
+
+            if (it <= 1)
+                break;
+
+            tau1_reEst_prev = tau1;
+            tau1 = std::min( std::max(  1 / (1/zeta1 + l2_norm2(z1_hat_m_p1, 0)/N), gamma_min ), gamma_max );
+
+            if (rank == 0 && it_revar % 1 == 0)
+                std::cout << "it_revar = " << it_revar << ": tau1 = " << tau1 << std::endl;
+
+            if ( abs(tau1 - tau1_reEst_prev) < 1e-2 )
+                break;
+            
+        }
+
+        probit_err_measures(dataset, 0, true_g, z1_hat, "z1_hat");
+
+        //***********************
+
+
+
+
+        /*
         // denoising part
         for (int i=0; i<N; i++){
 
@@ -231,6 +386,21 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
         if (rank == 0)
             std::cout << "beta1 = " << beta1 << std::endl;
+
+        double eta1_z = tau1 / beta1;
+        if (rank == 0)
+            std::cout << "eta1_z = " << eta1_z << std::endl;
+
+        */
+
+
+        // true precision calculation
+        std::vector<double> z1hatmtrue = z1_hat;
+        for (int i=0; i<z1hatmtrue.size(); i++)
+            z1hatmtrue[i] -= true_g[i];
+        double z1hatmtrue_l2norm2 = l2_norm2(z1hatmtrue,0) / N;
+        if (rank == 0)
+            std::cout << "true eta1_z = " << 1.0 / z1hatmtrue_l2norm2 << std::endl;
         
 
         for (int i=0; i<N; i++)
@@ -303,6 +473,19 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
 
+        eta2 = gam2 / alpha2;
+
+        // re-estimation of gam2
+        std::vector<double> x2_hat_m_r2 = x2_hat;
+        for (int i0 = 0; i0 < x2_hat_m_r2.size(); i0++)
+            x2_hat_m_r2[i0] = x2_hat_m_r2[i0] - r2[i0];
+
+        if (it > 1)
+            gam2 = std::min( std::max(  1 / (1/eta2 + l2_norm2(x2_hat_m_r2, 1)/Mt), gamma_min ), gamma_max );
+
+        if (rank == 0)
+            std::cout << "gam2 after reest = " << gam2 << std::endl;
+
         //for (int i=0; i<M; i++)
         //    r1[i] = (x2_hat[i] - alpha2*r2[i]) / (1-alpha2);
 
@@ -348,6 +531,20 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         if (rank == 0)
             std::cout << "beta2 = " << beta2 << std::endl;
 
+        // re-estimation of tau2
+        std::vector<double> z2_hat_m_p2 = z2_hat;
+        for (int i0 = 0; i0 < N; i0++)
+            z2_hat_m_p2[i0] = z2_hat_m_p2[i0] - p2[i0];
+
+        double zeta2 = tau2 / beta2;
+
+        if (it > 1)
+            tau2 = 1.0 / (1.0/zeta2 + l2_norm2(z2_hat_m_p2, 0)/N);
+
+        if (rank == 0)
+            std::cout << "tau2 after reest = " << tau2 << std::endl;
+
+
         //for (int i=0; i<N; i++)
         //    p1[i] = (z2_hat[i] - beta2 * p2[i]) / (1-beta2);
 
@@ -371,16 +568,34 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         tau1 = rho_it * tau1 + (1-rho_it) * tau1_prev;
 
         if (rank == 0)
-            std::cout << "tau1 = " << tau1 << std::endl << "rho_it = " << rho_it << std::endl;
+            std::cout << "tau1 = " << tau1 << std::endl;
        
+        /*
+        
+        // re-estimation of tau1
+        std::vector<double> z1_hat_m_p1 = z1_hat;
+            for (int i0 = 0; i0 < N; i0++)
+                z1_hat_m_p1[i0] = z1_hat_m_p1[i0] - p1[i0];
+
+        if (it > 1)
+            tau1 = 1.0 / (beta1 / tau2 * beta2 / (1-beta2) + l2_norm2(z1_hat_m_p1, 0)/N);
+
+        if (rank == 0)
+            std::cout << "tau1 after reest = " << tau1 << std::endl;
+
+        */
 
         // stopping criteria
         std::vector<double> x1_hat_diff(M, 0.0);
 
         for (int i0 = 0; i0 < x1_hat_diff.size(); i0++)
             x1_hat_diff[i0] = x1_hat_prev[i0] - x1_hat[i0];
+            
+        double rel_err_x1 = sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) );
+
+        MPI_Barrier(MPI_COMM_WORLD);
         
-        if (it > 1 && sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) ) < stop_criteria_thr){
+        if (it > 1 && rel_err_x1 < stop_criteria_thr){
             if (rank == 0)
                 std::cout << "probitVAMP stopping criteria fulfilled with threshold = " << stop_criteria_thr << "." << std::endl;
             break;
@@ -430,11 +645,11 @@ double vamp::g1d_bin_class(double p, double tau1, double y, double m_cov = 0){
     
     double c = (p + m_cov) / sqrt(probit_var + 1.0/tau1);
 
-    double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
+    //double Nc = exp(-0.5 * c * c) /  sqrt(2*M_PI);
 
     //double phic = normal_cdf(c);
 
-    double phiyc = normal_cdf( (2*y-1)*c );
+    //double phiyc = normal_cdf( (2*y-1)*c );
 
     //double Nc_phic;
 
@@ -601,7 +816,7 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
 
     double init_val = mlogL_probit(y, gg, probit_var, Z, eta);
 
-    for (int i=1; i<200; i++){ // 0.8^20 = 0.01152922
+    for (int i=1; i<300; i++){ // 0.8^20 = 0.01152922
 
         for (int j=0; j<C; j++)
             grad[j] *= scale;
@@ -630,7 +845,7 @@ std::vector<double> vamp::grad_desc_cov(std::vector<double> y, std::vector<doubl
     std::vector<double> new_eta(C, 0.0);
 
     double grad_norm = 1;
-    int max_iter = 1e4;
+    int max_iter = 500;
     int it = 1;
 
     while (it <= max_iter && grad_norm > 1e-6 && C>0){

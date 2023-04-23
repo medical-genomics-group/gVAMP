@@ -790,6 +790,28 @@ void vamp::updatePrior(int verbose = 1) {
         if (verbose == 1)
             if (rank == 0)  
                 std::cout << "Final number of prior EM iterations = " << std::min(it + 1, EM_max_iter) << " / " << EM_max_iter << std::endl;
+
+
+        // merging close variances
+
+        for (int j = 0; j < vars.size(); j++){
+            for (int k = j+1; k < vars.size(); k++){
+
+                double denom;
+                if (vars[j] != 0)
+                    denom = std::min(vars[j], vars[k]);
+                else
+                    denom = 0.1;
+
+                if ( abs(vars[j] - vars[k]) / denom < 5e-1 ){
+                    double sum2probs = probs[j] + probs[k];
+                    vars.erase(vars.begin() + k);
+                    probs.erase(probs.begin() + k);
+                    probs[j] = sum2probs;
+                    k--;
+                }
+            }
+        }
 }
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset, int red){ // multiplying with (tau*A^TAv + gam2*v)
