@@ -11,10 +11,16 @@
 #include "na_lut.hpp"
 #include "vamp.hpp"
 #include "utilities.hpp"
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 
 std::vector<double> vamp::infere_bin_class( data* dataset ){
 
+
+    double total_time = 0;
     double tol = 1e-11;
 
     std::vector<double> x1_hat_d(M, 0.0);
@@ -39,11 +45,11 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
     // Gaussian noise start
-    //r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
-    //p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
+    r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+    p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
 
-    r1 = std::vector<double> (M, 0.0);
-    p1 = std::vector<double> (N, 0.0);
+    //r1 = std::vector<double> (M, 0.0);
+    //p1 = std::vector<double> (N, 0.0);
 
 
     // initializing under VAMP assumption
@@ -56,13 +62,15 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
     p2 = std::vector<double> (N, 0.0);
-    std::vector<double> cov_eff(C, 0.0);
+    cov_eff = std::vector<double> (C, 0.0);
 
     std::vector< std::vector<double> > Z = (*dataset).get_covs();
     std::vector<double> gg;
 
     for (int it = 1; it <= max_iter; it++)
     {    
+
+        double start_covar = MPI_Wtime();
 
         if (rank == 0)
             std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl;
@@ -74,25 +82,38 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         }
         */
 
-        if (C>0){
+        if (it == 1)
+            if (C>0){
 
-            //gg = (*dataset).Ax(x1_hat.data());
+                //gg = (*dataset).Ax(x1_hat.data());
 
-            gg = z1_hat;
-            cov_eff = grad_desc_cov(y, gg, probit_var, Z, cov_eff); // std::vector<double>(C, 0.0)
-            //cov_eff = std::vector<double> {0.5};
+                gg = z1_hat;
+                //cov_eff = grad_desc_cov(y, gg, probit_var, Z, cov_eff); // std::vector<double>(C, 0.0)
+                cov_eff = Newton_method_cov(y, gg, Z, cov_eff);
+                //cov_eff = std::vector<double> {0.5};
 
-            if (rank == 0)
-                std::cout << "cov_eff[0] = " << cov_eff[0] << std::endl;
+                if (rank == 0){
+                    for (int i0=0; i0<C; i0++){
+                        std::cout << "cov_eff[" << i0 << "] = " << cov_eff[i0] << ", ";
+                        if (i0 % 4 == 3)
+                            std::cout << std::endl;
+                    }
+                    std::cout << std::endl;
+                }
+            }
 
-        }
+        double stop_covar = MPI_Wtime();
 
+        if (rank == 0)
+            std::cout << "time for covariates effects update = " << stop_covar - start_covar << " seconds." << std::endl;
 
         //************************
         //************************
         //      DENOISING X
         //************************
         //************************
+
+        double start_denoising = MPI_Wtime();
 
         if (rank == 0)
                 std::cout << "->DENOISING" << std::endl;
@@ -204,9 +225,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         else if (gam1 < 0.9 * gam1_max && it > 2){
             if (rank == 0){
                 std::cout << "previous gam1 = " << gam1 << ", while gam1_max = " << gam1_max << std::endl;
-                std::cout << "stopping criteria fullfiled" << std::endl;
+                // std::cout << "stopping criteria fullfiled" << std::endl;
             }
-            break;
+            // break;
         }
 
         if (rank == 0)
@@ -353,7 +374,6 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
 
-
         /*
         // denoising part
         for (int i=0; i<N; i++){
@@ -444,6 +464,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             std::cout << "probit_var = " << probit_var << std::endl;
 
 
+        double stop_denoising = MPI_Wtime();
+
 
         //************************
         //************************
@@ -452,6 +474,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         //************************
 
         
+        double start_LMMSE = MPI_Wtime();
+
         if (rank == 0)
                 std::cout << std::endl << "->LMMMSE" << std::endl;
 
@@ -594,6 +618,13 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         double rel_err_x1 = sqrt( l2_norm2(x1_hat_diff, 1) / l2_norm2(x1_hat_prev, 1) );
 
         MPI_Barrier(MPI_COMM_WORLD);
+
+        double stop_LMMSE = MPI_Wtime();
+
+        total_time += (stop_LMMSE - start_LMMSE) + (stop_denoising - start_denoising) + (stop_covar - start_covar);
+
+        if (rank == 0)
+            std::cout << "total time so far = " << total_time << " seconds." << std::endl;
         
         if (it > 1 && rel_err_x1 < stop_criteria_thr){
             if (rank == 0)
@@ -792,6 +823,7 @@ double vamp::mlogL_probit(std::vector<double> y, std::vector<double> gg, double 
 
     double mlogL = 0;
 
+    #pragma omp parallel for reduction( + : mlogL )
     for (int i=0; i<N; i++){
 
         double g_i = gg[i] + inner_prod(Z[i], eta, 0);
@@ -818,25 +850,29 @@ std::vector<double> vamp::grad_desc_step_cov(std::vector<double> y, std::vector<
 
     for (int i=1; i<300; i++){ // 0.8^20 = 0.01152922
 
+        //for (int j=0; j<C; j++)
+        //    grad[j] *= scale;
+
+        std::vector<double> displ = grad;
         for (int j=0; j<C; j++)
-            grad[j] *= scale;
-        
-        scale = 0.8;
+            displ[j] = scale * grad[j];
 
-        std::transform (eta.begin(), eta.end(), grad.begin(), new_eta.begin(), std::minus<double>());
+        std::transform (eta.begin(), eta.end(), displ.begin(), new_eta.begin(), std::minus<double>());
 
-        double curr_val = mlogL_probit(y, gg, probit_var, Z, eta);
+        double curr_val = mlogL_probit(y, gg, probit_var, Z, new_eta);
 
-        if (curr_val <= init_val - l2_norm2(grad,0)/2){
+        if (curr_val <= init_val - inner_prod(displ, grad,0)/2){
             *grad_norm = sqrt( l2_norm2(grad, 0) );
             break;
         }
 
-        eta = new_eta;
+        scale *= 0.9;
+
+        //eta = new_eta;
 
     }
 
-    return eta;
+    return new_eta;
 
 }
 
@@ -848,16 +884,167 @@ std::vector<double> vamp::grad_desc_cov(std::vector<double> y, std::vector<doubl
     int max_iter = 500;
     int it = 1;
 
-    while (it <= max_iter && grad_norm > 1e-6 && C>0){
+    while (it <= max_iter && grad_norm > 1e-3 && C>0){
         new_eta = grad_desc_step_cov(y, gg, probit_var, Z, eta, &grad_norm);
         if (rank == 0)
             std::cout << "[grad_desc_cov] it = " << it << ", ||grad||_2 = " << grad_norm << std::endl;
+        std::vector<double> diff = eta;
+        for (int i=0; i<diff.size(); i++)
+            diff[i] -= new_eta[i];
+        
+        double norm_eta = sqrt( l2_norm2(eta, 0) );
+        double rel_err;
+        if (norm_eta == 0)
+            rel_err = 1;
+        else
+            rel_err = sqrt( l2_norm2(diff, 0) ) / norm_eta;
+
+        if (rank == 0)
+            std::cout << "[grad_desc_cov] relative err = "<< rel_err << std::endl;
+        if (rel_err < 1e-4){
+            if (rank == 0)
+                std::cout << "[grad_desc_cov] relative error <= 1e-4 - stoping criteria satisfied" << std::endl;
+        }
+
         eta = new_eta;
         it++;
     }
 
     return new_eta;
 
+}
+
+std::vector<double> vamp::Newton_method_cov(std::vector<double> y, std::vector<double> gg, std::vector< std::vector<double> > Z, std::vector<double> eta){
+
+    using namespace boost::numeric::ublas;
+
+    std::vector<double> eta_new;
+
+    for (int it=0; it<=500; it++){
+
+        matrix<double> WXm(N,C), Xtm(C,N);
+        vector<double> lambda(N);
+
+        for(int i=0; i<N; i++){
+
+            double g_i = gg[i] + inner_prod(Z[i], eta, 0);
+
+            double arg = (2*y[i] - 1) * g_i;
+
+            double phi_arg = normal_cdf(arg);
+
+            double ratio = 2.0 /  sqrt(2*M_PI) / erfcx( - arg / sqrt(2) );
+
+            lambda(i) = ratio * (2*y[i]-1);
+        
+            for (int j=0; j<C; j++){
+
+                Xtm(j,i) = Z[i][j];
+
+                WXm(i,j) = Z[i][j] * lambda(i) * (lambda(i) + g_i);
+
+            }
+        }
+
+        matrix<double> XtmZm = prod(Xtm, WXm);
+        vector<double> RHS = prod(Xtm, lambda);    
+
+        
+        //if (rank == 0)
+        //    std::cout << "Xtm = " << Xtm << std::endl;
+
+        //if (rank == 0)
+        //    std::cout << "WXm = " << WXm << std::endl;
+
+        //if (rank == 0)
+        //    std::cout << "lambda = " << lambda << std::endl;
+        
+       
+        //matrix<double> hess = identity_matrix<double>(XtmZm.size1());
+        permutation_matrix<double> pm(XtmZm.size1());
+
+        //if (rank == 0)
+        //    std::cout << "XtmZm = " << XtmZm << std::endl;
+        
+        int sing = lu_factorize(XtmZm, pm);
+
+        //if (rank == 0)
+        //    std::cout << "sing = " << sing << std::endl;
+
+        //if (rank == 0)
+        //    std::cout << "XtmZm = " << XtmZm << std::endl;
+            
+        if (sing == 0)
+            lu_substitute(XtmZm, pm, RHS);
+        else
+            RHS = vector<double>(C);
+
+        eta_new = eta;
+        std::vector<double> displ(C, 0.0);
+        //for (int i=0; i<C; i++)
+        //    displ[i] = RHS(i);
+
+        //for (int i=0; i<C; i++)
+        //    eta_new[i] += RHS(i);
+
+        std::vector<double> grad = grad_cov(y, gg, probit_var, Z, eta);
+        double scale = 1;
+        double init_val = mlogL_probit(y, gg, probit_var, Z, eta);
+
+        for (int i=1; i<300; i++){ // 0.9^300 = 1.8e-14
+
+            for (int j=0; j<C; j++)
+                displ[j] = scale * RHS(j);
+
+            std::transform (eta.begin(), eta.end(), displ.begin(), eta_new.begin(), std::plus<double>());
+
+            double curr_val = mlogL_probit(y, gg, probit_var, Z, eta_new);
+
+            if (curr_val <= init_val + inner_prod(displ, grad,0)/2){
+                if (rank == 0)
+                    std::cout << "scale = " << scale << std::endl;
+                break;
+            }
+
+            scale *= 0.9;
+
+        }
+
+        std::vector<double> diff = eta;
+        for (int i=0; i<diff.size(); i++)
+            diff[i] -= eta_new[i];
+        double norm_eta = sqrt( l2_norm2(eta, 0) );
+        double rel_err;
+        if (norm_eta == 0)
+            rel_err = 1;
+        else
+            rel_err = sqrt( l2_norm2(diff, 0) ) / norm_eta;
+
+        if (rank == 0)
+            std::cout << "[Newton_cov] it = " << it <<", relative err = "<< rel_err << std::endl;
+        if (rel_err < 1e-4){
+            if (rank == 0)
+                std::cout << "[Newton_cov] relative error <= 1e-4 - stoping criteria satisfied" << std::endl;
+            break;
+        }
+
+        // another stopping criteria based on likelihood value
+        init_val = mlogL_probit(y, gg, probit_var, Z, eta);
+
+        eta = eta_new;
+
+        double curr_val = mlogL_probit(y, gg, probit_var, Z, eta);
+
+        if (curr_val > init_val){
+            if (rank == 0){
+                std::cout << "previous mlogL = " << init_val << ", current mlogL = " << curr_val << std::endl;
+                std::cout << "likelihood value is not increasing -> terminating Newton-Raphson mehod" << std::endl;
+            }
+            break;
+        }    
+
+    }
+    return eta;
 }
 
 void vamp::probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name){

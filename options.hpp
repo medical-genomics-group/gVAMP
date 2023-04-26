@@ -20,6 +20,7 @@ public:
     //std::string get_dim_file() const { return dim_file; }
     std::string get_bim_file() const { return bim_file; }
     std::string get_estimate_file() const { return estimate_file; }
+    std::string get_cov_estimate_file() const { return cov_estimate_file; }
     std::string get_cov_file() const { return cov_file; }
     //std::string get_ref_bim_file() const { return ref_bim_file; }
     //std::string get_group_index_file() const { return group_index_file; }
@@ -81,6 +82,7 @@ private:
     std::string bed_file = "";
     std::string bed_file_test = "";
     std::string estimate_file = "";
+    std::string cov_estimate_file = "";
     std::string cov_file = "";
     //std::string dim_file = "";
     std::string run_mode = "";

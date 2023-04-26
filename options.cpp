@@ -47,6 +47,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             estimate_file = argv[++i];
             ss << "--estimate-file " << estimate_file << "\n";
         }
+        else if (!strcmp(argv[i], "--cov-estimate-file")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            cov_estimate_file = argv[++i];
+            ss << "--cov-estimate-file " << cov_estimate_file << "\n";
+        }
         else if (!strcmp(argv[i], "--run-mode")) {
             if (i == argc - 1) fail_if_last(argv, i);
             run_mode = argv[++i];

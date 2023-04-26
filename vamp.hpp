@@ -15,6 +15,7 @@ private:
     std::vector<double> z1;
     std::vector<double> r1, r2, r2_prev;
     std::vector<double> p1, p2;
+    std::vector<double> cov_eff;
     std::vector<double> mu_CG_last;
     
 
@@ -27,7 +28,7 @@ private:
     int EM_max_iter; // = 1e5;
     double EM_err_thr; // = 1e-4;
     int CG_max_iter; // = 10;
-    int auto_var_max_iter = 10;
+    int auto_var_max_iter = 50;
     int calc_state_evo = 0;
     int learn_vars;
     double damp_max = 1;
@@ -89,10 +90,12 @@ public:
     double mlogL_probit(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta);
     std::vector<double> grad_desc_step_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta, double* grad_norm);
     std::vector<double> grad_desc_cov(std::vector<double> y, std::vector<double> gg, double probit_var, std::vector< std::vector<double> > Z, std::vector<double> eta);
+    std::vector<double> Newton_method_cov(std::vector<double> y, std::vector<double> gg, std::vector< std::vector<double> > Z, std::vector<double> eta);
 
 
     void set_SBglob(int SB) { SBglob = SB; }
     void set_LBglob(int LB) { LBglob = LB; }
     void set_gam2 (double gam) { gam2 = gam; }
+    std::vector<double> get_cov_eff() const {return cov_eff;}
     
    };

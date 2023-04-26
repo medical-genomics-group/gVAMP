@@ -143,7 +143,6 @@ std::vector<double> vamp::infere_linear(data* dataset){
     //for (int i0=0; i0<M; i0++)
 	//  r1[i0] = r1[i0]*M/N;
 
-    double rho_it;
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -166,11 +165,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
         // if (it == 1)
         //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
 
-        if (it > 2)
-            rho_it = rho;
-        else
-            rho_it = 1;
+        double alpha1_prev = alpha1;
 
+        /*
         double start_cond_expe= MPI_Wtime();
         for (int i = 0; i < M; i++)
             x1_hat[i] = g1(r1[i], gam1);
@@ -237,55 +234,97 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "alpha1 = " << alpha1 << std::endl;
         eta1 = gam1 / alpha1;
 
+        */
+
         // re-estimating the error variance
-        if (it > 4){
 
-            double gam1_reEst_prev;
-            int it_revar = 1;
+        double gam1_reEst_prev;
+        int it_revar = 1;
 
-            for (; it_revar <= auto_var_max_iter; it_revar++){
+        for (; it_revar <= auto_var_max_iter; it_revar++){
 
-                // new signal estimate
-                for (int i = 0; i < M; i++)
-                    x1_hat[i] = g1(r1[i], gam1);
-                    //x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
+            // new signal estimate
+            for (int i = 0; i < M; i++)
+                x1_hat[i] = g1(r1[i], gam1);
+                //x1_hat[i] = rho_it * g1(r1[i], gam1) + (1 - rho_it) * x1_hat_prev[i];
 
-                std::vector<double> x1_hat_m_r1 = x1_hat;
-                for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
-                    x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
+            std::vector<double> x1_hat_m_r1 = x1_hat;
+            for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
+                x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
 
-                // new MMSE estimate
-                sum_d = 0;
-                for (int i=0; i<M; i++)
-                {
-                    // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
-                    // x1_hat_d[i] = rho_it * g1d(r1[i], gam1) + (1 - rho_it) * x1_hat_d_prev[i];
-                    x1_hat_d[i] = g1d(r1[i], gam1);
-                    sum_d += x1_hat_d[i];
-                }
-
-                alpha1 = 0;
-                MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-                alpha1 /= Mt;
-                eta1 = gam1 / alpha1;
-
-                gam1_reEst_prev = gam1;
-                gam1 = std::min( std::max(  1 / (1/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
-
-                if (rank == 0 && it_revar % 1 == 0)
-                    std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
-
-                updatePrior(0);
-
-                if ( abs(gam1 - gam1_reEst_prev) < 1e-4 )
-                    break;
-                
+            // new MMSE estimate
+            double sum_d = 0;
+            for (int i=0; i<M; i++)
+            {
+                // we have to keep the entire derivative vector so that we could have its previous version in the damping step 
+                // x1_hat_d[i] = rho_it * g1d(r1[i], gam1) + (1 - rho_it) * x1_hat_d_prev[i];
+                x1_hat_d[i] = g1d(r1[i], gam1);
+                sum_d += x1_hat_d[i];
             }
 
-            if (rank == 0)
-                std::cout << "A total of " << std::max(it_revar - 1,1) << " variance and prior tuning iterations were performed" << std::endl;
+            alpha1 = 0;
+            MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            alpha1 /= Mt;
+            eta1 = gam1 / alpha1;
 
+            if (it <= 1)
+                break;
+
+            gam1_reEst_prev = gam1;
+            gam1 = std::min( std::max(  1 / (1/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
+
+            if (rank == 0 && it_revar % 1 == 0)
+                std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
+
+            updatePrior(0);
+
+            if ( abs(gam1 - gam1_reEst_prev) < 1e-3 )
+                break;
+            
         }
+
+        if (rank == 0)
+            std::cout << "A total of " << std::max(it_revar - 1,1) << " variance and prior tuning iterations were performed" << std::endl;
+        
+        if (it > 1){ // damping on the level of x1
+            for (int i = 0; i < M; i++)
+                x1_hat[i] = rho * x1_hat[i] + (1-rho) * x1_hat_prev[i];
+            
+            alpha1 = rho * alpha1 + (1-rho) * alpha1_prev;
+        }
+
+        double start_z1= MPI_Wtime();
+        z1 = (*dataset).Ax(x1_hat.data());
+        double end_z1= MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to calculate z1 = " << end_z1 - start_z1 << " seconds" <<  std::endl;
+
+        if (rank == 0)
+           std::cout << "rho = " << rho << std::endl;
+
+        double scale = sqrt(N);
+
+        // saving x1_hat
+        double start_saving = MPI_Wtime();
+        std::string filepath_out = out_dir + out_name + "_it_" + std::to_string(it) + ".bin";
+        int S = (*dataset).get_S();
+        for (int i0=0; i0<x1_hat_stored.size(); i0++)
+            x1_hat_stored[i0] =  x1_hat[i0] / scale;
+        mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
+
+        if (rank == 0)
+           std::cout << "filepath_out is " << filepath_out << std::endl;
+
+        if (it % 1 == 0){
+            std::string filepath_out_r1 = out_dir + out_name + "_r1_it_" + std::to_string(it) + ".bin";
+            std::vector<double> r1_stored = r1;
+            for (int i0=0; i0<r1_stored.size(); i0++)
+                r1_stored[i0] =  r1[i0] / scale;
+            mpi_store_vec_to_file(filepath_out_r1, r1_stored, S, M);
+        }
+        double end_saving = MPI_Wtime();
+        if (rank == 0)
+            std::cout << "time needed to save beta1 to an external file = " << end_saving - start_saving << " seconds" <<  std::endl;
 
         gam_before = gam2;
         gam2 = std::min(std::max(eta1 - gam1, gamma_min), gamma_max);
@@ -293,10 +332,6 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "eta1 = " << eta1 << std::endl;
             std::cout << "gam2 = " << gam2 << std::endl;
         }
-        double end_onsager1 = MPI_Wtime();
-
-        if (rank == 0)
-            std::cout << "denoising onsager calculation took " << end_onsager1 - start_onsager1 << " seconds" << std::endl;
 
         if (use_lmmse_damp == 1)
             r2_prev = r2;
@@ -495,10 +530,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         r1_prev = r1;
         for (int i = 0; i < M; i++)
-            r1[i] = rho_it * (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1 + (1-rho_it) * r1_prev[i];
-            // r1[i] = (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1;
+            // r1[i] = rho_it * (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1 + (1-rho_it) * r1_prev[i];
+            r1[i] = (eta2 * x2_hat[i] - gam2 * r2[i]) / gam1;
 
-        gam1 = rho_it * gam1 + (1-rho_it) * gam_before;
+        // gam1 = rho_it * gam1 + (1-rho_it) * gam_before;
 
         if (rank == 0)
             std::cout << "gam1 = " << gam1 << std::endl;
@@ -801,7 +836,7 @@ void vamp::updatePrior(int verbose = 1) {
                 if (vars[j] != 0)
                     denom = std::min(vars[j], vars[k]);
                 else
-                    denom = 0.1;
+                    denom = 0.01;
 
                 if ( abs(vars[j] - vars[k]) / denom < 5e-1 ){
                     double sum2probs = probs[j] + probs[k];
