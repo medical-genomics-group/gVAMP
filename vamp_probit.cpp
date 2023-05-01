@@ -45,12 +45,19 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
     // Gaussian noise start
-    r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
-    p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
+    //r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
+    //p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
 
-    //r1 = std::vector<double> (M, 0.0);
-    //p1 = std::vector<double> (N, 0.0);
+    r1 = std::vector<double> (M, 0.0);
+    p1 = std::vector<double> (N, 0.0);
+    r2 = r1;
+    alpha1 = 0;
+    //p2 = p1;
+    //for (int i=0; i<p2.size(); i++)
+    //    p2[i] = abs(p2[i]) * (2*y[i] - 1);
 
+    //gam2 = gam1;
+    //tau2 = tau1;
 
     // initializing under VAMP assumption
     //for (int i=0; i<r1.size(); i++)
@@ -62,7 +69,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
     p2 = std::vector<double> (N, 0.0);
-    cov_eff = std::vector<double> (C, 0.0);
+    if (C>0)
+        cov_eff = std::vector<double> (C, 0.0);
 
     std::vector< std::vector<double> > Z = (*dataset).get_covs();
     std::vector<double> gg;
@@ -70,17 +78,22 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     for (int it = 1; it <= max_iter; it++)
     {    
 
-        double start_covar = MPI_Wtime();
+        double rho_it;
+        if (it > 2)
+                rho_it = rho;
+            else
+                rho_it = 1;
+
+        rho_it = 1;
+
+        double start_covar = 0, stop_covar = 0, start_denoising = 0, stop_denoising = 0;
+
+    //if (it != 1){
+
+        start_covar = MPI_Wtime();
 
         if (rank == 0)
             std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl;
-        /*
-        if (rank == 0){
-            std::cout << "Z[0][0] = " << Z[0][0] << std::endl;
-            std::cout << "Z[1][0] = " << Z[1][0] << std::endl;
-            std::cout << "Z[2][0] = " << Z[2][0] << std::endl;
-        }
-        */
 
         if (it == 1)
             if (C>0){
@@ -102,7 +115,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
                 }
             }
 
-        double stop_covar = MPI_Wtime();
+        stop_covar = MPI_Wtime();
 
         if (rank == 0)
             std::cout << "time for covariates effects update = " << stop_covar - start_covar << " seconds." << std::endl;
@@ -113,20 +126,12 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         //************************
         //************************
 
-        double start_denoising = MPI_Wtime();
+        start_denoising = MPI_Wtime();
 
         if (rank == 0)
                 std::cout << "->DENOISING" << std::endl;
 
         x1_hat_prev = x1_hat;
-
-        double rho_it;
-        if (it > 2)
-            rho_it = rho;
-        else
-            rho_it = 1;
-
-        rho_it = 1;
 
         double rho_it2 = rho;
         double alpha1_prev = alpha1;
@@ -198,7 +203,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         mpi_store_vec_to_file(filepath_out, x1_hat_stored, S, M);
 
         if (rank == 0)
-           std::cout << "filepath_out is " << filepath_out << std::endl;
+        std::cout << "filepath_out is " << filepath_out << std::endl;
 
         if (it % 1 == 0){
             std::string filepath_out_r1 = out_dir + out_name + "_probit_r1_it_" + std::to_string(it) + ".bin";
@@ -299,7 +304,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         //      DENOISING Z
         //************************
         //************************
-      
+    
         std::vector<double> y = (*dataset).filter_pheno();
 
         probit_err_measures(dataset, 0, true_g, p1, "p1");
@@ -399,7 +404,7 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
                 m_cov = inner_prod(Z[i], cov_eff, 0);
 
             beta1 += g1d_bin_class(p1[i], tau1, y[i], m_cov);
-           
+        
         }
 
         beta1 /= N;
@@ -464,8 +469,8 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             std::cout << "probit_var = " << probit_var << std::endl;
 
 
-        double stop_denoising = MPI_Wtime();
-
+        stop_denoising = MPI_Wtime();
+        //}
 
         //************************
         //************************
@@ -473,7 +478,6 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
         //************************
         //************************
 
-        
         double start_LMMSE = MPI_Wtime();
 
         if (rank == 0)

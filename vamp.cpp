@@ -143,6 +143,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
     //for (int i0=0; i0<M; i0++)
 	//  r1[i0] = r1[i0]*M/N;
 
+    alpha1 = 0;
+
 
     for (int it = 1; it <= max_iter; it++)
     {    
@@ -836,7 +838,7 @@ void vamp::updatePrior(int verbose = 1) {
                 if (vars[j] != 0)
                     denom = std::min(vars[j], vars[k]);
                 else
-                    denom = 0.01;
+                    denom = 1e-5;
 
                 if ( abs(vars[j] - vars[k]) / denom < 5e-1 ){
                     double sum2probs = probs[j] + probs[k];
