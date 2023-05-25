@@ -23,6 +23,7 @@ private:
     std::string phenfp;       // filepath to phenotypes
     std::string bedfp;          // filepath to .bed file
     std::string methfp;          // filepath to methylation data
+    std::string bimfp;           // filepath to .bim file
     // std::string covfp;             // filepath to covariates (in a probit model)
     std::vector<double> phen_data;   // vector of phenotype data
     std::string type_data;           // type of data used in inference("bed" or "meth")
@@ -50,10 +51,15 @@ private:
     double sigma_max = 1e8;
     double intercept = 0;
     double scale = 1; 
+    double alpha = 1;
 
 public:
 
+    //***************************
+    // ACCESSING CLASS VARIABLES
+    //***************************
     std::vector<double> get_phen(){ return phen_data; };
+    std::string get_bimfp() { return bimfp; }
     double get_intercept() { return intercept; };
     double get_scale() { return scale; };
     double get_sigma_max() { return sigma_max; };
@@ -80,39 +86,58 @@ public:
 
     std::string get_type_data() const { return type_data; }
 
-    // constructor and destructor for class data
-    data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed");
-    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed");
+    
+    //******************************
+    //  CONSTRUCTORS and DESTRUCTOR
+    //******************************
+    data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed", double alpha = 1, std::string bimfp = "");
+    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed", double alpha = 1, std::string bimfp = "");
     ~data() {
         if (mave     != nullptr)  _mm_free(mave);
         if (msig     != nullptr)  _mm_free(msig);
     }
+    
 
+    //**************************
+    // DATA LOADING PROCEDURES
+    //**************************
     void read_phen();   // reading phenotype file
+    void read_genotype_data();
+    void read_covariates(std::string covfp, int C = 0);
+    void read_methylation_data();
+    std::vector<int> read_chromosome_info(std::string bim_file);
 
     void compute_markers_statistics(); 
-
     void compute_people_statistics();
 
-    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, const int SB, const int LB);
 
-    void read_genotype_data();
-
-    void read_covariates(std::string covfp, int C = 0);
-
-    void read_methylation_data();
-
+    //**************************************************************
+    // PROCEDURES IMPLEMENTING OPERATIONS INVOLVING DESIGN MATRIX A
+    //**************************************************************
     std::vector<double> Ax(double* __restrict__ phen, int SB, int LB);
     std::vector<double> Ax(double* __restrict__ phen);
     
     std::vector<double> ATx(double* __restrict__ phen, int SB, int LB);
     std::vector<double> ATx(double* __restrict__ phen);
+    double dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, const int SB, const int LB);
 
     std::vector<double> Zx(std::vector<double> phen);
 
+
+
+    //****************************
+    // FILTERING PHENOTYPE VALUES
+    //*****************************
     std::vector<double> filter_pheno();
+    std::vector<double> filter_pheno(int *nonnan);
     
+
+        
+    //*****************************************************
+    // CALCULATION OF p-values using LOO and LOCO APPROACH
+    //*****************************************************
     std::vector<double> pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath);
+    std::vector<double> pvals_calc_LOCO(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath);
 
 };
 

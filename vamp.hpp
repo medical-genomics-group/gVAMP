@@ -8,15 +8,21 @@ class vamp{
 
 private:
     int N, M, Mt, C, max_iter, rank, nranks;
-    double gam1, gam2, eta1, eta2, rho, gamw, gam_before, tau1, tau2, alpha1, alpha2;
+    double gam1, gam2, gam_before, eta1, eta2;  // linear model precisions
+    std::vector<double> gam1s, gam2s;
+    double tau1, tau2;                          // probit model precisions
+    double alpha1, alpha2;                      // Onsager corrections
+    double rho;                                 // damping factor
+    double gamw;                                // linear model noise precision 
 
-    std::vector<double> x1_hat, x2_hat, true_signal, z1_hat, z2_hat;
-    std::vector<double> y;
-    std::vector<double> z1;
+    std::vector<double> x1_hat, x2_hat, true_signal;
+    std::vector<double> z1_hat, z2_hat;
+    std::vector<double> y;                              // phenotype vector
+    std::vector<double> z1;                             // z1 = A * x1_hat 
     std::vector<double> r1, r2, r2_prev;
     std::vector<double> p1, p2;
-    std::vector<double> cov_eff;
-    std::vector<double> mu_CG_last;
+    std::vector<double> cov_eff;                        // covariates in a probit model
+    std::vector<double> mu_CG_last;                     // last LMMSE estimate
     
 
     std::vector<double> probs, probs_before;
@@ -41,24 +47,37 @@ private:
     std::vector<double> bern_vec;
     std::vector<double> invQ_bern_vec;
 
-    int store_pvals = 1;
+    int store_pvals = 1;                                // if .bim file is present we also perform LOCO p-value estimation
     double total_comp_time=0;
     int reverse = 1;
     int use_lmmse_damp = 0;
 
+    // cross-validation parameters
     int SBglob, LBglob, redglob;
+    int use_cross_val = 0, SB_cross;
 
 public:
 
-
+    //******************
+    //  CONSTRUCTORS 
+    //******************
     vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model, Options opt = Options());
     vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int rank, Options opt);
+
+
+    //**********************
+    // INFERENCE PROCEDURES
+    //**********************
     std::vector<double> infere(data* dataset);
     std::vector<double> infere_linear(data* dataset);
     std::vector<double> infere_bin_class(data* dataset);
 
     //std::vector<double> predict(std::vector<double> est, data* dataset);
 
+
+    //********************************************
+    // DENOISING PROCEDURES & ONSAGER CALCULATION
+    //********************************************
     double g1(double x, double gam1);
     double g1_bin_class(double p, double tau1, double y, double m_cov);
     double g1d(double x, double gam1);
@@ -66,6 +85,10 @@ public:
     double g2d_onsager(double gam2, double tau, data* dataset);
     double g2d_onsagerAAT(double gam2, double tau, data* dataset);
 
+
+    //************************
+    // HYPERPARAMETERS UPDATE
+    //************************
     void updatePrior(int verbose);
     void updateNoisePrec(data* dataset);
     void updateNoisePrecAAT(data* dataset);

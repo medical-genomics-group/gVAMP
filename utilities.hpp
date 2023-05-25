@@ -116,3 +116,13 @@ void mpi_file_write_at_all(const size_t N, MPI_Offset offset, MPI_File fh, MPI_D
         check_mpi(MPI_File_write_at_all(fh, offset + iim * size_t(dtsize), &buffer[iim], count, MPI_DT, &status), __LINE__, __FILE__);
     }
 }
+
+template<typename T>
+std::vector<T> slice(std::vector<T> const &v, int m, int n)
+{
+    auto first = v.cbegin() + m;
+    auto last = v.cbegin() + n + 1;
+ 
+    std::vector<T> vec(first, last);
+    return vec;
+}

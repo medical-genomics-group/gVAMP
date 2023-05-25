@@ -32,6 +32,7 @@ Currently supported input options to C++ version of the code:
 | Input option | Description |
 | --- | --- |
 | `run-mode` | 'infere' / 'test' / 'both' |
+| `bim-file` | filepath to .bim file including the .bim extension |
 | `bed-file` | filepath to .bed file including the .bed extension |
 | `bed-file-test` | filepath to .bed file reserved for testing purposes |
 | `phen-files` | path to file containing phenotype of interest (only 1 phenotype supportet at the moment) |
@@ -63,6 +64,7 @@ Currently supported input options to C++ version of the code:
 | `alpha` | scaling factor applied in the normalization of a genotype matrix |
 | `learn-vars` | indicates wheather or not prior variances are learnt |
 | `C` | indicates the number of covariates in a probit model |
+| `alpha` | columns of genotype matrix are scaled with std^(-alpha) |
 
 
 

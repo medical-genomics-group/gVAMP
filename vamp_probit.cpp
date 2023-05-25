@@ -20,6 +20,8 @@
 std::vector<double> vamp::infere_bin_class( data* dataset ){
 
 
+    //C = 0; // remove later
+
     double total_time = 0;
     double tol = 1e-11;
 
@@ -47,11 +49,21 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
     // Gaussian noise start
     //r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
     //p1 = simulate(N, std::vector<double> {1.0/tau1}, std::vector<double> {1});
+    p1 = simulate(N, std::vector<double> {1.0/1}, std::vector<double> {1});
 
     r1 = std::vector<double> (M, 0.0);
-    p1 = std::vector<double> (N, 0.0);
+    //p1 = std::vector<double> (N, 0.0);
     r2 = r1;
     alpha1 = 0;
+
+    
+    // linear estimator
+    //r1 = (*dataset).ATx(y.data());
+    //for (int i0=0; i0<M; i0++)
+	//  r1[i0] = r1[i0]*M/N;
+
+    //p1 = (*dataset).Ax(r1.data());
+
     //p2 = p1;
     //for (int i=0; i<p2.size(); i++)
     //    p2[i] = abs(p2[i]) * (2*y[i] - 1);
@@ -356,6 +368,9 @@ std::vector<double> vamp::infere_bin_class( data* dataset ){
             }
 
             beta1 /= N;
+
+            if (rank == 0)
+                std::cout << "beta1 = " << beta1 << std::endl;
 
             double zeta1 = tau1 / beta1;
 

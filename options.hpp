@@ -52,6 +52,7 @@ public:
     unsigned int get_redglob() const { return redglob; }
     unsigned int get_learn_vars() const { return learn_vars; }
     double get_h2() const { return h2; }
+    double get_alpha() const { return alpha; }
 
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
@@ -121,7 +122,7 @@ private:
     std::vector<int> test_iter_range = std::vector<int>(2, -1);
 
     double rho = 0.98;
-    double h2 = 0.5;
+    double h2 = -1;
     //int verbosity = 0;
     unsigned int iterations = 1;
 

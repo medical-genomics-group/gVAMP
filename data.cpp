@@ -17,15 +17,26 @@
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
 
 
-// constructors for class data
-data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data) :
+
+
+//******************
+//  CONSTRUCTORS 
+//******************
+
+// -> DESCRIPTION:
+//
+//      constructor that is given a file pointer to the phenotype and genotype file
+//
+data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data, double alpha, std::string bimfp) :
     phenfp(fp),
+    bimfp(bimfp),
     type_data(type_data),
     N(N),
     M(M),
     Mt(Mt),
     S(S),
     rank(rank),
+    alpha(alpha),
     mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
     im4(N%4 == 0 ? N/4 : N/4+1) {
     mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
@@ -49,15 +60,22 @@ data::data(std::string fp, std::string genofp, const int N, const int M, const i
     
 }
 
-// constructors for class data
-data::data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data) :
+
+// -> DESCRIPTION:
+//
+//      constructor that is given a file pointer to the genotype file, but phenotype values are assigned for a vector provided. 
+//      All values of phenotype are assume to be non-NA, usually used in simulation settings.
+//
+data::data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data, double alpha, std::string bimfp) :
     type_data(type_data),
+    bimfp(bimfp),
     N(N),
     M(M),
     Mt(Mt),
     S(S),
     rank(rank),
     phen_data(y),
+    alpha(alpha),
     mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
     im4(N%4 == 0 ? N/4 : N/4+1) {
     mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
@@ -95,8 +113,18 @@ data::data(std::vector<double> y, std::string genofp, const int N, const int M, 
 }
 
 
-// Read phenotype file assuming PLINK format:
-// Family ID, Individual ID, Phenotype; One row per individual
+
+
+
+//**************************
+// DATA LOADING PROCEDURES
+//**************************
+
+// -> DESCRIPTION:
+//
+//      Read phenotype file assuming PLINK format:
+//      Family ID, Individual ID, Phenotype; One row per individual
+// 
 void data::read_phen() {
 
     std::ifstream infile(phenfp);
@@ -114,7 +142,7 @@ void data::read_phen() {
 
             std::sregex_token_iterator first{line.begin(), line.end(), re, -1}, last;
             std::vector<std::string> tokens{first, last};
-            if (tokens[2] == "NA") {
+            if (tokens[2] == "NA" || tokens[2] == "-9") {
                 nas += 1;
                 phen_data.push_back(std::numeric_limits<double>::max());
                 mask4.at(int(line_n / 4)) &= ~(0b1 << m4);
@@ -127,6 +155,8 @@ void data::read_phen() {
             line_n += 1;
         }
         infile.close();
+
+        // fail if the input size doesn not match the size of the read data
         assert(nas + nonas == N);
 
         // Set last bits to 0 if ninds % 4 != 0
@@ -162,10 +192,197 @@ void data::read_phen() {
 }
 
 
-// Compute mean and associated standard deviation for markers
-// for each of the phenotypes (stats are NA dependent)
-// ! one byte of bed  contains information for 4 individuals
-// ! one byte of phen contains information for 8 individuals
+
+
+// -> DESCRIPTION:
+//
+//      Read genotype file assuming PLINK .bed format
+// 
+void data::read_genotype_data(){
+
+    double ts = MPI_Wtime();
+
+    MPI_File bedfh;
+
+    check_mpi(MPI_File_open(MPI_COMM_WORLD, bedfp.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &bedfh),  __LINE__, __FILE__);
+
+    const size_t size_bytes = size_t(M) * size_t(mbytes) * sizeof(unsigned char);
+
+    bed_data = (unsigned char*)_mm_malloc(size_bytes, 64);
+    printf("INFO   : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
+
+    // Offset to section of bed file to be processed by task
+    MPI_Offset offset = size_t(3) + size_t(S) * size_t(mbytes) * sizeof(unsigned char);
+
+    // Gather the sizes to determine common number of reads
+    size_t max_size_bytes = 0;
+    check_mpi(MPI_Allreduce(&size_bytes, &max_size_bytes, 1, MPI_UNSIGNED_LONG_LONG, MPI_MAX, MPI_COMM_WORLD), __LINE__, __FILE__);
+
+    const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
+    size_t bytes = 0;
+    mpi_file_read_at_all <unsigned char*> (size_bytes, offset, bedfh, MPI_UNSIGNED_CHAR, NREADS, bed_data, bytes);
+
+    MPI_File_close(&bedfh);
+
+    double te = MPI_Wtime();
+    
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (rank == 0)
+        std::cout <<"reading genotype data took " << te - ts << " seconds."<< std::endl;
+
+}
+
+
+// -> DESCRIPTION:
+//
+//      Reads methylation design matrix assuming matrix of doubles stores in binary format
+// 
+void data::read_methylation_data(){
+
+    double ts = MPI_Wtime();
+
+    MPI_File methfh;
+
+    if (rank == 0)
+        std::cout << "meth file name = " << methfp.c_str() << std::endl;
+
+    check_mpi(MPI_File_open(MPI_COMM_WORLD, methfp.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &methfh),  __LINE__, __FILE__);
+
+    const size_t size_bytes = size_t(M) * size_t(N) * sizeof(double);
+
+    meth_data = (double*)_mm_malloc(size_bytes, 64);
+
+    printf("INFO  : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
+
+    // Offset to section of bed file to be processed by task
+    MPI_Offset offset = size_t(0) + size_t(S) * size_t(N) * sizeof(double);
+
+    // Gather the sizes to determine common number of reads
+    size_t max_size_bytes = 0;
+    check_mpi(MPI_Allreduce(&size_bytes, &max_size_bytes, 1, MPI_UNSIGNED_LONG_LONG, MPI_MAX, MPI_COMM_WORLD), __LINE__, __FILE__);
+
+    const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
+    size_t bytes = 0;
+    mpi_file_read_at_all <double*> (size_t(M) * size_t(N), offset, methfh, MPI_DOUBLE, NREADS, meth_data, bytes);
+
+    MPI_File_close(&methfh);
+    
+    double te = MPI_Wtime();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (rank == 0)
+        std::cout <<"reading methylation data took " << te - ts << " seconds."<< std::endl;
+
+}
+
+
+
+// -> DESCRIPTION:
+//
+//      Reads covariates files, used with a probit model
+// 
+void data::read_covariates(std::string covfp, int C){ // values should be separate with space delimiter
+
+    if (C==0)
+        return;
+
+    double start = MPI_Wtime();
+
+    std::ifstream covf(covfp);
+    std::string line; 
+    //std::regex re("\\S+");
+    std::regex re("\\s+");
+
+    while (std::getline(covf, line)) // read the current line
+    {
+        int Cobs = 0;
+        std::vector<double> entries;
+        std::sregex_token_iterator iter(line.begin(), line.end(), re, -1);
+        std::sregex_token_iterator re_end;
+
+        for ( ; iter != re_end; ++iter){
+            entries.push_back(std::stod(*iter));
+            Cobs++;
+        }
+            
+        /*
+        for (auto it = std::sregex_iterator(line.begin(), line.end(), re); it != std::sregex_iterator(); it++) {
+            std::string token = (*it).str();
+            entries.push_back(std::stod(token));
+            Cobs++;      
+        }   
+        */
+
+        if (Cobs != C){
+            std::cout << "FATAL: number of covariates = " << Cobs << " does not match to the specified number of covariates = " << C << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        covs.push_back(entries);        
+    }
+
+    double end = MPI_Wtime();
+
+    if (rank == 0)
+        std::cout << "rank = " << rank << ": reading covariates took " << end - start << " seconds to run." << std::endl;
+
+}
+
+// -> DESCRIPTION:
+//
+//      a function that reads .bim file and returns an integer vector of length M (number of markers accessible to a single worker)
+//      whose elements specify the chromosome on which certain marker is present
+//
+// -> INPUT:
+//
+//       [string] bim_file - name of bim file to be loaded
+//
+// -> OUTPUT:  
+//
+//      [vector<int>] chroms - chromosome indices corresponding to markers assigned to a worker 
+//
+std::vector<int> data::read_chromosome_info(std::string bim_file){
+    
+    //initializing the output vector
+    std::vector<int> chroms(M);
+
+    // specifying bim file and reggex expression
+    std::ifstream infile(bim_file);
+    std::string line;
+    std::regex re("\\s+");
+
+    if (infile.is_open()) {
+        int line_n = 0;
+        while (getline(infile, line)) {
+            if (line_n >= S && line_n < S + M){
+                std::sregex_token_iterator first{line.begin(), line.end(), re, -1}, last;
+                std::vector<std::string> tokens{first, last};
+                // first line of .bim file contains information on the chromosome index
+                chroms.push_back( atof( tokens[0].c_str() ) );
+            }
+            line_n += 1;
+        }
+        infile.close();
+    } else {
+        std::cout << "FATAL: could not open bim file: " << bim_file << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    return chroms;
+}
+
+
+
+// -> DESCRIPTION:
+//
+//      Compute mean and associated standard deviation for markers
+//      for each of the phenotypes (stats are NA dependent)
+//      ! one byte of bed  contains information for 4 individuals
+//      ! one byte of phen contains information for 8 individuals  
+//      whose elements specify the chromosome on which certain marker is present
+//
 void data::compute_markers_statistics() {
 
     int rank;
@@ -178,8 +395,10 @@ void data::compute_markers_statistics() {
 
     double start = MPI_Wtime();
 
+    // distinction between genomic and methylation data
     if (type_data == "bed"){
 
+        // MANual VECTorization is used if computer architecture allows it
         #ifdef MANVECT
         #ifdef _OPENMP
         #pragma omp parallel for
@@ -234,7 +453,11 @@ void data::compute_markers_statistics() {
                             sumb += dotp_lut_b[bedm[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
                         }
                     }
-                    mave[i] = suma / sumb;
+                    if (sumb != 0)
+                        mave[i] = suma / sumb;
+                    else
+                        mave[i] = 0.0;
+
                     double sumsqr = 0.0;
                     for (int j=0; j<im4; j++) {
                         for (int k=0; k<4; k++) {
@@ -243,7 +466,15 @@ void data::compute_markers_statistics() {
                             sumsqr += val * val;
                         }
                     }
-                    msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                    if (sumsqr != 0)
+                        // we scale inverse standard deviation to the exponent alpha (usually 0, 0.3, 1)
+                        if (alpha == 1)
+                            msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                        else
+                            msig[i] = 1.0 / pow( sqrt( sumsqr / (double( get_nonas() ) - 1.0)), alpha );
+                    else 
+                        // in case entire column contains only zero-elements
+                        msig[i] = 1.0;
                 }
             #endif
     }
@@ -294,7 +525,13 @@ void data::compute_markers_statistics() {
                         } 
                     }
 
-                    msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                    if (sumsqr != 0.0)
+                        if (alpha == 1)
+                                msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                            else
+                                msig[i] = 1.0 / pow( sqrt( sumsqr / (double( get_nonas() ) - 1.0)), alpha );
+                    else 
+                        msig[i] = 1.0;
                 }
     }
         double end = MPI_Wtime();
@@ -303,12 +540,15 @@ void data::compute_markers_statistics() {
 }
 
 
-// Compute mean and associated standard deviation for people
-// ! one byte of bed  contains information for 4 individuals
-// ! one byte of phen contains information for 8 individuals
-// we modify vectors of length 4*mbytes to contain to contain 
-// average value and inverse standard deviation per individual
-// (0 if phenotype is missing)
+// -> DESCRIPTION:
+//
+//      Compute mean and associated standard deviation for people
+//      !one byte of bed  contains information for 4 individuals
+//      ! one byte of phen contains information for 8 individuals
+//      we modify vectors of length 4*mbytes to contain to contain 
+//      average value and inverse standard deviation per individual
+//      (0 if phenotype is missing)
+//
 void data::compute_people_statistics() {
 
     int rank;
@@ -470,6 +710,15 @@ void data::compute_people_statistics() {
 }
 
 
+//**************************************************************
+// PROCEDURES IMPLEMENTING OPERATIONS INVOLVING DESIGN MATRIX A
+//**************************************************************
+
+
+// -> DESCRIPTION:
+//
+//      Computes < phen, (A_mloc - mu) * sigma_inv > from 4*SB to 4*(SB+LB)
+//
     double data::dot_product(const int mloc, double* __restrict__ phen, const double mu, const double sigma_inv, const int SB, const int LB) {
     // __restrict__ means that phen is the only pointer pointing to that data
 
@@ -545,6 +794,12 @@ void data::compute_people_statistics() {
 }
 
 
+// -> DESCRIPTION:
+//
+//      Computes A^T phen using dot_product function above.
+//      There are 2 versions: one that takes full data and one that
+//      takes a subset of individuals.
+//
 std::vector<double> data::ATx(double* __restrict__ phen) {
     return ATx(phen, 0, mbytes);
 }
@@ -559,6 +814,8 @@ std::vector<double> data::ATx(double* __restrict__ phen, int SB, int LB) {
     for (int mloc=0; mloc < M; mloc++)
          ATx[mloc] = dot_product(mloc, phen, mave[mloc], msig[mloc], SB, LB);
 
+
+    // for stability reasons we scale design matrix A with 1/sqrt(number of people)
     double scale;
     if (SB == 0 && LB == mbytes)
         scale = 1.0 / sqrt(N);
@@ -571,6 +828,16 @@ std::vector<double> data::ATx(double* __restrict__ phen, int SB, int LB) {
     return ATx;
 }
 
+
+
+
+
+// -> DESCRIPTION:
+//
+//      Computes A * phen using dot_product function above.
+//      There are 2 versions: one that takes full data and one that
+//      takes a subset of individuals.
+//
 
 std::vector<double> data::Ax(double* __restrict__ phen) {
     return Ax(phen, 0, mbytes);
@@ -698,6 +965,18 @@ std::vector<double> data::Ax(double* __restrict__ phen, int SB, int LB) {
                     //Ax_temp[j * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k] * na_lut[mask4[j] * 4 + k]; 
                     Ax_temp[(j-SB) * 4 + k] += (dotp_lut_a[bed[j] * 4 + k] - ave) * sig_phen_i * dotp_lut_b[bed[j] * 4 + k] * na_lut[mask4[j] * 4 + k];
 
+                    /*
+                    if ((j==0 && ave==0) || (j==0 && i==0)){
+                        if (rank == 0){
+                            std::cout << "i = " << i << std::endl;
+                            std::cout << "dotp_lut_a[bed[j] * 4 + k] = " << dotp_lut_a[bed[j] * 4 + k] << std::endl;
+                            std::cout << "ave = " << ave << std::endl;
+                            std::cout << "sig_phen_i = " << sig_phen_i << std::endl;
+                            std::cout << "dotp_lut_b[bed[j] * 4 + k]  = " << dotp_lut_b[bed[j] * 4 + k]  << std::endl;
+                            std::cout << "na_lut[mask4[j] * 4 + k] = " << na_lut[mask4[j] * 4 + k] << std::endl;
+                            std::cout << "Ax_temp[(j-SB) * 4 + k] = " << Ax_temp[(j-SB) * 4 + k] << std::endl;
+                        }
+                    } */
                 }
             } 
         }
@@ -709,8 +988,6 @@ std::vector<double> data::Ax(double* __restrict__ phen, int SB, int LB) {
         // MPI_Allreduce(Ax_temp.data(), Ax_total.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         MPI_Allreduce(Ax_temp.data(), Ax_total.data(), 4*LB, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-        //for(int i = 0; i < 4 * mbytes; i++)
-        //    Ax_total[i] /= sqrt(N);
 
         double scale;
         if (SB == 0 && LB == mbytes)
@@ -774,80 +1051,10 @@ std::vector<double> data::Zx(std::vector<double> phen){
     return Zx_temp;
 }
 
-void data::read_genotype_data(){
 
-    double ts = MPI_Wtime();
-
-    MPI_File bedfh;
-
-    check_mpi(MPI_File_open(MPI_COMM_WORLD, bedfp.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &bedfh),  __LINE__, __FILE__);
-
-    const size_t size_bytes = size_t(M) * size_t(mbytes) * sizeof(unsigned char);
-
-    bed_data = (unsigned char*)_mm_malloc(size_bytes, 64);
-    printf("INFO   : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
-
-    // Offset to section of bed file to be processed by task
-    MPI_Offset offset = size_t(3) + size_t(S) * size_t(mbytes) * sizeof(unsigned char);
-
-    // Gather the sizes to determine common number of reads
-    size_t max_size_bytes = 0;
-    check_mpi(MPI_Allreduce(&size_bytes, &max_size_bytes, 1, MPI_UNSIGNED_LONG_LONG, MPI_MAX, MPI_COMM_WORLD), __LINE__, __FILE__);
-
-    const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
-    size_t bytes = 0;
-    mpi_file_read_at_all <unsigned char*> (size_bytes, offset, bedfh, MPI_UNSIGNED_CHAR, NREADS, bed_data, bytes);
-
-    MPI_File_close(&bedfh);
-
-    double te = MPI_Wtime();
-    
-    MPI_Barrier(MPI_COMM_WORLD);
-
-    if (rank == 0)
-        std::cout <<"reading genotype data took " << te - ts << " seconds."<< std::endl;
-
-}
-
-void data::read_methylation_data(){
-
-    double ts = MPI_Wtime();
-
-    MPI_File methfh;
-
-    if (rank == 0)
-        std::cout << "meth file name = " << methfp.c_str() << std::endl;
-
-    check_mpi(MPI_File_open(MPI_COMM_WORLD, methfp.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &methfh),  __LINE__, __FILE__);
-
-    const size_t size_bytes = size_t(M) * size_t(N) * sizeof(double);
-
-    meth_data = (double*)_mm_malloc(size_bytes, 64);
-
-    printf("INFO  : rank %d has allocated %zu bytes (%.3f GB) for raw data.\n", rank, size_bytes, double(size_bytes) / 1.0E9);
-
-    // Offset to section of bed file to be processed by task
-    MPI_Offset offset = size_t(0) + size_t(S) * size_t(N) * sizeof(double);
-
-    // Gather the sizes to determine common number of reads
-    size_t max_size_bytes = 0;
-    check_mpi(MPI_Allreduce(&size_bytes, &max_size_bytes, 1, MPI_UNSIGNED_LONG_LONG, MPI_MAX, MPI_COMM_WORLD), __LINE__, __FILE__);
-
-    const int NREADS = size_t( ceil(double(max_size_bytes)/double(INT_MAX/2)) );
-    size_t bytes = 0;
-    mpi_file_read_at_all <double*> (size_t(M) * size_t(N), offset, methfh, MPI_DOUBLE, NREADS, meth_data, bytes);
-
-    MPI_File_close(&methfh);
-    
-    double te = MPI_Wtime();
-
-    MPI_Barrier(MPI_COMM_WORLD);
-
-    if (rank == 0)
-        std::cout <<"reading methylation data took " << te - ts << " seconds."<< std::endl;
-
-}
-
+//****************************
+// FILTERING PHENOTYPE VALUES
+//*****************************
 
 std::vector<double> data::filter_pheno(){
 
@@ -865,58 +1072,36 @@ std::vector<double> data::filter_pheno(){
 
 }
 
-void data::read_covariates(std::string covfp, int C){ // values should be separate with space delimiter
+std::vector<double> data::filter_pheno(int *nonnan){
 
-    if (C==0)
-        return;
+    *nonnan = 0;
+    std::vector<double> y = get_phen();
+    std::vector<unsigned char> mask4 = get_mask4();
+    int im4 = get_im4();
 
-    double start = MPI_Wtime();
-
-    std::ifstream covf(covfp);
-    std::string line; 
-    //std::regex re("\\S+");
-    std::regex re("\\s+");
-
-    while (std::getline(covf, line)) // read the current line
-    {
-        int Cobs = 0;
-        std::vector<double> entries;
-        std::sregex_token_iterator iter(line.begin(), line.end(), re, -1);
-        std::sregex_token_iterator re_end;
-
-        for ( ; iter != re_end; ++iter){
-            entries.push_back(std::stod(*iter));
-            Cobs++;
-        }
-            
-        /*
-        for (auto it = std::sregex_iterator(line.begin(), line.end(), re); it != std::sregex_iterator(); it++) {
-            std::string token = (*it).str();
-            entries.push_back(std::stod(token));
-            Cobs++;      
-        }   
-        */
-
-        if (Cobs != C){
-            std::cout << "FATAL: number of covariates = " << Cobs << " does not match to the specified number of covariates = " << C << std::endl;
-            exit(EXIT_FAILURE);
-        }
-
-        covs.push_back(entries);        
-    }
-
-    double end = MPI_Wtime();
-
-    if (rank == 0)
-        std::cout << "rank = " << rank << ": reading covariates took " << end - start << " seconds to run." << std::endl;
+    for (int j=0; j<im4; j++) 
+        for (int k=0; k<4; k++) 
+            if (4*j + k < N)
+                if (na_lut[mask4[j] * 4 + k] == 0)
+                    y[4*j + k] = 0;
+                else
+                    *nonnan++;
+    return y;
 
 }
 
+
  
+//*****************************************************
+// CALCULATION OF p-values using LOO and LOCO APPROACH
+//*****************************************************
+
 // finding p-values from t-test on regression coefficient = 0 
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
+// Supports only full - individual version of the algorithm.
 std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath){
     std::vector<double> pvals(M, 0.0);
+    // phenotypic values corrected for genetic predictors
     std::vector<double> y_mod = std::vector<double> (4*mbytes, 0.0);
     for (int i=0; i<N; i++)
         y_mod[i] = y[i] - z1[i];
@@ -928,8 +1113,9 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
         for (int k=0; k<M; k++){
 
             if (rank == 0 && k % 1000 == 0)
-                std::cout << "so far " << k << " pvals have been calc."<< std::endl;
+                std::cout << "so far worker 0 has calculated " << k << " pvals." << std::endl;
 
+            // phenotype values after marker specific correction
             std::vector<double> y_mark = std::vector<double> (4*mbytes, 0.0);
 
             for (int i=0; i<N; i++)
@@ -1005,3 +1191,88 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
     return pvals;
 }
 
+
+
+// finding p-values from t-test on regression coefficient = 0 
+// in leave-one-out setting, i.e. y - A_{-S}x_{-S} = alpha_k * x_k, H0: alpha_k = 0,
+// S contains markers from all the other chromosome except the one that contains marker
+// with index k.
+// !! Currently implemented only for .bed type of data !!
+std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath){
+
+    std::vector<double> pvals(M, 0.0);
+    // phenotypic values corrected for genetic predictors
+    std::vector<double> y_mod = std::vector<double> (4*mbytes, 0.0);
+    for (int i=0; i<N; i++)
+        y_mod[i] = y[i] - z1[i];
+
+    // fetch mean and inverse standard deviation values per markers
+    double* mave = get_mave();
+    double* msig = get_msig();
+
+    // phenotype values after chromosome specific correction
+    std::vector<double> y_chrom = std::vector<double> (4*mbytes, 0.0);
+
+    std::vector<int> ch_info = read_chromosome_info(bimfp);
+
+    // we iterate over 22 non-sex chromosomes in humans
+    for (int ch=1; ch<=22; ch++){
+
+        std::vector<double> y_chrom_tmp = std::vector<double> (4*mbytes, 0.0);
+
+        for (int m=0; m<M; m++){    
+
+            if (ch_info[m] == ch){
+
+                unsigned char* bed = &bed_data[m * mbytes];
+
+                for (int i=0; i<mbytes; i++) {
+
+                    #ifdef _OPENMP
+                    #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
+                    #endif
+                    for (int j=0; j<4; j++) 
+                        y_chrom_tmp[4*i+j] += (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] * x1_hat[m] / sqrt(N);
+                }
+            }
+        }
+    
+        MPI_Allreduce(y_chrom_tmp.data(), y_chrom.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        std::transform (y_chrom.begin(), y_chrom.end(), y_mod.begin(), y_chrom.begin(), std::plus<double>());
+    
+        for (int m=0; m<M; m++){    
+            if (ch_info[m] == ch){
+
+                unsigned char* bed = &bed_data[m * mbytes];
+                double sumx = 0, sumsqx = 0, sumxy = 0, sumy = 0, sumsqy = 0;
+                int count = 0;
+                
+                #ifdef _OPENMP
+                #pragma omp parallel for reduction(+ : sumx, sumsqx, sumxy, sumy, sumsqy, count)
+                #endif
+                for (int i=0; i<mbytes; i++) {
+
+                    for (int j=0; j<4; j++) {
+
+                        double value = (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+
+                        sumx += value;
+                        sumsqx += value * value;
+                        sumxy += value * y_chrom[4*i+j];   
+                        sumy += y_chrom[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                        sumsqy += y_chrom[4*i+j] * y_chrom[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                        count += dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+
+                    }
+                }
+
+                pvals[m] = linear_reg1d_pvals(sumx, sumsqx, sumxy, sumy, sumsqy, count);   
+            }
+        }
+    }
+
+    mpi_store_vec_to_file(filepath, pvals, S, M);
+
+    return pvals;
+}
