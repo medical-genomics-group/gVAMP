@@ -51,9 +51,9 @@ int main(int argc, char** argv)
         
         std::string phenfp = (opt.get_phen_files())[0];
         std::string type_data = "bed";
-        double alpha = opt.get_alpha();
+        double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
-        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha, bimfp);
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
         // dataset.read_phen();
         // dataset.read_genotype_data();
         // dataset.compute_markers_statistics();
@@ -139,10 +139,12 @@ int main(int argc, char** argv)
         int M_test = MS[0];
         int S_test = MS[1];
         std::string type_data = "bed";
-        double alpha = opt.get_alpha();
+        double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
+        if (rank == 0)
+            std::cout << "bimfp = " << bimfp << std::endl;
 
-        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha, bimfp);
+        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha_scale, bimfp);
         // dataset_test.read_phen();
         // dataset_test.read_genotype_data();
         // dataset_test.compute_markers_statistics();
@@ -244,9 +246,9 @@ int main(int argc, char** argv)
         std::vector<double> beta_true = std::vector<double> (M, 0.0);
         std::string phenfp = (opt.get_phen_files())[0]; // currently only one phenotype file is supported
         std::string type_data = "bed";
-        double alpha = opt.get_alpha();
+        double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
-        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha, bimfp);
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
         // dataset.read_phen();
         // dataset.read_genotype_data();
         // dataset.compute_markers_statistics();
@@ -281,7 +283,7 @@ int main(int argc, char** argv)
         int M_test = MS_test[0];
         int S_test = MS_test[1];
 
-        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S, rank, type_data, alpha, bimfp);
+        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S, rank, type_data, alpha_scale, bimfp);
         // dataset_test.read_phen();
         // dataset_test.read_genotype_data();
         // dataset_test.compute_markers_statistics();
@@ -326,9 +328,9 @@ int main(int argc, char** argv)
         
         std::string phenfp = (opt.get_phen_files())[0];
         std::string type_data = "bed";
-        double alpha = opt.get_alpha();
+        double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
-        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha, bimfp);
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // reading an estimate file 
@@ -364,6 +366,7 @@ int main(int argc, char** argv)
 
     }
 
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
     return 0;
 }

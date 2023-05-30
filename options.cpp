@@ -279,10 +279,10 @@ void Options::read_command_line_options(int argc, char** argv) {
             EM_err_thr = atof(argv[++i]);
             ss << "--EM-err-thr " << EM_err_thr << "\n";
         }
-        else if (!strcmp(argv[i], "--alpha")){ // strcmp return 0 if both strings are identical
+        else if (!strcmp(argv[i], "--alpha-scale")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
-            alpha = atof(argv[++i]);
-            ss << "--alpha " << alpha << "\n";
+            alpha_scale = atof(argv[++i]);
+            ss << "--alpha-scale " << alpha_scale << "\n";
         }
         else if (!strcmp(argv[i], "--rho")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
@@ -296,7 +296,7 @@ void Options::read_command_line_options(int argc, char** argv) {
         }
         else if (!strcmp(argv[i], "--h2")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
-            rho = atof(argv[++i]);
+            h2 = atof(argv[++i]);
             ss << "--h2 " << h2 << "\n";
         }
         else if (!strcmp(argv[i], "--EM-max-iter")){ // strcmp return 0 if both strings are identical

@@ -52,7 +52,7 @@ public:
     unsigned int get_redglob() const { return redglob; }
     unsigned int get_learn_vars() const { return learn_vars; }
     double get_h2() const { return h2; }
-    double get_alpha() const { return alpha; }
+    double get_alpha_scale() const { return alpha_scale; }
 
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
@@ -108,7 +108,7 @@ private:
     unsigned int use_lmmse_damp = 0;
     unsigned int use_XXT_denoiser = 0;
     unsigned int learn_vars = 1;
-    double alpha = 1; 
+    double alpha_scale = 1; 
     unsigned int CV;
     unsigned int redglob = 0;
     unsigned int C = 0;

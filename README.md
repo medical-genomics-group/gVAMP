@@ -64,7 +64,7 @@ Currently supported input options to C++ version of the code:
 | `alpha` | scaling factor applied in the normalization of a genotype matrix |
 | `learn-vars` | indicates wheather or not prior variances are learnt |
 | `C` | indicates the number of covariates in a probit model |
-| `alpha` | columns of genotype matrix are scaled with std^(-alpha) |
+| `alpha-scale` | columns of genotype matrix are scaled with std^(-alpha-scale) |
 
 
 

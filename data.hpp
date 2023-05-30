@@ -51,7 +51,7 @@ private:
     double sigma_max = 1e8;
     double intercept = 0;
     double scale = 1; 
-    double alpha = 1;
+    double alpha_scale;
 
 public:
 
@@ -90,8 +90,8 @@ public:
     //******************************
     //  CONSTRUCTORS and DESTRUCTOR
     //******************************
-    data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed", double alpha = 1, std::string bimfp = "");
-    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed", double alpha = 1, std::string bimfp = "");
+    data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed", double alpha_scale = 1, std::string bimfp = "");
+    data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data = "bed", double alpha_scale = 1, std::string bimfp = "");
     ~data() {
         if (mave     != nullptr)  _mm_free(mave);
         if (msig     != nullptr)  _mm_free(msig);

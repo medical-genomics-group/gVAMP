@@ -230,9 +230,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 x1_hat[i] = g1(r1[i], gam1);
 
             std::vector<double> x1_hat_m_r1 = x1_hat;
-            std::transform (x1_hat_m_r1.begin(), x1_hat_m_r1.end(), x1_hat.begin(), x1_hat_m_r1.begin(), std::minus<double>());
-            //for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
-            //    x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
+            //std::transform (x1_hat_m_r1.begin(), x1_hat_m_r1.end(), r1.begin(), x1_hat_m_r1.begin(), std::minus<double>());
+            for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
+                x1_hat_m_r1[i0] = x1_hat_m_r1[i0] - r1[i0];
 
             // new MMSE estimate
             double sum_d = 0;
@@ -247,18 +247,20 @@ std::vector<double> vamp::infere_linear(data* dataset){
             alpha1 /= Mt;
             eta1 = gam1 / alpha1;
 
-            if (it <= 1)
+            if (it <= 2)
                 break;
 
             // because we want both EM updates to be performed by maximizing likelihood
             // with respect to the old gamma
-            updatePrior(0);
+            //updatePrior(0);
 
             gam1_reEst_prev = gam1;
             gam1 = std::min( std::max(  1.0 / (1.0/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
 
+            updatePrior(0);
+
             if (rank == 0 && it_revar % 1 == 0)
-                std::cout << "it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
+                std::cout << "[old] it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
 
             if ( abs(gam1 - gam1_reEst_prev) < 1e-3 )
                 break;
@@ -426,7 +428,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         double start_prior_up = MPI_Wtime();
 
         // new place for prior update
-        if (auto_var_max_iter == 0 || it == 1)
+        if (auto_var_max_iter == 0 || it <=2)
             updatePrior(1);
 
         double end_prior_up = MPI_Wtime();
@@ -635,6 +637,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
     if (rank == 0)
         std::cout << "gam2s filepath_out is " << filepath_out_gam2s << std::endl;
 
+    MPI_Barrier(MPI_COMM_WORLD);
     // returning scaled version of the effects
     return x1_hat_stored;          
 }
@@ -893,7 +896,7 @@ void vamp::updatePrior(int verbose = 1) {
                 if (vars[j] != 0)
                     denom = std::min(vars[j], vars[k]);
                 else
-                    denom = 1e-5;
+                    denom = 1e-7;
 
                 if ( abs(vars[j] - vars[k]) / denom < 5e-1 ){
                     double sum2probs = probs[j] + probs[k];

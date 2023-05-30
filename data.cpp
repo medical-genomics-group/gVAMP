@@ -27,7 +27,7 @@
 //
 //      constructor that is given a file pointer to the phenotype and genotype file
 //
-data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data, double alpha, std::string bimfp) :
+data::data(std::string fp, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data, double alpha_scale, std::string bimfp) :
     phenfp(fp),
     bimfp(bimfp),
     type_data(type_data),
@@ -36,7 +36,7 @@ data::data(std::string fp, std::string genofp, const int N, const int M, const i
     Mt(Mt),
     S(S),
     rank(rank),
-    alpha(alpha),
+    alpha_scale(alpha_scale),
     mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
     im4(N%4 == 0 ? N/4 : N/4+1) {
     mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
@@ -66,7 +66,7 @@ data::data(std::string fp, std::string genofp, const int N, const int M, const i
 //      constructor that is given a file pointer to the genotype file, but phenotype values are assigned for a vector provided. 
 //      All values of phenotype are assume to be non-NA, usually used in simulation settings.
 //
-data::data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data, double alpha, std::string bimfp) :
+data::data(std::vector<double> y, std::string genofp, const int N, const int M, const int Mt, const int S, const int rank, std::string type_data, double alpha_scale, std::string bimfp) :
     type_data(type_data),
     bimfp(bimfp),
     N(N),
@@ -75,7 +75,7 @@ data::data(std::vector<double> y, std::string genofp, const int N, const int M, 
     S(S),
     rank(rank),
     phen_data(y),
-    alpha(alpha),
+    alpha_scale(alpha_scale),
     mbytes(( N % 4 ) ? (size_t) N / 4 + 1 : (size_t) N / 4),
     im4(N%4 == 0 ? N/4 : N/4+1) {
     mave = (double*) _mm_malloc(size_t(M) * sizeof(double), 32);
@@ -142,7 +142,7 @@ void data::read_phen() {
 
             std::sregex_token_iterator first{line.begin(), line.end(), re, -1}, last;
             std::vector<std::string> tokens{first, last};
-            if (tokens[2] == "NA" || tokens[2] == "-9") {
+            if (tokens[2] == "NA") {
                 nas += 1;
                 phen_data.push_back(std::numeric_limits<double>::max());
                 mask4.at(int(line_n / 4)) &= ~(0b1 << m4);
@@ -388,6 +388,9 @@ void data::compute_markers_statistics() {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+    if (rank == 0) 
+        std::cout << "alpha_scale = " << alpha_scale << std::endl;
+
     const std::vector<unsigned char> mask4 = get_mask4();
     const int im4 = get_im4();
     double* mave = get_mave();
@@ -468,10 +471,10 @@ void data::compute_markers_statistics() {
                     }
                     if (sumsqr != 0)
                         // we scale inverse standard deviation to the exponent alpha (usually 0, 0.3, 1)
-                        if (alpha == 1)
+                        if (alpha_scale == 1)
                             msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
                         else
-                            msig[i] = 1.0 / pow( sqrt( sumsqr / (double( get_nonas() ) - 1.0)), alpha );
+                            msig[i] = 1.0 / pow( sqrt(sumsqr / (double( get_nonas() ) - 1.0)), alpha_scale );
                     else 
                         // in case entire column contains only zero-elements
                         msig[i] = 1.0;
@@ -526,10 +529,10 @@ void data::compute_markers_statistics() {
                     }
 
                     if (sumsqr != 0.0)
-                        if (alpha == 1)
+                        if (alpha_scale == 1)
                                 msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
                             else
-                                msig[i] = 1.0 / pow( sqrt( sumsqr / (double( get_nonas() ) - 1.0)), alpha );
+                                msig[i] = 1.0 / pow( sqrt(sumsqr / (double( get_nonas() ) - 1.0)), alpha_scale );
                     else 
                         msig[i] = 1.0;
                 }
@@ -1085,7 +1088,7 @@ std::vector<double> data::filter_pheno(int *nonnan){
                 if (na_lut[mask4[j] * 4 + k] == 0)
                     y[4*j + k] = 0;
                 else
-                    *nonnan++;
+                    (*nonnan)++;
     return y;
 
 }
@@ -1213,7 +1216,11 @@ std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<do
     // phenotype values after chromosome specific correction
     std::vector<double> y_chrom = std::vector<double> (4*mbytes, 0.0);
 
+    if (rank == 0)
+        std::cout << "before reading chr data" << std::endl;
     std::vector<int> ch_info = read_chromosome_info(bimfp);
+    if (rank == 0)
+        std::cout << "after reading chr data" << std::endl;
 
     // we iterate over 22 non-sex chromosomes in humans
     for (int ch=1; ch<=22; ch++){
