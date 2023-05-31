@@ -250,10 +250,16 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
         
     MPI_File outfh;
     MPI_Status status;
+    std::cout << "filename is " << filename << std::endl;
     MPI_File_open(MPI_COMM_SELF, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &outfh);
     std::vector<double> vec(M, 0.0);
     MPI_File_set_view(outfh, S*sizeof(double), MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL);
     MPI_File_read_at(outfh, 0, (void*) vec.data(), M, MPI_DOUBLE, &status);
+    //std::cout << "Received from process " << status.MPI_SOURCE << "; with tag " << status.MPI_TAG << ", MPI_ERROR = " << status.MPI_ERROR << std::endl;
+    //int count;
+    //MPI_Get_count(&status, MPI_DOUBLE, &count);
+    //std::cout << "and assuming it contains doubles there are " << count << " elements" << std::endl;
+
     MPI_File_close(&outfh);  
     return vec;
  }

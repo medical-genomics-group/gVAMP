@@ -141,8 +141,6 @@ int main(int argc, char** argv)
         std::string type_data = "bed";
         double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
-        if (rank == 0)
-            std::cout << "bimfp = " << bimfp << std::endl;
 
         data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha_scale, bimfp);
         // dataset_test.read_phen();
@@ -158,7 +156,7 @@ int main(int argc, char** argv)
         if (rank == 0)
             std::cout << "est_file_name = " << est_file_name << std::endl;
 
-        int pos_it = est_file_name.find("it");
+        int pos_it = est_file_name.rfind("it");
         std::vector<int> iter_range = opt.get_test_iter_range();
         int min_it = iter_range[0];
         int max_it = iter_range[1];
@@ -169,8 +167,8 @@ int main(int argc, char** argv)
             for (int it = min_it; it <= max_it; it++){
                 std::vector<double> x_est;
                 std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
-                //if (rank == 0)
-                    //std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
+                if (rank == 0)
+                    std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
                 if (end_est_file_name == "bin")
                     x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
                 else
@@ -178,7 +176,7 @@ int main(int argc, char** argv)
 
                 for (int i0 = 0; i0 < x_est.size(); i0++)
                     x_est[i0] *= sqrt( (double) N_test );
-
+                
                 std::vector<double> z_test = dataset_test.Ax(x_est.data());
 
                 double l2_pred_err2 = 0;

@@ -108,7 +108,7 @@ private:
     unsigned int use_lmmse_damp = 0;
     unsigned int use_XXT_denoiser = 0;
     unsigned int learn_vars = 1;
-    double alpha_scale = 1; 
+    double alpha_scale = 1.0; 
     unsigned int CV;
     unsigned int redglob = 0;
     unsigned int C = 0;

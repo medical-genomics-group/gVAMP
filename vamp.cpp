@@ -299,7 +299,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
                             if (4*i0 + k < Nold)
                                 l2_pred_err2 += (y[4*i0 + k] - z_cross[4*(i0-SB_cross) + k]) * (y[4*i0 + k] - z_cross[4*(i0-SB_cross) + k]);
 
-                    std::vector<double> y_cross (Nold - 4*SB_cross, 0.0); // slice(y, 4*SB_cross, N);
+                    std::vector<double> y_cross (Nold - 4*SB_cross, 0.0); 
                     for (int i=0; i<y_cross.size(); i++)
                         y_cross[i] = y[4*SB_cross + i];
 

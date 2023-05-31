@@ -388,9 +388,6 @@ void data::compute_markers_statistics() {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (rank == 0) 
-        std::cout << "alpha_scale = " << alpha_scale << std::endl;
-
     const std::vector<unsigned char> mask4 = get_mask4();
     const int im4 = get_im4();
     double* mave = get_mave();
@@ -471,7 +468,7 @@ void data::compute_markers_statistics() {
                     }
                     if (sumsqr != 0)
                         // we scale inverse standard deviation to the exponent alpha (usually 0, 0.3, 1)
-                        if (alpha_scale == 1)
+                        if (alpha_scale == 1.0)
                             msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
                         else
                             msig[i] = 1.0 / pow( sqrt(sumsqr / (double( get_nonas() ) - 1.0)), alpha_scale );
@@ -529,10 +526,10 @@ void data::compute_markers_statistics() {
                     }
 
                     if (sumsqr != 0.0)
-                        if (alpha_scale == 1)
-                                msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
-                            else
-                                msig[i] = 1.0 / pow( sqrt(sumsqr / (double( get_nonas() ) - 1.0)), alpha_scale );
+                        if (alpha_scale == 1.0)
+                            msig[i] = 1.0 / sqrt(sumsqr / (double( get_nonas() ) - 1.0));
+                        else
+                            msig[i] = 1.0 / pow( sqrt(sumsqr / (double( get_nonas() ) - 1.0)), alpha_scale );
                     else 
                         msig[i] = 1.0;
                 }
