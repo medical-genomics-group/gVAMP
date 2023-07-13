@@ -247,20 +247,20 @@ std::vector<double> vamp::infere_linear(data* dataset){
             alpha1 /= Mt;
             eta1 = gam1 / alpha1;
 
-            if (it <= 2)
+            if (it <= 1)
                 break;
 
             // because we want both EM updates to be performed by maximizing likelihood
             // with respect to the old gamma
-            //updatePrior(0);
+            updatePrior(0);
 
             gam1_reEst_prev = gam1;
             gam1 = std::min( std::max(  1.0 / (1.0/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
 
-            updatePrior(0);
+            //updatePrior(0);
 
             if (rank == 0 && it_revar % 1 == 0)
-                std::cout << "[old] it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
+                std::cout << "[new] it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
 
             if ( abs(gam1 - gam1_reEst_prev) < 1e-3 )
                 break;
@@ -428,7 +428,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         double start_prior_up = MPI_Wtime();
 
         // new place for prior update
-        if (auto_var_max_iter == 0 || it <=2)
+        if (auto_var_max_iter == 0 || it <=1)
             updatePrior(1);
 
         double end_prior_up = MPI_Wtime();

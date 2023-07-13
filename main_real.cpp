@@ -163,12 +163,14 @@ int main(int argc, char** argv)
         if (rank == 0)
             std::cout << "iter range = [" << min_it << ", " << max_it << "]" << std::endl;
 
+        double maxR2 = -1;
+
         if (min_it != -1){
             for (int it = min_it; it <= max_it; it++){
                 std::vector<double> x_est;
                 std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
-                if (rank == 0)
-                    std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
+                //if (rank == 0)
+                //    std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
                 if (end_est_file_name == "bin")
                     x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
                 else
@@ -186,13 +188,22 @@ int main(int argc, char** argv)
                 }  
 
                 double stdev = calc_stdev(y_test);
+                double R2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
                 if (rank == 0){
                     //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
                     //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
                     // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
-                    std::cout << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << ", ";
+                    std::cout <<  R2 << ", ";
                 }
+
+                if (R2 > maxR2)
+                    maxR2 = R2;
             }
+
+            if (rank == 0){
+                std::cout << std::endl << "max R2 = " << maxR2 << std::endl;
+            }
+
         }
         else 
         {
@@ -212,6 +223,10 @@ int main(int argc, char** argv)
             double l2_pred_err2 = 0;
             for (int i0 = 0; i0 < N_test; i0++){
                 l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
+                //if ( std::isinf(l2_pred_err2) == 1 || i0 <= 4)
+                //    std::cout << "y_test[" << i0 << "] = " << y_test[i0] << ", z_test[i0] = " << z_test[i0] << std::endl;
+                //if (i0 % 1000 == 0)
+                //    std::cout << "l2_pred_err2 = " << l2_pred_err2 << std::endl;
             }  
 
             double stdev = calc_stdev(y_test);
@@ -362,6 +377,13 @@ int main(int argc, char** argv)
             std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
         std::vector<double> pvals = dataset.pvals_calc(z1, y, x_est, filepath_out_pvals);
 
+        // calculating p-values using LOCO method, if .bim file is specified
+        if (dataset.get_bimfp() != ""){
+            std::string filepath_out_pvals_LOCO = opt.get_out_dir() + opt.get_out_name() + "_pvals_LOCO.bin";
+            std::vector<double> pvals_LOCO = dataset.pvals_calc_LOCO(z1, y, x_est, filepath_out_pvals_LOCO);
+            if (rank == 0)
+                std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;
+        }
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
