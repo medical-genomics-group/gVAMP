@@ -53,6 +53,9 @@ public:
     unsigned int get_learn_vars() const { return learn_vars; }
     double get_h2() const { return h2; }
     double get_alpha_scale() const { return alpha_scale; }
+    double get_gamw_init() const { return gamw_init; }
+    double get_gam1_init() const { return gam1_init; }
+    
 
     std::vector<double> get_vars() const { return vars; } 
     std::vector<double> get_probs() const { return probs; }
@@ -113,6 +116,8 @@ private:
     unsigned int redglob = 0;
     unsigned int C = 0;
     double probit_var = 1;
+    double gamw_init;
+    double gam1_init = -1;
 
 
     // unsigned int meth_imp = 0;

@@ -385,6 +385,43 @@ int main(int argc, char** argv)
                 std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;
         }
     }
+    else if (opt.get_run_mode() == "restart"){ 
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // setting blocks of markers 
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        size_t Mt = opt.get_Mt();
+        size_t N = opt.get_N();
+
+        std::vector<double> MS = divide_work(Mt);
+        int M = MS[0];
+        int S = MS[1];
+        int Mm = MS[2];
+        
+        std::string phenfp = (opt.get_phen_files())[0];
+        std::string type_data = "bed";
+        double alpha_scale = opt.get_alpha_scale();
+        std::string bimfp = opt.get_bim_file();
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
+        
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // running EM-VAMP algorithm on the data
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+        std::string est_file_name = opt.get_estimate_file();
+        std::vector<double> r1_init = mpi_read_vec_from_file(est_file_name, M, S); // file name ends in .bin
+
+        double gam1 = opt.get_gam1_init();
+        double gamw = opt.get_gamw_init();
+        
+        std::vector<double> beta_true = std::vector<double> (M, 0.0);
+        vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
+
+        std::vector<double> x_est = emvamp.infere(&dataset);
+
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();

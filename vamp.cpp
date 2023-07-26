@@ -13,6 +13,7 @@
 #include "vamp.hpp"
 #include "data.hpp"
 #include "vamp_probit.cpp"
+#include "vamp_Huber.cpp"
 #include "denoiserXXT.cpp"
 #include "utilities.hpp"
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
@@ -62,6 +63,11 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     use_lmmse_damp = opt.get_use_lmmse_damp();
     stop_criteria_thr = opt.get_stop_criteria_thr();
     probit_var = opt.get_probit_var();
+
+    // restart variables
+    gam1_init = opt.get_gam1_init();
+    gamw_init = opt.get_gamw_init();
+    r1_init_file = opt.get_estimate_file();  
     
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 }
@@ -106,7 +112,13 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     vars = opt.get_vars();
     // we scale the signal prior with N since X -> X / sqrt(N)
     probit_var = opt.get_probit_var();
-    MPI_Comm_size(MPI_COMM_WORLD, &nranks);
+
+    // restart variables
+    gam1_init = opt.get_gam1_init();
+    gamw_init = opt.get_gamw_init();
+    r1_init_file = opt.get_estimate_file(); 
+
+    MPI_Comm_size(MPI_COMM_WORLD, &nranks);   
 }
 
 //std::vector<double> predict(std::vector<double> est, data* dataset){
@@ -145,6 +157,8 @@ std::vector<double> vamp::infere( data* dataset ){
         return infere_linear(dataset);
     else if (!strcmp(model.c_str(), "bin_class"))
         return infere_bin_class(dataset);
+    else if (!strcmp(model.c_str(), "robust"))
+        return infere_robust(dataset);
     else
         throw "invalid model specification!";
 
@@ -184,6 +198,14 @@ std::vector<double> vamp::infere_linear(data* dataset){
     // Gaussian noise start
     // r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
     r1 = std::vector<double> (M, 0.0);
+
+    // restart option
+    if (gam1_init != -1){
+        gam1 = gam1_init;
+        gamw = gamw_init;
+        std::vector<double> r1_init = mpi_read_vec_from_file(r1_init_file, M, (*dataset).get_S()); // file name ends in .bin
+        r1 = r1_init;   
+    }
 
     // linear estimator
     //r1 = (*dataset).ATx(y.data());
@@ -395,6 +417,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (use_lmmse_damp == 1)
             r2_prev = r2;
 
+        // onsager approx
+        r2_prev = r2;
+
         for (int i = 0; i < M; i++)
             r2[i] = (eta1 * x1_hat[i] - gam1 * r1[i]) / gam2;
 
@@ -529,6 +554,19 @@ std::vector<double> vamp::infere_linear(data* dataset){
         
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
+
+        // onsager approx
+        if (it > 1){
+            std::vector<double> r2_m_r2prev = r2;
+            for (int i=0; i<M; i++)
+                r2_m_r2prev[i] -= r2_prev[i];
+
+            double onsager_approx = inner_prod(x2_hat, r2_m_r2prev, 1) / inner_prod(r2, r2_m_r2prev, 1);
+            if (rank == 0)
+                std::cout << "onsager approx = " << onsager_approx << std::endl;
+
+            //alpha2 = onsager_approx;
+        }
         eta2 = gam2 / alpha2;
 
 

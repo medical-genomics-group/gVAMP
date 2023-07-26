@@ -289,6 +289,16 @@ void Options::read_command_line_options(int argc, char** argv) {
             rho = atof(argv[++i]);
             ss << "--rho " << rho << "\n";
         }
+        else if (!strcmp(argv[i], "--gam1-init")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            gam1_init = atof(argv[++i]);
+            ss << "--gam1-init " << gam1_init << "\n";
+        }
+        else if (!strcmp(argv[i], "--gamw-init")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            gamw_init = atof(argv[++i]);
+            ss << "--gamw-init " << gamw_init << "\n";
+        }
         else if (!strcmp(argv[i], "--probit-var")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
             probit_var = atof(argv[++i]);

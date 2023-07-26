@@ -56,6 +56,13 @@ private:
     int SBglob, LBglob, redglob;
     int use_cross_val = 0, SB_cross;
 
+    double deltaH;
+
+    // restart variables
+    double gam1_init;
+    double gamw_init;
+    std::string r1_init_file;
+
 public:
 
     //******************
@@ -72,6 +79,8 @@ public:
     std::vector<double> infere_linear(data* dataset);
     std::vector<double> infere_bin_class(data* dataset);
 
+    std::vector<double> infere_robust(data* dataset);
+
     //std::vector<double> predict(std::vector<double> est, data* dataset);
 
 
@@ -85,6 +94,10 @@ public:
     double g2d_onsager(double gam2, double tau, data* dataset);
     double g2d_onsagerAAT(double gam2, double tau, data* dataset);
 
+    double g1_Huber(double p1, double tau1, double deltaH, double y);
+    double g1d_Huber(double p1, double tau1, double deltaH, double y);
+    double g1d_Huber_der(double p1, double tau1, double deltaH, double y);
+
 
     //************************
     // HYPERPARAMETERS UPDATE
@@ -92,6 +105,12 @@ public:
     void updatePrior(int verbose);
     void updateNoisePrec(data* dataset);
     void updateNoisePrecAAT(data* dataset);
+
+    double Huber_loss(double z, double deltaH, double y);
+    double E_MC_eval_ind(double p1, double tau1, double deltaH, double y, int num_MC_steps);
+    double E_MC_eval(std::vector<double> p1, double tau1, double deltaH, std::vector<double> y, int num_MC_steps);
+    double M_deltaH_update(std::vector<double> p1, double tau1, double deltaH, std::vector<double> y, int num_MC_steps, std::vector<double> grid);
+    double EM_deltaH(std::vector<double> p1, double tau1, double deltaH, std::vector<double> y, int num_MC_steps, std::vector<double> grid, int num_EM_steps);
 
     std::vector<double> lmmse_mult(std::vector<double> v, double tau, data* dataset, int red = 0);
     std::vector<double> lmmse_multAAT(std::vector<double> u, double tau, data* dataset);
@@ -103,6 +122,7 @@ public:
 
     void err_measures(data * dataset, int ind);
     void probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name);
+    void robust_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name);
 
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);
 

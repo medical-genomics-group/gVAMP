@@ -65,6 +65,9 @@ Currently supported input options to C++ version of the code:
 | `learn-vars` | indicates wheather or not prior variances are learnt |
 | `C` | indicates the number of covariates in a probit model |
 | `alpha-scale` | columns of genotype matrix are scaled with std^(-alpha-scale) |
+| `gam1-init` | initial value of gam1 in the restart scenario |
+| `gamw-init` | initial value of gamw in the restart scenario |
+
 
 
 
