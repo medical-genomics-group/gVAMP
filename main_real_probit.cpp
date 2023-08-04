@@ -61,8 +61,12 @@ int main(int argc, char** argv)
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         double gam1 = 1e-8;
-        
-        std::vector<double> beta_true = std::vector<double> (M, 0.0);
+
+        std::vector<double> beta_true;
+        if(opt.get_true_signal_files().size() > 0)
+            beta_true = read_vec_from_file(opt.get_true_signal_files()[0], M, S);
+        else 
+            beta_true = std::vector<double> (M, 0.0);
 
         vamp emvamp(M, gam1, 1, beta_true, rank, opt);
 

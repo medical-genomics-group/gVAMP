@@ -57,6 +57,8 @@ int main(int argc, char** argv)
         // dataset.read_phen();
         // dataset.read_genotype_data();
         // dataset.compute_markers_statistics();
+
+        dataset.read_covariates(opt.get_cov_file(), opt.get_C());
         
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,7 +74,12 @@ int main(int argc, char** argv)
             gamw = 1.0 / (1.0 - opt.get_h2());
         // gamw = 1.0 / (1.0 - 0.57);
         
-        std::vector<double> beta_true = std::vector<double> (M, 0.0);
+        std::vector<double> beta_true;
+        if(opt.get_true_signal_files().size() > 0)
+            beta_true = read_vec_from_file(opt.get_true_signal_files()[0], M, S);
+        else 
+            beta_true = std::vector<double> (M, 0.0);
+        
         vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
 
         /*
