@@ -275,11 +275,6 @@ void data::read_methylation_data(){
     if (rank == 0)
         std::cout <<"reading methylation data took " << te - ts << " seconds."<< std::endl;
 
-    if (rank == 0){
-        std::cout << meth_data[0] << std::endl;
-        std::cout << meth_data[N] << std::endl;
-    }
-
 }
 
 
