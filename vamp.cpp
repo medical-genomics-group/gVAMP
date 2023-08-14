@@ -204,6 +204,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
         gam1 = gam1_init;
         gamw = gamw_init;
         std::vector<double> r1_init = mpi_read_vec_from_file(r1_init_file, M, (*dataset).get_S()); // file name ends in .bin
+        for (int i=0; i<M; i++)
+            r1_init[i] /= sqrt(N);
         r1 = r1_init;   
     }
 
@@ -274,15 +276,15 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
             // because we want both EM updates to be performed by maximizing likelihood
             // with respect to the old gamma
-            updatePrior(0);
+            //updatePrior(0);
 
             gam1_reEst_prev = gam1;
             gam1 = std::min( std::max(  1.0 / (1.0/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
 
-            //updatePrior(0);
+            updatePrior(0);
 
             if (rank == 0 && it_revar % 1 == 0)
-                std::cout << "[new] it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
+                std::cout << "[old] it_revar = " << it_revar << ": gam1 = " << gam1 << std::endl;
 
             if ( abs(gam1 - gam1_reEst_prev) < 1e-3 )
                 break;
@@ -300,8 +302,12 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (it > 1){ 
 
             std::vector<double> x1_hat_temp = x1_hat;
+            // change in damping
             for (int i = 0; i < M; i++)
                 x1_hat[i] = rho * x1_hat[i] + (1-rho) * x1_hat_prev[i];
+
+            //for (int i = 0; i < M; i++)
+            //    x1_hat[i] = rho * x1_hat[i] + (1-rho) * x2_hat[i];
 
             if (use_cross_val == 1){
                 int cross_it = 1;
@@ -359,6 +365,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 alpha1 = rho_cross * alpha1 + (1-rho_cross) * alpha1_prev;
             else if (it > 1)
                 alpha1 = rho * alpha1 + (1-rho) * alpha1_prev;
+                //alpha1 = rho * alpha1 + (1-rho) * alpha2;
 
 
             // damping on the level of prior parameters
@@ -401,7 +408,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         mpi_store_vec_to_file(filepath_out_r1, r1_stored, S, M);
 
         if (rank == 0)
-           std::cout << "r1_hat filepath_out is " << filepath_out_r1 << std::endl;
+           std::cout << "r1 filepath_out is " << filepath_out_r1 << std::endl;
 
         double end_saving = MPI_Wtime();
         if (rank == 0)
@@ -472,6 +479,16 @@ std::vector<double> vamp::infere_linear(data* dataset){
         // %%%%%%%%%% LMMSE step %%%%%%%%%%%%%%
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+        // saving r2
+        std::string filepath_out_r2 = out_dir + out_name + "_r2_it_" + std::to_string(it) + ".bin";
+        std::vector<double> r2_stored = r2;
+        for (int i0=0; i0<r2_stored.size(); i0++)
+            r2_stored[i0] =  r2[i0] / scale;
+        mpi_store_vec_to_file(filepath_out_r2, r2_stored, S, M);
+
+        if (rank == 0)
+           std::cout << "r2 filepath_out is " << filepath_out_r2 << std::endl;
+
         double start_lmmse_step = MPI_Wtime();
 
         if (rank == 0)
@@ -529,6 +546,15 @@ std::vector<double> vamp::infere_linear(data* dataset){
             x2_hat = lmmse_denoiserAAT(r2, mu_CG_last, dataset);
 
         }
+
+        std::string filepath_out_x2 = out_dir + out_name + "_it_" + std::to_string(it) + "_x2_hat.bin";
+        std::vector<double> x2_hat_stored = x2_hat;
+        for (int i0=0; i0<x2_hat_stored.size(); i0++)
+            x2_hat_stored[i0] =  x2_hat[i0] / scale;
+        mpi_store_vec_to_file(filepath_out_x2, x2_hat_stored, S, M);
+        if (rank == 0)
+           std::cout << "x2_hat filepath_out is " << filepath_out_x2 << std::endl;
+
         
         double end_CG = MPI_Wtime();
 
@@ -565,7 +591,32 @@ std::vector<double> vamp::infere_linear(data* dataset){
             if (rank == 0)
                 std::cout << "onsager approx = " << onsager_approx << std::endl;
 
-            //alpha2 = onsager_approx;
+            // polynomial onsager approximator
+            std::vector<double> Xr2 = (*dataset).Ax(r2.data());
+            std::vector<double> r2_m_x2hat = r2;
+            for (int i=0; i<M; i++)
+                r2_m_x2hat[i] -= x2_hat[i];
+            std::vector<double> Xx2hat_m_y = (*dataset).Ax(x2_hat.data());
+            for (int i=0; i<N; i++)
+                Xx2hat_m_y[i] -= y[i];
+
+            double u1 = (l2_norm2(r2_m_x2hat,1) - 1.0/gam2 - l2_norm2(Xx2hat_m_y,0) + (double) N / (double) Mt / gamw) / Mt;
+            double u2 = (inner_prod(r2,r2,1) - inner_prod(x2_hat,r2,1) - inner_prod(y, Xr2, 0) + inner_prod((*dataset).Ax(x2_hat.data()), Xr2,0) )/Mt*2;
+            double u3 = l2_norm2(r2,1)/Mt - l2_norm2(Xr2,0)/Mt;
+            // alpha2 = onsager_approx;
+            if (rank == 0){
+                std::cout << "u1 = " << u1 << ", u2 = " << u2 << ", u3 = " << u3 << std::endl;
+                double polyest1 = (-u2 + sqrt(u2*u2 - 4*u1*u3))/2/u3;
+                double polyest2 = (-u2 - sqrt(u2*u2 - 4*u1*u3))/2/u3;
+                std::cout << "polyest1 = " << polyest1 << ", polyest2 = " << polyest2 << std::endl;
+                double polyest;
+                if (u3<0)
+                    polyest = std::max(polyest1,polyest2);
+                else
+                    polyest = std::min(polyest1,polyest2);
+                std::cout << "extremum = " << -u2/2/u3 << std::endl;
+                std::cout << "polyest = " << polyest << std::endl;
+            }
         }
         eta2 = gam2 / alpha2;
 
