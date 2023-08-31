@@ -295,12 +295,20 @@ void data::read_covariates(std::string covfp, int C){ // values should be separa
     //std::regex re("\\S+");
     std::regex re("\\s+");
 
+    int i = 0;
+
     while (std::getline(covf, line)) // read the current line
     {
+        i++;
+        if(i == 1) continue; //skip header
+
         int Cobs = 0;
         std::vector<double> entries;
         std::sregex_token_iterator iter(line.begin(), line.end(), re, -1);
         std::sregex_token_iterator re_end;
+
+        ++iter; // skip individual ID
+        ++iter; // skip family ID
 
         for ( ; iter != re_end; ++iter){
             entries.push_back(std::stod(*iter));
@@ -328,6 +336,29 @@ void data::read_covariates(std::string covfp, int C){ // values should be separa
     if (rank == 0)
         std::cout << "rank = " << rank << ": reading covariates took " << end - start << " seconds to run." << std::endl;
 
+    // Normalize covariates
+    for(int covi = 0; covi < C; covi++){
+            
+        long double cavg = 0.0;
+        long double csig = 0.0;
+
+        for (int i = 0; i < N; i++) {
+            cavg += covs[i][covi];    
+        }
+        cavg = cavg / double(N);
+
+        for (int i = 0; i < N; i++) {
+            csig += ((covs[i][covi] - cavg) * (covs[i][covi] - cavg));            
+        }
+        csig = sqrt(csig / double(N));
+
+        for (int i = 0; i < N; i++) {
+            if(csig < 0.00000001)
+                covs[i][covi] = 0;
+            else 
+                covs[i][covi] = (covs[i][covi] - cavg) / csig;
+        }
+    }
 }
 
 // -> DESCRIPTION:

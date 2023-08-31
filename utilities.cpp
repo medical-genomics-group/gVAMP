@@ -250,7 +250,7 @@ double log_mix_gauss_pdf_ratio(double x, std::vector<double> eta_nom, std::vecto
         
     MPI_File outfh;
     MPI_Status status;
-    std::cout << "filename is " << filename << std::endl;
+    //std::cout << "filename is " << filename << std::endl;
     MPI_File_open(MPI_COMM_SELF, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &outfh);
     std::vector<double> vec(M, 0.0);
     MPI_File_set_view(outfh, S*sizeof(double), MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL);

@@ -7,8 +7,6 @@
 #include "utilities.hpp"
 #include "data.hpp"
 #include "vamp.hpp"
-#include "options.hpp"
-
 
 int main(int argc, char** argv)
 {
@@ -20,22 +18,12 @@ int main(int argc, char** argv)
 
     const Options opt(argc, argv);
 
-    // retrieving MPI specific information
     int rank = 0;
     int nranks = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // reading genotype data / phenotype file
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   
-    if (opt.get_run_mode() == "infere"){ 
-
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        // setting blocks of markers 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if (opt.get_run_mode() == "infere"){
 
         size_t Mt = opt.get_Mt();
         size_t N = opt.get_N();
@@ -44,98 +32,39 @@ int main(int argc, char** argv)
         int M = MS[0];
         int S = MS[1];
         int Mm = MS[2];
-
-        // reading signal estimate from gmrm software
-        //const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
-        //std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S); //for smaller dataset
-        
+ 
         std::string phenfp = (opt.get_phen_files())[0];
-        std::string type_data = "bed";
+        std::string type_data = "meth";
         double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
         data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
-        // dataset.read_phen();
-        // dataset.read_genotype_data();
-        // dataset.compute_markers_statistics();
 
-        dataset.read_covariates(opt.get_cov_file(), opt.get_C());
-        
+        //dataset.read_covariates(opt.get_cov_file(), opt.get_C());
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // running EM-VAMP algorithm on the data
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
 
-        double gam1 = 1e-6;
         double gamw;
         if (opt.get_h2() == -1)
             gamw = 2;
         else 
             gamw = 1.0 / (1.0 - opt.get_h2());
-        // gamw = 1.0 / (1.0 - 0.57);
-        
+        double gamw_init = 0.9 * gamw;
+        double gam1 = 1e-6;
+
         std::vector<double> beta_true;
         if(opt.get_true_signal_files().size() > 0)
             beta_true = read_vec_from_file(opt.get_true_signal_files()[0], M, S);
         else 
             beta_true = std::vector<double> (M, 0.0);
-        
-        vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
 
-        /*
-        std::vector<double> vec(M, 1.0);
-        emvamp.set_LBglob((N/4)*4/5);
-        emvamp.set_LBglob((N/4)/10);
-        emvamp.set_SBglob(0);
-
-        std::vector<double> lm1 =  emvamp.lmmse_mult(vec, 1, &dataset, 0);
-        std::vector<double> lm2 =  emvamp.lmmse_mult(vec, 1, &dataset, 1);
-
-        double std1 = calc_stdev(lm1,1);
-        double std2 = calc_stdev(lm2,1);
-
-        if (rank == 0)
-            std::cout << "std1 = " << std1 << ", std2 = " << std2 << std::endl;
-        
-        std::vector<double> diff = lm1;
-        for (int i=0; i<M; i++)
-            diff[i] -= lm2[i];
-        
-        double l2norm2_diff = l2_norm2(diff, 1);
-        double l2norm2_true = l2_norm2(lm1, 1);
-
-        if (rank == 0)
-            std::cout << "sqrt( l2norm2_diff / l2norm2_true ) = " << sqrt( l2norm2_diff / l2norm2_true ) << std::endl; 
-
-        std::vector<double> xhat = emvamp.precondCG_solver(vec, std::vector<double>(M, 0.0), 2, 1, &dataset, 0);
-
-        std::vector<double> xhat_red = emvamp.precondCG_solver(vec, std::vector<double>(M, 0.0), 2, 1, &dataset, 1);
-
-        double stdx = calc_stdev(xhat,1);
-        double stdx_red = calc_stdev(xhat_red,1);
-
-        if (rank == 0)
-            std::cout << "stdx = " << stdx << ", stdx_red = " << stdx_red << std::endl;
-
-        
-        std::vector<double> diff_x = xhat;
-        for (int i=0; i<M; i++)
-            diff_x[i] -= xhat_red[i];
-
-        double l2norm2_diff_x = l2_norm2(diff_x, 1);
-        double l2norm2_true_x = l2_norm2(xhat, 1);
-
-        if (rank == 0)
-            std::cout << "sqrt( l2norm2_diff_x / l2norm2_true_x ) = " << sqrt( l2norm2_diff_x / l2norm2_true_x ) << std::endl; 
-
-        */
-
+        vamp emvamp(M, gam1, gamw_init, beta_true, rank, opt);
         std::vector<double> x_est = emvamp.infere(&dataset);
 
     }
     else if (opt.get_run_mode() == "test") // just analyzing the result on the test data
-    {   
-
+    {
         // reading test set
         const std::string bedfp_test = opt.get_bed_file_test();
         const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
@@ -145,7 +74,7 @@ int main(int argc, char** argv)
         std::vector<double> MS = divide_work(Mt_test);
         int M_test = MS[0];
         int S_test = MS[1];
-        std::string type_data = "bed";
+        std::string type_data = "meth";
         double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
 
@@ -174,8 +103,8 @@ int main(int argc, char** argv)
             for (int it = min_it; it <= max_it; it++){
                 std::vector<double> x_est;
                 std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
-                if (rank == 0)
-                    std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
+                //if (rank == 0)
+                //    std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
                 if (end_est_file_name == "bin")
                     x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
                 else
@@ -230,13 +159,7 @@ int main(int argc, char** argv)
         }
         
     }
-    else if (opt.get_run_mode() == "both")
-    {
-
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        // setting blocks of markers 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    else if (opt.get_run_mode() == "both"){
         size_t Mt = opt.get_Mt();
         size_t N = opt.get_N();
 
@@ -244,39 +167,12 @@ int main(int argc, char** argv)
         int M = MS[0];
         int S = MS[1];
         int Mm = MS[2];
-
-        //const std::string true_beta_height = "/nfs/scistore13/robingrp/human_data/adepope_preprocessing/VAMPJune2022/height_true.txt";
-        //std::vector<double> beta_true = read_vec_from_file(true_beta_height, M, S);
-  
-        std::vector<double> beta_true = std::vector<double> (M, 0.0);
-        std::string phenfp = (opt.get_phen_files())[0]; // currently only one phenotype file is supported
-        std::string type_data = "bed";
+ 
+        std::string phenfp = (opt.get_phen_files())[0];
+        std::string type_data = "meth";
         double alpha_scale = opt.get_alpha_scale();
         std::string bimfp = opt.get_bim_file();
         data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
-        // dataset.read_phen();
-        // dataset.read_genotype_data();
-        // dataset.compute_markers_statistics();
-
-        double gam1 = 1e-6; 
-        double gamw;
-        
-        if (opt.get_h2() == -1)
-            gamw = 2;
-        else 
-            gamw = 1.0 / (1.0 - opt.get_h2());
-
-        vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
-        std::vector<double> x_est = emvamp.infere(&dataset);
-
-        double intercept = dataset.get_intercept();
-        double scale = dataset.get_scale();
-        if (rank == 0){
-            std::cout << "intercept = " << intercept << std::endl;
-            std::cout << "scale = " << scale << std::endl;
-        }
-                
-        int final_it = opt.get_iterations();
 
         // reading test set
         const std::string bedfp_test = opt.get_bed_file_test();
@@ -284,90 +180,48 @@ int main(int argc, char** argv)
 
         int N_test = opt.get_N_test();
         int Mt_test = opt.get_Mt_test();
-        std::vector<double> MS_test = divide_work(Mt);
-        int M_test = MS_test[0];
-        int S_test = MS_test[1];
 
-        data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S, rank, type_data, alpha_scale, bimfp);
-        // dataset_test.read_phen();
-        // dataset_test.read_genotype_data();
-        // dataset_test.compute_markers_statistics();
+        data dataset_test(pheno_test, bedfp_test, N_test, M, Mt_test, S, rank, type_data, alpha_scale, bimfp);
+        
+        std::vector<double> y_test = dataset_test.get_phen();
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // running EM-VAMP algorithm on the data
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        double gamw;
+        if (opt.get_h2() == -1)
+            gamw = 2;
+        else 
+            gamw = 1.0 / (1.0 - opt.get_h2());
+        double gamw_init = 0.9 * gamw;
+        double gam1 = 1e-6;
+
+        std::vector<double> beta_true;
+        if(opt.get_true_signal_files().size() > 0)
+            beta_true = read_vec_from_file(opt.get_true_signal_files()[0], M, S);
+        else 
+            beta_true = std::vector<double> (M, 0.0);
+
+        vamp emvamp(M, gam1, gamw_init, beta_true, rank, opt);
+        std::vector<double> x_est = emvamp.infere(&dataset);
 
         for (int i0 = 0; i0 < x_est.size(); i0++)
             x_est[i0] *= sqrt( (double) N_test );
 
         std::vector<double> z_test = dataset_test.Ax(x_est.data());
 
-        for (int i0 = 0; i0 < z_test.size(); i0++)
-            z_test[i0] = intercept + scale * z_test[i0];
-
-        std::vector<double> y_test = dataset_test.get_phen();
-
         double l2_pred_err2 = 0;
         for (int i0 = 0; i0 < N_test; i0++){
             l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
-        }
+        }  
 
         double stdev = calc_stdev(y_test);
         if (rank == 0){
-            std::cout << std::endl;
             std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
             std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
             std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
         }
-    }
-    else if (opt.get_run_mode() == "pvals-calc")
-    {
-
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        // setting blocks of markers 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-        size_t Mt = opt.get_Mt();
-        size_t N = opt.get_N();
-
-        std::vector<double> MS = divide_work(Mt);
-        int M = MS[0];
-        int S = MS[1];
-        int Mm = MS[2];
-        
-        std::string phenfp = (opt.get_phen_files())[0];
-        std::string type_data = "bed";
-        double alpha_scale = opt.get_alpha_scale();
-        std::string bimfp = opt.get_bim_file();
-        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
-
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        // reading an estimate file 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-        std::string est_file_name = opt.get_estimate_file();
-        int pos_dot = est_file_name.find(".");
-        std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
-        if (rank == 0)
-            std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
-
-        std::vector<double> x_est;
-        if (end_est_file_name == "bin")
-            x_est = mpi_read_vec_from_file(est_file_name, M, S);
-        else
-            x_est = read_vec_from_file(est_file_name, M, S);
-
-        for (int i0 = 0; i0 < x_est.size(); i0++)
-            x_est[i0] *= sqrt( (double) N );
-
-
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        //   obtaining p-values 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-        std::vector<double> z1 = dataset.Ax(x_est.data());
-        std::vector<double> y =  dataset.filter_pheno();
-        // saving pvals vector
-        std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_pvals.bin";
-        if (rank == 0)
-            std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
-        std::vector<double> pvals = dataset.pvals_calc(z1, y, x_est, filepath_out_pvals);
 
     }
 

@@ -193,10 +193,51 @@ std::vector<double> vamp::infere_linear(data* dataset){
     //double scale_rho = exp( log(0.3)/max_iter );
     //scale_rho = 1;
 
+    // initializing z1_hat and p2
+    z1_hat = std::vector<double> (N, 0.0);
+    p2 = std::vector<double> (N, 0.0);
+    if (C>0)
+        cov_eff = std::vector<double> (C, 0.0);
+
+    std::vector< std::vector<double> > Z = (*dataset).get_covs();
+    std::vector<double> gg;
+
 
     // starting VAMP iterations
     for (int it = 1; it <= max_iter; it++)
     {    
+
+        if (rank == 0)
+            std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl;
+
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // %%%%%%%%% Covariate effects %%%%%%%%%%%%%
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        double start_covar = MPI_Wtime();
+
+        if (it == 1)
+            if (C>0){
+
+                gg = z1_hat;
+                cov_eff = Newton_method_cov(y, gg, Z, cov_eff);
+                if (rank == 0){
+                    for (int i0=0; i0<C; i0++){
+                        std::cout << "cov_eff[" << i0 << "] = " << cov_eff[i0] << ", ";
+                        if (i0 % 4 == 3)
+                            std::cout << std::endl;
+                    }
+                    std::cout << std::endl;
+                }
+                for (int i=0; i<N; i++){
+                    y[i] -= inner_prod(Z[i], cov_eff, 0);
+                }
+            }
+
+        double stop_covar = MPI_Wtime();
+
+        if (rank == 0)
+            std::cout << "time for covariates effects update = " << stop_covar - start_covar << " seconds." << std::endl;
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // %%%%%%%%%%% Denoising step %%%%%%%%%%%%%%
@@ -205,7 +246,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         double start_denoising = MPI_Wtime();
 
         if (rank == 0)
-            std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl << "->DENOISING" << std::endl;
+                std::cout << "->DENOISING" << std::endl;
 
         x1_hat_prev = x1_hat;
 
