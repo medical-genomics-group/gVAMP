@@ -180,6 +180,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
     // filtering a phenotype for nans
     std::vector<double> y =  (*dataset).filter_pheno();
+    std::cout << y[0] << std::endl;
+    std::cout << y[1] << std::endl;
 
     // Gaussian noise start
     // r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
