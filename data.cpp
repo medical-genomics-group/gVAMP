@@ -346,7 +346,7 @@ void data::read_covariates(std::string covfp, int C){ // values should be separa
 std::vector<int> data::read_chromosome_info(std::string bim_file){
     
     //initializing the output vector
-    std::vector<int> chroms(M);
+    std::vector<int> chroms;
 
     // specifying bim file and reggex expression
     std::ifstream infile(bim_file);
@@ -360,7 +360,13 @@ std::vector<int> data::read_chromosome_info(std::string bim_file){
                 std::sregex_token_iterator first{line.begin(), line.end(), re, -1}, last;
                 std::vector<std::string> tokens{first, last};
                 // first line of .bim file contains information on the chromosome index
-                chroms.push_back( atof( tokens[0].c_str() ) );
+                const char * Xchr = "X";
+                //if (rank == 0)
+                //    std::cout << "tokens[0] = " << tokens[0] << "atof( tokens[0].c_str() ) = " << atof( tokens[0].c_str() ) << std::endl;
+                if (!strcmp(tokens[0].c_str(), Xchr))
+                    chroms.push_back(23);
+                else
+                    chroms.push_back( atof( tokens[0].c_str() ) );
             }
             line_n += 1;
         }
@@ -1112,7 +1118,7 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
 
         for (int k=0; k<M; k++){
 
-            if (rank == 0 && k % 1000 == 0)
+            if (rank == 0 && k % 5000 == 0)
                 std::cout << "so far worker 0 has calculated " << k << " pvals." << std::endl;
 
             // phenotype values after marker specific correction
@@ -1211,16 +1217,14 @@ std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<do
     double* msig = get_msig();
 
     // phenotype values after chromosome specific correction
-    std::vector<double> y_chrom = std::vector<double> (4*mbytes, 0.0);
+    std::vector<double> y_chrom; 
 
-    if (rank == 0)
-        std::cout << "before reading chr data" << std::endl;
     std::vector<int> ch_info = read_chromosome_info(bimfp);
-    if (rank == 0)
-        std::cout << "after reading chr data" << std::endl;
 
     // we iterate over 22 non-sex chromosomes in humans
-    for (int ch=1; ch<=22; ch++){
+    for (int ch=1; ch<=23; ch++){
+
+        y_chrom = std::vector<double> (4*mbytes, 0.0);
 
         std::vector<double> y_chrom_tmp = std::vector<double> (4*mbytes, 0.0);
 
@@ -1242,6 +1246,14 @@ std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<do
         }
     
         MPI_Allreduce(y_chrom_tmp.data(), y_chrom.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        // saving predictors for a particular chromosome
+        std::string filepath_predictors = filepath + "_LOCO_chr_" + std::to_string(ch) + ".csv";
+        if (rank == 0)
+            store_vec_to_file(filepath_predictors, y_chrom);
+
+        if (rank == 0)
+           std::cout << "filepath predictors = " << filepath_predictors << std::endl;
 
         std::transform (y_chrom.begin(), y_chrom.end(), y_mod.begin(), y_chrom.begin(), std::plus<double>());
     
@@ -1274,9 +1286,11 @@ std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<do
                 pvals[m] = linear_reg1d_pvals(sumx, sumsqx, sumxy, sumy, sumsqy, count);   
             }
         }
+        
     }
 
-    mpi_store_vec_to_file(filepath, pvals, S, M);
+    std::string filepath_pvals = filepath + "_pvals_LOCO.bin";
+    mpi_store_vec_to_file(filepath_pvals, pvals, S, M);
 
     return pvals;
 }

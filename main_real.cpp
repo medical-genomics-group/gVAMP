@@ -383,7 +383,7 @@ int main(int argc, char** argv)
 
         // calculating p-values using LOCO method, if .bim file is specified
         if (dataset.get_bimfp() != ""){
-            std::string filepath_out_pvals_LOCO = opt.get_out_dir() + opt.get_out_name() + "_pvals_LOCO.bin";
+            std::string filepath_out_pvals_LOCO = opt.get_out_dir() + opt.get_out_name();
             std::vector<double> pvals_LOCO = dataset.pvals_calc_LOCO(z1, y, x_est, filepath_out_pvals_LOCO);
             if (rank == 0)
                 std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;

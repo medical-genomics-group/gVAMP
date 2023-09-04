@@ -416,6 +416,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         gam_before = gam2;
         gam2 = std::min(std::max(eta1 - gam1, gamma_min), gamma_max);
+
         if (rank == 0){
             std::cout << "eta1 = " << eta1 << std::endl;
             std::cout << "gam2 = " << gam2 << std::endl;
@@ -707,7 +708,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         // calculating p-values using LOCO method, if .bim file is specified
         if ((*dataset).get_bimfp() != ""){
-            std::string filepath_out_pvals_LOCO = out_dir + out_name + "_pvals_LOCO.bin";
+            std::string filepath_out_pvals_LOCO = out_dir + out_name;
             std::vector<double> pvals_LOCO = (*dataset).pvals_calc_LOCO(z1, y, x1_hat, filepath_out_pvals_LOCO);
             if (rank == 0)
                 std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;

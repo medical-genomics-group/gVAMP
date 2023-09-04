@@ -34,7 +34,7 @@ private:
     int EM_max_iter; // = 1e5;
     double EM_err_thr; // = 1e-4;
     int CG_max_iter; // = 10;
-    int auto_var_max_iter = 50;
+    int auto_var_max_iter  = 50;// = 50;
     int calc_state_evo = 0;
     int learn_vars;
     double damp_max = 1;
