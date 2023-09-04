@@ -49,10 +49,10 @@ int main(int argc, char** argv)
     //std::vector<double> vars_init = opt.get_vars();
     //std::vector<double> probs_init = opt.get_probs();
     int CV = opt.get_CV();
-    double h2 = opt.get_h2();
+    double h2 = 0.5525262;
     int CVhat = CV / 3;
     //CVhat = CV;
-    double h2hat = 0.6 * h2;
+    double h2hat = 0.5 * h2;
     //h2hat = h2;
     if (rank == 0){
         std::cout << "true CV = " << CV << std::endl;
@@ -61,19 +61,19 @@ int main(int argc, char** argv)
     }
 
     int L = opt.get_num_mix_comp();
-    // in this simulation we fix L=4
-    L = 4;
+    // in this simulation we fix L=7
+    L = 7;
 
-    double prob_eq = (double) CVhat / Mt / (L-1) ;
-    // prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-1));
+    // double prob_eq = (double) CVhat / Mt / (L-1) ;
+    double prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-2));
     
-    double min_vars = 0.1 / CVhat;
+    double min_vars = 1e-6;
 
     std::vector<double> vars_init {0};
     std::vector<double> probs_init {1 - (double) CVhat / Mt};
 
     double curr_var = min_vars;
-    curr_var = h2hat / CVhat;
+    //curr_var = h2hat / CVhat;
 
     for (int i = 1; i<L; i++){
         probs_init.push_back(prob_eq);
@@ -83,9 +83,8 @@ int main(int argc, char** argv)
     }
 
 
-    double var = h2 / CV * 6 / 123;
-    std::vector<double> vars_true{0, var, 10*var, 100*var};
-    std::vector<double> probs_true{1 - (double) CV / Mt, (double) CV / Mt / 2, (double) CV / Mt / 3, (double) CV / Mt / 6}; 
+    std::vector<double> vars_true{0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1};
+    std::vector<double> probs_true{0.9595661, 0.0008876436,  0.0367001, 0.002712435, 0.0001066884, 8.915961e-6, 1.814535e-5}; 
 
 
     //scaling variances

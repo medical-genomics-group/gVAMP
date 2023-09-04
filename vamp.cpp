@@ -381,8 +381,15 @@ std::vector<double> vamp::infere_linear(data* dataset){
         else
             z1 = (*dataset).Ax(x1_hat.data());
         double end_z1= MPI_Wtime();
+
         if (rank == 0)
             std::cout << "time needed to calculate z1 = " << end_z1 - start_z1 << " seconds" <<  std::endl;
+
+        std::string filepath_out_z1 = out_dir + out_name + "_z1_it_" + std::to_string(it) + ".csv";
+        store_vec_to_file(filepath_out_z1, z1);
+
+        if (rank == 0)
+            std::cout << "filepath_out_z1 = " << filepath_out_z1 <<  std::endl;
 
         if (rank == 0)
            std::cout << "rho = " << rho << std::endl;
