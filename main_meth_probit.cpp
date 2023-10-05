@@ -39,19 +39,11 @@ int main(int argc, char** argv)
         std::string bimfp = opt.get_bim_file();
         data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
 
-        //dataset.read_covariates(opt.get_cov_file(), opt.get_C());
+        dataset.read_covariates(opt.get_cov_file(), opt.get_C());
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // running EM-VAMP algorithm on the data
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-        double gamw;
-        if (opt.get_h2() == -1)
-            gamw = 2;
-        else 
-            gamw = 1.0 / (1.0 - opt.get_h2());
-        //double gamw_init = 0.9 * gamw;
-        double gam1 = 1e-6;
 
         std::vector<double> beta_true;
         if(opt.get_true_signal_files().size() > 0)
@@ -59,7 +51,9 @@ int main(int argc, char** argv)
         else 
             beta_true = std::vector<double> (M, 0.0);
 
-        vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
+        double gam1 = 1e-8; 
+
+        vamp emvamp(M, gam1, 1, beta_true, rank, opt);
         std::vector<double> x_est = emvamp.infere(&dataset);
 
     }
@@ -168,11 +162,11 @@ int main(int argc, char** argv)
         int S = MS[1];
         int Mm = MS[2];
  
-        std::string phenfp = (opt.get_phen_files())[0];
         std::string type_data = "meth";
-        double alpha_scale = opt.get_alpha_scale();
-        std::string bimfp = opt.get_bim_file();
-        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data, alpha_scale, bimfp);
+        std::string phenfp = (opt.get_phen_files())[0]; // currently only one phenotype file is supported
+        data dataset(phenfp, opt.get_bed_file(), opt.get_N(), M, opt.get_Mt(), S, rank, type_data);
+
+        dataset.read_covariates(opt.get_cov_file(), opt.get_C());
 
         // reading test set
         const std::string bedfp_test = opt.get_bed_file_test();
@@ -181,7 +175,9 @@ int main(int argc, char** argv)
         int N_test = opt.get_N_test();
         int Mt_test = opt.get_Mt_test();
 
-        data dataset_test(pheno_test, bedfp_test, N_test, M, Mt_test, S, rank, type_data, alpha_scale, bimfp);
+        data dataset_test(pheno_test, bedfp_test, N_test, M, Mt_test, S, rank, type_data);
+
+        dataset_test.read_covariates(opt.get_cov_file_test(), opt.get_C());
         
         std::vector<double> y_test = dataset_test.get_phen();
 
@@ -189,21 +185,14 @@ int main(int argc, char** argv)
         // running EM-VAMP algorithm on the data
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        double gamw;
-        if (opt.get_h2() == -1)
-            gamw = 2;
-        else 
-            gamw = 1.0 / (1.0 - opt.get_h2());
-        //double gamw_init = 0.9 * gamw;
-        double gam1 = 1e-6;
-
         std::vector<double> beta_true;
         if(opt.get_true_signal_files().size() > 0)
             beta_true = read_vec_from_file(opt.get_true_signal_files()[0], M, S);
         else 
             beta_true = std::vector<double> (M, 0.0);
 
-        vamp emvamp(M, gam1, gamw, beta_true, rank, opt);
+        double gam1 = 1e-8; 
+        vamp emvamp(M, gam1, 1, beta_true, rank, opt);
         std::vector<double> x_est = emvamp.infere(&dataset);
 
         for (int i0 = 0; i0 < x_est.size(); i0++)
@@ -211,73 +200,39 @@ int main(int argc, char** argv)
 
         std::vector<double> z_test = dataset_test.Ax(x_est.data());
 
-        double l2_pred_err2 = 0;
-        for (int i0 = 0; i0 < N_test; i0++){
-            l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
+        if (opt.get_C() > 0){
+                std::vector<double> cov_effect = emvamp.get_cov_eff();
+                std::vector<double> Zx_temp = dataset_test.Zx(cov_effect);
+                std::transform (z_test.begin(), z_test.end(), Zx_temp.begin(), z_test.begin(), std::plus<double>());
+        }
+
+        for (int i=0; i<N_test; i++){
+            double prob = normal_cdf(z_test[i]);
+            if (prob >= 0.5)
+                z_test[i] = 1;
+            else 
+                z_test[i] = 0;
+        } 
+
+        int Ne = 0, P = 0, TP = 0, FP = 0;
+        for (int i = 0; i < N_test; i++){
+            if (y_test[i] == 1){
+                P++;
+                if (z_test[i] == 1)
+                    TP++;
+            }
+            else{
+                Ne++;
+                if (z_test[i] == 1)
+                    FP++;
+            }
         }  
 
-        double stdev = calc_stdev(y_test);
         if (rank == 0){
-            std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-            std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-            std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+            std::cout <<  "P = " << P << ", " << "N = " << Ne << ", TPR = " << (double) TP / P << ", FPR = " << (double) FP / Ne <<  ", ";
         }
 
-    } else if (opt.get_run_mode() == "predict"){
-        size_t Mt = opt.get_Mt();
-        size_t N = opt.get_N();
-
-        std::vector<double> MS = divide_work(Mt);
-        int M = MS[0];
-        int S = MS[1];
-        int Mm = MS[2];
- 
-        std::string phenfp = (opt.get_phen_files())[0];
-        std::string type_data = "meth";
-        double alpha_scale = opt.get_alpha_scale();
-        std::string bimfp = opt.get_bim_file();
-        data dataset(phenfp, opt.get_bed_file(), N, M, Mt, S, rank, type_data, alpha_scale, bimfp);
-        
-        std::vector<double> y = dataset.get_phen();
-
-        std::vector<double> beta_true;
-        if(opt.get_true_signal_files().size() > 0)
-            beta_true = read_vec_from_file(opt.get_true_signal_files()[0], M, S);
-
-        std::string est_file_name = opt.get_estimate_file();
-
-        if (rank == 0)
-            std::cout << "est_file_name = " << est_file_name << std::endl;
-
-        std::vector<double> x_est;
-        x_est = mpi_read_vec_from_file(est_file_name, M, S);
-
-        for (int i0 = 0; i0 < x_est.size(); i0++){
-            x_est[i0] *= sqrt( (double) N );
-            beta_true[i0] *= sqrt( (double) N );
-        }
-                
-        std::vector<double> z = dataset.Ax(x_est.data());
-
-        double l2_pred_err2 = 0;
-        for (int i0 = 0; i0 < N; i0++){
-            // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
-            l2_pred_err2 += (y[i0] - z[i0]) * (y[i0] - z[i0]);
-        }  
-
-        double stdev = calc_stdev(y);
-        if (rank == 0){
-                    //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-                    //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-                    // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
-            std::cout << "R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y.size() ) << std::endl;
-        }
-        // Saving predictions
-        std::string filepath_out_z = opt.get_out_dir() + opt.get_out_name() + "_z.yest";
-        store_vec_to_file(filepath_out_z, z);
-        if (rank == 0)
-            std::cout << "prediction filepath is " << filepath_out_z << std::endl;
-        }
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();

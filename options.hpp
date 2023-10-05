@@ -22,6 +22,7 @@ public:
     std::string get_estimate_file() const { return estimate_file; }
     std::string get_cov_estimate_file() const { return cov_estimate_file; }
     std::string get_cov_file() const { return cov_file; }
+    std::string get_cov_file_test() const { return cov_file_test; }
     //std::string get_ref_bim_file() const { return ref_bim_file; }
     //std::string get_group_index_file() const { return group_index_file; }
     //std::string get_group_mixture_file() const { return group_mixture_file; }
@@ -34,6 +35,7 @@ public:
     double get_stop_criteria_thr() const { return stop_criteria_thr; }
     double get_EM_err_thr() const { return EM_err_thr; }
     double get_rho() const { return rho; }
+    double get_scale_rho() const { return scale_rho; }
     double get_probit_var() const { return probit_var; }
     
 
@@ -85,6 +87,7 @@ private:
     std::string estimate_file = "";
     std::string cov_estimate_file = "";
     std::string cov_file = "";
+    std::string cov_file_test = "";
     //std::string dim_file = "";
     std::string run_mode = "";
     std::string bim_file = "";
@@ -122,6 +125,7 @@ private:
     std::vector<int> test_iter_range = std::vector<int>(2, -1);
 
     double rho = 0.98;
+    double scale_rho = 1.0;
     double h2 = -1;
     //int verbosity = 0;
     unsigned int iterations = 1;

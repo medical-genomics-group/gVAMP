@@ -27,6 +27,18 @@ mpirun -np {number of MPI workers} /$loc/main_real.exe [input options]
 
 ```
 
+| Main file | description |
+| --- | --- |
+| main_real.cpp | linear model for real genomic data | 
+| main_real_probit.cpp | probit model for real genomic data |
+| main_meth.cpp | linear model for real methylation data |
+| main_meth_probit.cpp | probit model for real methylation data |
+| main_meth_ex.cpp | linear model and simulated methylation data |
+
+Parameters and metrics from each interation are stored in .csv file in format:
+
+| iteration | R2 denoising | L2 error denoising | R2 lmmse | L2 error lmmse | gamw | gam1 | gam2 | eta1 | eta2 | number of mixture components L | L * mixture probabilities | L * mixture variances |
+
 Currently supported input options to C++ version of the code:
 
 | Input option | Description |
@@ -50,6 +62,7 @@ Currently supported input options to C++ version of the code:
 | `probs` | initial prior mixture coefficients (separated by comma, must sum up to 1) |
 | `vars` | initial prior variances (separated by comma) |
 | `rho` | initial value of damping factor |
+| `scale-rho` | scaling factor of rho |
 | `EM-err-thr` | relative error threshold within expectation maximization |
 | `EM-max-iter` | maximal number of iterations of expectation maximization procedure |
 | `stop-criteria-thr` | relative error threshold within expectation maximization |

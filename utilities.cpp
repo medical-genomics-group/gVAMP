@@ -353,3 +353,26 @@ double erfcx (double x)
     }
     return r;
 }
+
+// CSV out file
+void write_ofile_csv(const MPI_File fh, const uint iteration, const std::vector<double>* params) {
+
+    MPI_Status status;
+    const unsigned n_saved = iteration - 1;
+    
+    char buff[LENBUF];
+
+    int cx = snprintf(buff, LENBUF, "%5d", iteration);
+    assert(cx >= 0 && cx < LENBUF);
+        
+    for(int i=0; i<params->size(); i++){
+        cx = snprintf(&buff[strlen(buff)], LENBUF - strlen(buff), ", %20.15f", params->at(i));
+        assert(cx >= 0 && cx < LENBUF - strlen(buff));
+    }        
+    
+    cx = snprintf(&buff[strlen(buff)], LENBUF - strlen(buff), "\n");
+    assert(cx >= 0 && cx < LENBUF - strlen(buff));
+        
+    MPI_Offset offset = size_t(n_saved) * strlen(buff);
+    check_mpi(MPI_File_write_at(fh, offset, &buff, strlen(buff), MPI_CHAR, &status), __LINE__, __FILE__);
+}

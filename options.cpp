@@ -37,6 +37,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             cov_file = argv[++i];
             ss << "--cov-file " << cov_file << "\n";
         }
+        else if (!strcmp(argv[i], "--cov-file-test")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            cov_file_test = argv[++i];
+            ss << "--cov-file-test " << cov_file_test << "\n";
+        }
         else if (!strcmp(argv[i], "--bed-file-test")) {
             if (i == argc - 1) fail_if_last(argv, i);
             bed_file_test = argv[++i];
@@ -288,6 +293,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             if (i == argc - 1) fail_if_last(argv, i);
             rho = atof(argv[++i]);
             ss << "--rho " << rho << "\n";
+        }
+        else if (!strcmp(argv[i], "--scale-rho")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            scale_rho = atof(argv[++i]);
+            ss << "--scale-rho " << scale_rho << "\n";
         }
         else if (!strcmp(argv[i], "--probit-var")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);

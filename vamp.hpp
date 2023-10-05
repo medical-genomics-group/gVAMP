@@ -3,7 +3,7 @@
 #include <tuple>
 #include "data.hpp"
 #include "options.hpp"
-
+#include "utilities.hpp"
 class vamp{
 
 private:
@@ -13,6 +13,7 @@ private:
     double tau1, tau2;                          // probit model precisions
     double alpha1, alpha2;                      // Onsager corrections
     double rho;                                 // damping factor
+    double scale_rho;                           // scale rho after each iteration
     double gamw;                                // linear model noise precision 
 
     std::vector<double> x1_hat, x2_hat, true_signal;
@@ -55,6 +56,8 @@ private:
     // cross-validation parameters
     int SBglob, LBglob, redglob;
     int use_cross_val = 0, SB_cross;
+
+    MPI_File outcsv_fh;
 
 public:
 
@@ -101,7 +104,7 @@ public:
     std::vector<double> precondCG_solver(std::vector<double> v, double tau, int denoiser, data* dataset, int red = 0);
     std::vector<double> precondCG_solver(std::vector<double> v, std::vector<double> mu_start, double tau, int denoiser, data* dataset, int red = 0);    
 
-    void err_measures(data * dataset, int ind);
+    void err_measures(data * dataset, int ind, std::vector<double>* params);
     void probit_err_measures(data *dataset, int sync, std::vector<double> true_signal, std::vector<double> est, std::string var_name);
 
     std::tuple<double, double, double> state_evo(int ind, double gam_prev, double gam_before, std::vector<double> probs_before, std::vector<double> vars_before, data* dataset);
@@ -120,5 +123,17 @@ public:
     void set_LBglob(int LB) { LBglob = LB; }
     void set_gam2 (double gam) { gam2 = gam; }
     std::vector<double> get_cov_eff() const {return cov_eff;}
+    //std::string get_outcsv_fp(){return outcsv_fp;};
+
+    void setup_iofiles(){
+        std::string outcsv_fp = out_dir + "/" + out_name + ".csv";
+        MPI_File_delete(outcsv_fp.c_str(), MPI_INFO_NULL);
+        check_mpi(MPI_File_open(MPI_COMM_WORLD,
+                            outcsv_fp.c_str(),
+                            MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL,
+                            MPI_INFO_NULL,
+                            &outcsv_fh),
+                            __LINE__, __FILE__);
+    }
     
    };

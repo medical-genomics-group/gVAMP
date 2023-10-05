@@ -39,6 +39,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     eta2(0),
     max_iter(max_iter),
     rho(rho),
+    scale_rho(opt.get_scale_rho()),
     vars(vars),
     probs(probs),
     out_dir(out_dir),
@@ -80,6 +81,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     eta1(0),
     eta2(0),
     rho(opt.get_rho()),
+    scale_rho(opt.get_scale_rho()),
     probs(opt.get_probs()),
     out_dir(opt.get_out_dir()),
     out_name(opt.get_out_name()),
@@ -118,7 +120,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
 // VAMP - MAIN INFERENCE PROCEDURE
 //*********************************
 std::vector<double> vamp::infere( data* dataset ){
-
+    setup_iofiles();
     y = (*dataset).get_phen();
 
     // we scale mixture variances of effects by N (since the design matrix is scaled by 1/sqrt(N))
@@ -180,8 +182,6 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
     // filtering a phenotype for nans
     std::vector<double> y =  (*dataset).filter_pheno();
-    std::cout << y[0] << std::endl;
-    std::cout << y[1] << std::endl;
 
     // Gaussian noise start
     // r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
@@ -193,7 +193,6 @@ std::vector<double> vamp::infere_linear(data* dataset){
 	//  r1[i0] = r1[i0]*M/N;    
 
     //double scale_rho = exp( log(0.3)/max_iter );
-    //scale_rho = 1;
 
     // initializing z1_hat and p2
     z1_hat = std::vector<double> (N, 0.0);
@@ -204,14 +203,16 @@ std::vector<double> vamp::infere_linear(data* dataset){
     std::vector< std::vector<double> > Z = (*dataset).get_covs();
     std::vector<double> gg;
 
-
     // starting VAMP iterations
     for (int it = 1; it <= max_iter; it++)
     {    
 
         if (rank == 0)
             std::cout << std::endl << "********************" << std::endl << "iteration = "<< it << std::endl << "********************" << std::endl;
-
+        
+        // Paramters to save
+        std::vector<double> params;
+        
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // %%%%%%%%% Covariate effects %%%%%%%%%%%%%
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -348,6 +349,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
                     double stdev = calc_stdev(y_cross);
                     currR2 = 1 - l2_pred_err2 / ( stdev * stdev * y_cross.size() );
+                    //params.push_back(currR2);
                     if (rank == 0)
                         std::cout << "[cross_val, it = " << cross_it << "] R2 = " << currR2 << std::endl;
                     
@@ -450,12 +452,13 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 //for (int i = 0; i < M; i++)
                 //    r2[i] = xi * r2[i] + (1-xi) * r2_prev[i];
                 gam2 = 1.0 / pow( xi / sqrt(gam2) + (1-xi) / sqrt(gam_before), 2);
+                //gam2 = rho * gam2 + (1.0 - rho) * gam_before;
             } 
         }
 
         // we try with larger rhos if damping criteria allows it
-        double xi = std::min(2 * std::min(alpha1, alpha2), 1.0);
-        rho = std::max(rho, xi);
+        //double xi = std::min(2 * std::min(alpha1, alpha2), 1.0);
+        //rho = std::max(rho, xi);
 
         // if the true value of the signal is known, we print out the true gam2
         double se_dev = 0;
@@ -478,7 +481,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << "time needed to calculate conditional expectation = " << end_prior_up - start_prior_up << " seconds" <<  std::endl;
     
-        err_measures(dataset, 1);
+        err_measures(dataset, 1, &params);
 
         double end_denoising = MPI_Wtime();
 
@@ -621,14 +624,18 @@ std::vector<double> vamp::infere_linear(data* dataset){
         //    updateNoisePrecAAT(dataset);
    
         // printing out error measures
-        err_measures(dataset, 2);
+        err_measures(dataset, 2, &params);
         
         double end_lmmse_step = MPI_Wtime();
 
         if (rank == 0)
             std::cout << "lmmse step took "  << end_lmmse_step - start_lmmse_step << " seconds." << std::endl;
         
-        //rho = rho * scale_rho; 
+        rho = (1.0 - exp(log(0.2) / double(it))) * scale_rho;
+        //rho = rho * scale_rho;
+        //double l2_pred_err_denoising = params[1];
+        //double l2_pred_err_lmmse = params[3];
+        //rho = abs(l2_pred_err_denoising - l2_pred_err_lmmse) / l2_pred_err_denoising * scale_rho;
 
         // stopping criteria
         std::vector<double> x1_hat_diff = x1_hat;
@@ -649,6 +656,23 @@ std::vector<double> vamp::infere_linear(data* dataset){
         
         if (rank == 0)
             std::cout << std::endl << std::endl;
+
+        // Save parameters to file
+        params.push_back(gamw);
+        params.push_back(gam1);
+        params.push_back(gam2);
+        params.push_back(eta1);
+        params.push_back(eta2);
+        params.push_back(probs.size());
+
+        for(int i=0; i < probs.size(); i++)
+            params.push_back(probs[i]);
+        for(int i=0; i < vars.size(); i++)
+            params.push_back(vars[i] / N);
+        
+        if (rank == 0) {
+            write_ofile_csv(outcsv_fh, it, &params);
+        }
     }
 
     if (store_pvals == 1){
@@ -679,6 +703,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
     store_vec_to_file(filepath_out_gam2s, gam2s);
     if (rank == 0)
         std::cout << "gam2s filepath_out is " << filepath_out_gam2s << std::endl;
+
+    check_mpi(MPI_File_close(&outcsv_fh), __LINE__, __FILE__);
 
     MPI_Barrier(MPI_COMM_WORLD);
     // returning scaled version of the effects
@@ -931,7 +957,7 @@ void vamp::updatePrior(int verbose = 1) {
 
 
         // merging close variances
-
+        /*
         for (int j = 0; j < vars.size(); j++){
             for (int k = j+1; k < vars.size(); k++){
 
@@ -950,6 +976,7 @@ void vamp::updatePrior(int verbose = 1) {
                 }
             }
         }
+        */
 }
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset, int red){ // multiplying with (tau*A^TAv + gam2*v)
@@ -1108,7 +1135,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
  }
 
 
-void vamp::err_measures(data *dataset, int ind){
+void vamp::err_measures(data *dataset, int ind, std::vector<double>* params){
 
     double scale = 1.0 / (double) N;
     
@@ -1189,7 +1216,8 @@ void vamp::err_measures(data *dataset, int ind){
             std::cout << "l2 prediction error = " << l2_pred_err << std::endl;
 
         double R2 = 1 - l2_pred_err * l2_pred_err;
-
+        params->push_back(R2);
+        params->push_back(l2_pred_err);
         if (rank == 0)
             std::cout << "R2 = " << R2 << std::endl;
     }
@@ -1220,7 +1248,8 @@ void vamp::err_measures(data *dataset, int ind){
             std::cout << "l2 prediction error = " << l2_pred_err << std::endl;
 
         double R2 = 1 - l2_pred_err * l2_pred_err;
-
+        params->push_back(R2);
+        params->push_back(l2_pred_err);
         if (rank == 0)
             std::cout << "R2 = " << R2 << std::endl;
     }
