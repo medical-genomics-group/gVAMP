@@ -631,7 +631,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << "lmmse step took "  << end_lmmse_step - start_lmmse_step << " seconds." << std::endl;
         
-        rho = (1.0 - exp(log(0.2) / double(it))) * scale_rho;
+        //rho = (1.0 - exp(log(0.2) / double(it))) * scale_rho;
         //rho = rho * scale_rho;
         //double l2_pred_err_denoising = params[1];
         //double l2_pred_err_lmmse = params[3];

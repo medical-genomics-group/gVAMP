@@ -10,7 +10,6 @@
 
 int main(int argc, char** argv)
 {
-
     // starting parallel processes
     int required_MPI_level = MPI_THREAD_MULTIPLE;
     int provided_MPI_level;
@@ -65,6 +64,16 @@ int main(int argc, char** argv)
     }
     else if (opt.get_run_mode() == "test") // just analyzing the result on the test data
     {
+        MPI_File outcsv_test_fh;
+        std::string outcsv_test_fp = opt.get_out_dir() + "/" + opt.get_out_name() + ".csv";
+        MPI_File_delete(outcsv_test_fp.c_str(), MPI_INFO_NULL);
+        check_mpi(MPI_File_open(MPI_COMM_WORLD,
+                            outcsv_test_fp.c_str(),
+                            MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL,
+                            MPI_INFO_NULL,
+                            &outcsv_test_fh),
+                            __LINE__, __FILE__);
+       
         // reading test set
         const std::string bedfp_test = opt.get_bed_file_test();
         const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
@@ -101,6 +110,7 @@ int main(int argc, char** argv)
 
         if (min_it != -1){
             for (int it = min_it; it <= max_it; it++){
+                std::vector<double> params;
                 std::vector<double> x_est;
                 std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
                 //if (rank == 0)
@@ -122,11 +132,16 @@ int main(int argc, char** argv)
                 }  
 
                 double stdev = calc_stdev(y_test);
+                double r2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
                 if (rank == 0){
                     //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
                     //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
                     // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
-                    std::cout << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << ", ";
+                    std::cout << r2 << ", ";
+                    params.push_back(r2);
+                }
+                if (rank == 0) {
+                    write_ofile_csv(outcsv_test_fh, it, &params);
                 }
             }
         }
@@ -148,13 +163,14 @@ int main(int argc, char** argv)
             double l2_pred_err2 = 0;
             for (int i0 = 0; i0 < N_test; i0++){
                 l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
-            }  
+            }
 
             double stdev = calc_stdev(y_test);
+            double r2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
             if (rank == 0){
                 std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
                 std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-                std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+                std::cout << "test R2 = " << r2 << std::endl;
             }
         }
         
@@ -217,11 +233,14 @@ int main(int argc, char** argv)
         }  
 
         double stdev = calc_stdev(y_test);
+        double r2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
         if (rank == 0){
             std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
             std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-            std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+            std::cout << "test R2 = " << r2 << std::endl;
         }
+
+
 
     } else if (opt.get_run_mode() == "predict"){
         size_t Mt = opt.get_Mt();
