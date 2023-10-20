@@ -45,10 +45,11 @@ int check_int_overflow(const size_t n, const int linenumber, const char* filenam
 
 
 // sampling from a mixture of gaussians
-double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi)
+double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi, long unsigned int seed)
 {
     std::random_device rand_dev;
-    std::mt19937 generator(rand_dev());  
+    //std::mt19937 generator(rand_dev());  
+    std::mt19937 generator{seed};  
     std::uniform_real_distribution<double> unif(0.0,1.0);
     double u = unif(generator);
     double c_sum = 0;
@@ -73,7 +74,7 @@ double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vecto
 
 
 // simulating signal from a mixture of gaussians
-std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double> pi){
+std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double> pi, long unsigned int seed){
 
     int K_grp = eta.size();
     std::vector<double> signal(M, 0.0);
@@ -81,7 +82,7 @@ std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double>
         #pragma omp parallel for
     #endif
     for (int i = 0; i < M; i++){
-        signal[i] = generate_mixture_gaussians(K_grp, eta, pi);
+        signal[i] = generate_mixture_gaussians(K_grp, eta, pi, seed);
     }
     return signal;
  }

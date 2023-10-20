@@ -29,7 +29,7 @@
 //
 //      constructor in which all parameters are manually specifies
 //
-vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars,  std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model, Options opt) :
+vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double rho, std::vector<double> vars, std::vector<double> probs, std::vector<double> true_signal, int rank, std::string out_dir, std::string out_name, std::string model, Options opt) :
     N(N),
     M(M),
     Mt(Mt),
@@ -75,17 +75,38 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     gamw_init = opt.get_gamw_init();
     r1_init_file = opt.get_estimate_file();  
 
-    if (probs.length()==0 || vars.length==0){
+    if (probs.size()==0 || vars.size()==0){
         double probs_1 = (1-50000.0/Mt)/ (2 - 1.0/pow(2,22)); // pow(-,-) requires <cmath>
         if (Mt <= 50000)
             throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
-        double curr_prob = prob_1;
+        double curr_prob = probs_1;
         probs.push_back(50000.0/Mt);
         for (int i0 = 0; i0 < 22; i0++){
             probs.push_back(curr_prob);
             curr_prob /= 2;
         }
         vars = std::vector<double>{0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773};
+        for (int i0 = 0; i0 < vars.size(); i0++)
+            vars[i0] *= N;
+
+        //printing out the prior details
+        if (rank == 0)
+            std::cout << "scaled variances = ";
+        for (int i = 0; i < vars.size(); i++)
+            if (rank == 0)
+                std::cout << vars[i] << ' ';
+        
+        if (rank ==0)
+            std::cout << std::endl;
+
+        if (rank == 0)
+            std::cout << "probs = ";
+        for (int i = 0; i < probs.size(); i++){
+            if (rank == 0)
+                std::cout << probs[i] << ' ';
+        }
+        if (rank ==0)
+            std::cout << std::endl;  
     }
 
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
@@ -144,17 +165,38 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     gamw_init = opt.get_gamw_init();
     r1_init_file = opt.get_estimate_file(); 
 
-    if (probs.length()==0 || vars.length==0){
+    if (probs.size()==0 || vars.size()==0){
         double probs_1 = (1-50000.0/Mt)/ (2 - 1.0/pow(2,22)); // pow(-,-) requires <cmath>
         if (Mt <= 50000)
             throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
-        double curr_prob = prob_1;
+        double curr_prob = probs_1;
         probs.push_back(50000.0/Mt);
         for (int i0 = 0; i0 < 22; i0++){
             probs.push_back(curr_prob);
             curr_prob /= 2;
         }
         vars = std::vector<double>{0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773};
+        for (int i0 = 0; i0 < vars.size(); i0++)
+            vars[i0] *= N;
+
+        //printing out the prior details
+        if (rank == 0)
+            std::cout << "scaled variances = ";
+        for (int i = 0; i < vars.size(); i++)
+            if (rank == 0)
+                std::cout << vars[i] << ' ';
+        
+        if (rank ==0)
+            std::cout << std::endl;
+
+        if (rank == 0)
+            std::cout << "probs = ";
+        for (int i = 0; i < probs.size(); i++){
+            if (rank == 0)
+                std::cout << probs[i] << ' ';
+        }
+        if (rank ==0)
+            std::cout << std::endl;  
     }
 
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);   
@@ -814,6 +856,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
     store_vec_to_file(filepath_out_R2trains, R2trains);
     if (rank == 0)
         std::cout << "R2trains filepath_out is " << filepath_out_R2trains << std::endl;
+
+    int maxR2trainsIndex = std::max_element(R2trains.begin(),R2trains.end()) - R2trains.begin();
+    if (rank == 0)
+        std::cout << "index of max train R2 iteration = " << maxR2trainsIndex << std::endl;
 
     MPI_Barrier(MPI_COMM_WORLD);
     // returning scaled version of the effects

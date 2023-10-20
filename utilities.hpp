@@ -16,9 +16,9 @@ int check_int_overflow(const size_t n, const int linenumber, const char* filenam
 
 double round_dp(double in);
 
-double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi);
+double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi, long unsigned int seed = 1);
 
-std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double> pi);
+std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double> pi, long unsigned int seed = 1);
 
 double noise_prec_calc(double SNR, std::vector<double> vars, std::vector<double> probs, int Mt, int N);
 
