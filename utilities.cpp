@@ -78,9 +78,9 @@ std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double>
 
     int K_grp = eta.size();
     std::vector<double> signal(M, 0.0);
-    #ifdef _OPENMP
-        #pragma omp parallel for
-    #endif
+    //#ifdef _OPENMP
+    //    #pragma omp parallel for // not to mess with seeds
+    //#endif
     for (int i = 0; i < M; i++){
         signal[i] = generate_mixture_gaussians(K_grp, eta, pi, seed);
     }

@@ -201,7 +201,6 @@ int main(int argc, char** argv)
             store_vec_to_file(filepath_out_Ax, y);
         }
 
-        
         // noise precision calculation
         double std = calc_stdev(y, 0);
         gamw = h2 / (1-h2) / expe_varg;

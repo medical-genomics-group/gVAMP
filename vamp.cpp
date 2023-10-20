@@ -76,11 +76,11 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     r1_init_file = opt.get_estimate_file();  
 
     if (probs.size()==0 || vars.size()==0){
-        double probs_1 = (1-50000.0/Mt)/ (2 - 1.0/pow(2,22)); // pow(-,-) requires <cmath>
+        double probs_1 = std::min(50000.0/Mt, 1.0) / (2 - 1.0/pow(2,21)); // pow(-,-) requires <cmath>
         if (Mt <= 50000)
             throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
         double curr_prob = probs_1;
-        probs.push_back(50000.0/Mt);
+        probs.push_back(1 - 50000.0/Mt);
         for (int i0 = 0; i0 < 22; i0++){
             probs.push_back(curr_prob);
             curr_prob /= 2;
@@ -166,11 +166,11 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     r1_init_file = opt.get_estimate_file(); 
 
     if (probs.size()==0 || vars.size()==0){
-        double probs_1 = (1-50000.0/Mt)/ (2 - 1.0/pow(2,22)); // pow(-,-) requires <cmath>
+        double probs_1 = std::min(50000.0/Mt,1.0)/ (2 - 1.0/pow(2,21)); // pow(-,-) requires <cmath>
         if (Mt <= 50000)
             throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
         double curr_prob = probs_1;
-        probs.push_back(50000.0/Mt);
+        probs.push_back(1 - 50000.0/Mt);
         for (int i0 = 0; i0 < 22; i0++){
             probs.push_back(curr_prob);
             curr_prob /= 2;
@@ -936,7 +936,7 @@ double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared bet
     
     // std::random_device rd;
 
-    std::mt19937 rd{seed}; // rng
+    std::mt19937 rd{seed + (long unsigned int) (*dataset).get_S()}; // rng
 
     std::bernoulli_distribution bern(0.5);
 

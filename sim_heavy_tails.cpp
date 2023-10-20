@@ -46,66 +46,67 @@ int main(int argc, char** argv)
 
     // simulating data for realistic values of parameters
 
-    //std::vector<double> vars_init = opt.get_vars();
-    //std::vector<double> probs_init = opt.get_probs();
+    std::vector<double> vars_init;
+    std::vector<double> probs_init;
+    
     int CV = opt.get_CV();
     double h2 = opt.get_h2();
-    int CVhat = CV / 3;
+    //int CVhat = CV / 3;
     //CVhat = CV;
-    double h2hat = 0.6 * h2;
+    //double h2hat = 0.6 * h2;
     //h2hat = h2;
     if (rank == 0){
         std::cout << "true CV = " << CV << std::endl;
-        std::cout << "initial CVhat = " << CVhat << std::endl;
-        std::cout << "initial h2hat = " << h2hat << std::endl;
+        //std::cout << "initial CVhat = " << CVhat << std::endl;
+        //std::cout << "initial h2hat = " << h2hat << std::endl;
     }
 
-    int L = opt.get_num_mix_comp();
+    //int L = opt.get_num_mix_comp();
     // in this simulation we fix L=4
-    L = 4;
+    //L = 4;
 
-    double prob_eq = (double) CVhat / Mt / (L-1) ;
+    //double prob_eq = (double) CVhat / Mt / (L-1) ;
     // prob_eq = (double) CVhat / Mt / (2 - 1.0 / pow(2, L-1));
     
-    double min_vars = 0.1 / CVhat;
+    //double min_vars = 0.1 / CVhat;
 
-    std::vector<double> vars_init {0};
-    std::vector<double> probs_init {1 - (double) CVhat / Mt};
+    //std::vector<double> vars_init {0};
+    //std::vector<double> probs_init {1 - (double) CVhat / Mt};
 
-    double curr_var = min_vars;
-    curr_var = h2hat / CVhat;
+    //double curr_var = min_vars;
+    //curr_var = h2hat / CVhat;
 
-    for (int i = 1; i<L; i++){
-        probs_init.push_back(prob_eq);
-        vars_init.push_back(curr_var);
-        curr_var *= 10;
-        prob_eq /= 2;
-    }
+    //for (int i = 1; i<L; i++){
+    //    probs_init.push_back(prob_eq);
+    //    vars_init.push_back(curr_var);
+    //    curr_var *= 10;
+    //    prob_eq /= 2;
+    //}
 
 
-    double var = h2 / CV * 6 / 123;
+    double var = h2 / CV * 6 / 123; // implicitely Var(1) = 1
     std::vector<double> vars_true{0, var, 10*var, 100*var};
     std::vector<double> probs_true{1 - (double) CV / Mt, (double) CV / Mt / 2, (double) CV / Mt / 3, (double) CV / Mt / 6}; 
 
 
     //scaling variances
-    if (rank == 0)
-        std::cout << "init scaled variances = ";
-    for (int i = 0; i < vars_init.size(); i++)
-        if (rank == 0)
-            std::cout << vars_init[i] * N << ' ';
+    //if (rank == 0)
+    //    std::cout << "init scaled variances = ";
+    //for (int i = 0; i < vars_init.size(); i++)
+    //    if (rank == 0)
+    //        std::cout << vars_init[i] * N << ' ';
 
-    if (rank ==0)
-        std::cout << std::endl;
+    //if (rank ==0)
+    //    std::cout << std::endl;
 
-    if (rank == 0)
-        std::cout << "init probs = ";
-    for (int i = 0; i < probs_init.size(); i++)
-        if (rank == 0)
-            std::cout << probs_init[i] << ' ';
+    //if (rank == 0)
+    //    std::cout << "init probs = ";
+    //for (int i = 0; i < probs_init.size(); i++)
+    //    if (rank == 0)
+    //        std::cout << probs_init[i] << ' ';
             
-    if (rank ==0)
-        std::cout << std::endl;
+    //if (rank ==0)
+    //    std::cout << std::endl;
 
         
     //printing out true variances
@@ -128,10 +129,9 @@ int main(int argc, char** argv)
         std::cout << std::endl;
 
     // noise precision calculation
-    double gamw = 1 / (1 - h2);
+    double gamw = 1 / (1 - h2);  //implicit assumption that Var(y) = 1
     if (rank == 0)
         std::cout << "true gamw = " << gamw << std::endl;
-
 
     std::vector<double> beta_true(M, 0.0); 
     std::vector<double> y;
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
         // simulating beta
         if (rank == 0){
             
-            std::vector<double> beta_true_tmp = simulate(Mt, vars_true, probs_true);
+            std::vector<double> beta_true_tmp = simulate(Mt, vars_true, probs_true, opt.get_seed());
             
             for (int i0=S; i0<S+M; i0++)
                 beta_true[i0-S] = beta_true_tmp[i0];
@@ -188,7 +188,8 @@ int main(int argc, char** argv)
 
 
         std::random_device rand_dev;
-        std::mt19937 generator(rand_dev());  
+        //std::mt19937 generator(rand_dev());
+        std::mt19937 generator{(long unsigned int) opt.get_seed()};  
         std::normal_distribution<double> gauss_beta_gen( 0, 1 / sqrt(gamw) ); //2nd parameter is stddev
         std::vector<double> noise(N, 0.0);
 
@@ -251,7 +252,7 @@ int main(int argc, char** argv)
     // running EM-VAMP algorithm on the data
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    double gamw_init = 1 / (1 - h2hat);
+    double gamw_init = 2; // 1 / (1 - h2hat);
     //gamw_init = gamw;
 
     double gam1 = 1e-8;
@@ -260,7 +261,7 @@ int main(int argc, char** argv)
     //vars_init = vars_true;
     //probs_init = probs_true;
 
-    vamp emvamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model());
+    vamp emvamp(N, M, Mt, gam1, gamw_init, opt.get_iterations(), opt.get_rho(), vars_init, probs_init, beta_true, rank, opt.get_out_dir() , opt.get_out_name(), opt.get_model(), opt);
 
     //vamp emvamp(M, gam1, gamw_init, beta_true, rank, opt);
 
