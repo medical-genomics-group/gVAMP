@@ -34,12 +34,14 @@ private:
     int EM_max_iter; // = 1e5;
     double EM_err_thr; // = 1e-4;
     int CG_max_iter; // = 10;
-    int auto_var_max_iter  = 50;// = 50;
+    int auto_var_max_iter  = 5;// = 50;
     int calc_state_evo = 0;
     int learn_vars;
+    int init_est;
     double damp_max = 1;
     double damp_min = 0.05;
     double stop_criteria_thr; // = 1e-5;
+    double gamma_damp;
 
     std::string model;
     std::string out_dir;
@@ -51,6 +53,7 @@ private:
     double total_comp_time=0;
     int reverse = 1;
     int use_lmmse_damp = 0;
+    int use_freeze=0;
 
     // cross-validation parameters
     int SBglob, LBglob, redglob;
@@ -62,6 +65,9 @@ private:
     double gam1_init;
     double gamw_init;
     std::string r1_init_file;
+
+    std::string estimate_file;
+    std::string freeze_index_file;
 
 public:
 

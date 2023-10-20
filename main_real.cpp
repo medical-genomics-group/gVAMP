@@ -368,12 +368,18 @@ int main(int argc, char** argv)
         for (int i0 = 0; i0 < x_est.size(); i0++)
             x_est[i0] *= sqrt( (double) N );
 
+        //if (rank==0)
+        //    std::cout << "x_est[1] = " << x_est[1] << std::endl;
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%
         //   obtaining p-values 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         std::vector<double> z1 = dataset.Ax(x_est.data());
+
+        //if (rank==0)
+        //    std::cout << "z1[1] = " << z1[1] << std::endl;
+
         std::vector<double> y =  dataset.filter_pheno();
         // saving pvals vector
         std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_pvals.bin";
@@ -427,8 +433,7 @@ int main(int argc, char** argv)
 
     // reading test set
     const std::string bedfp_test = opt.get_bed_file_test();
-    const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
-
+    
     int N_test = opt.get_N_test();
     int Mt_test = opt.get_Mt_test();
     std::vector<double> MS = divide_work(Mt_test);
@@ -438,9 +443,8 @@ int main(int argc, char** argv)
     double alpha_scale = opt.get_alpha_scale();
     std::string bimfp = opt.get_bim_file();
 
-    data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha_scale, bimfp);
-    
-    std::vector<double> y_test = dataset_test.get_phen();
+    std::vector<double> phen(N_test, 0.0);
+    data dataset_test(phen, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha_scale, bimfp);
 
     //std::vector<double> x_est = read_vec_from_file(opt.get_estimate_file() + "_rank_" + std::to_string(rank) + ".bin", M, 0);
     std::string est_file_name = opt.get_estimate_file();
@@ -462,6 +466,7 @@ int main(int argc, char** argv)
         for (int it = min_it; it <= max_it; it++){
             std::vector<double> x_est;
             std::string est_file_name_it = est_file_name.substr(0, pos_it) + "temp_" + std::to_string(it) + "_" + std::to_string(it) + "_gibbs_est." + end_est_file_name;
+            //std::string est_file_name_it = est_file_name.substr(0, pos_it) + "temp_" + std::to_string(it) + "_" + std::to_string(it) + "." + end_est_file_name;
             if (rank == 0)
                 std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
             if (end_est_file_name == "bin")
@@ -493,8 +498,7 @@ int main(int argc, char** argv)
 
     // reading test set
     const std::string bedfp_test = opt.get_bed_file_test();
-    const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
-
+   
     int N_test = opt.get_N_test();
     int Mt_test = opt.get_Mt_test();
     std::vector<double> MS = divide_work(Mt_test);
@@ -504,9 +508,9 @@ int main(int argc, char** argv)
     double alpha_scale = opt.get_alpha_scale();
     std::string bimfp = opt.get_bim_file();
 
-    data dataset_test(pheno_test, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha_scale, bimfp);
-    
-    std::vector<double> y_test = dataset_test.get_phen();
+    std::vector<double> y(N_test, 0.0);
+
+    data dataset_test(y, bedfp_test, N_test, M_test, Mt_test, S_test, rank, type_data, alpha_scale, bimfp);
 
     //std::vector<double> x_est = read_vec_from_file(opt.get_estimate_file() + "_rank_" + std::to_string(rank) + ".bin", M, 0);
     std::string est_file_name = opt.get_estimate_file();
@@ -528,8 +532,8 @@ int main(int argc, char** argv)
 
     std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_predict.csv";
     if (rank == 0){
-        std::cout << "filepath_out = " << filepath_out << std::endl;
-        store_vec_to_file(filepath_out, z_test);
+            std::cout << "filepath_out = " << filepath_out << std::endl;
+            store_vec_to_file(filepath_out, z_test);
         }
 
     }

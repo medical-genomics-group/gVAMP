@@ -47,6 +47,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             estimate_file = argv[++i];
             ss << "--estimate-file " << estimate_file << "\n";
         }
+        else if (!strcmp(argv[i], "--freeze-index-file")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            freeze_index_file = argv[++i];
+            ss << "--freeze-index-file " << estimate_file << "\n";
+        }
         else if (!strcmp(argv[i], "--cov-estimate-file")) {
             if (i == argc - 1) fail_if_last(argv, i);
             cov_estimate_file = argv[++i];
@@ -173,6 +178,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             use_lmmse_damp = (unsigned int) atoi(argv[++i]);
             ss << "--use-lmmse-damp " << use_lmmse_damp << "\n";
         }
+        else if (!strcmp(argv[i], "--use-freeze")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --use-freeze has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            use_freeze = (unsigned int) atoi(argv[++i]);
+            ss << "--use-freeze " << use_freeze << "\n";
+        }
         else if (!strcmp(argv[i], "--learn-vars")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 0) {
@@ -226,6 +240,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             }
             redglob = (unsigned int) atoi(argv[++i]);
             ss << "--red " << redglob << "\n";
+        }
+        else if (!strcmp(argv[i], "--init-est")){
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --init-est has to be an integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            init_est = (unsigned int) atoi(argv[++i]);
+            ss << "--init-est " << init_est << "\n";
         }
         /*else if (!strcmp(argv[i], "--meth-imp")){
             if (i == argc - 1) fail_if_last(argv, i);
@@ -288,6 +311,11 @@ void Options::read_command_line_options(int argc, char** argv) {
             if (i == argc - 1) fail_if_last(argv, i);
             rho = atof(argv[++i]);
             ss << "--rho " << rho << "\n";
+        }
+        else if (!strcmp(argv[i], "--gamma-damp")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            gamma_damp = atof(argv[++i]);
+            ss << "--gamma-damp " << gamma_damp << "\n";
         }
         else if (!strcmp(argv[i], "--gam1-init")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);

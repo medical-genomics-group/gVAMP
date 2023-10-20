@@ -67,6 +67,9 @@ Currently supported input options to C++ version of the code:
 | `alpha-scale` | columns of genotype matrix are scaled with std^(-alpha-scale) |
 | `gam1-init` | initial value of gam1 in the restart scenario |
 | `gamw-init` | initial value of gamw in the restart scenario |
+| `init-est` | indicates whether or not we initialze gVAMP with an estimate provided in estimate-file |
+| `use-freeze` | indicates whether or not to freeze certain position in the inference process |
+| `freeze-index-file` | a file containing 0/1 assigned to the indices that are being freezed in the inference process |
 
 
 

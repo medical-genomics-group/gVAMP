@@ -22,6 +22,7 @@ public:
     std::string get_estimate_file() const { return estimate_file; }
     std::string get_cov_estimate_file() const { return cov_estimate_file; }
     std::string get_cov_file() const { return cov_file; }
+    std::string get_freeze_index_file() const { return freeze_index_file; }
     //std::string get_ref_bim_file() const { return ref_bim_file; }
     //std::string get_group_index_file() const { return group_index_file; }
     //std::string get_group_mixture_file() const { return group_mixture_file; }
@@ -51,10 +52,13 @@ public:
     unsigned int get_C() const { return C; }
     unsigned int get_redglob() const { return redglob; }
     unsigned int get_learn_vars() const { return learn_vars; }
+    unsigned int get_init_est() const { return init_est; }
+    unsigned int get_use_freeze() const { return use_freeze; }
     double get_h2() const { return h2; }
     double get_alpha_scale() const { return alpha_scale; }
     double get_gamw_init() const { return gamw_init; }
     double get_gam1_init() const { return gam1_init; }
+    double get_gamma_damp() const { return gamma_damp; }
     
 
     std::vector<double> get_vars() const { return vars; } 
@@ -86,6 +90,7 @@ private:
     std::string bed_file = "";
     std::string bed_file_test = "";
     std::string estimate_file = "";
+    std::string freeze_index_file = "";
     std::string cov_estimate_file = "";
     std::string cov_file = "";
     //std::string dim_file = "";
@@ -110,14 +115,17 @@ private:
     unsigned int store_pvals = 0;
     unsigned int use_lmmse_damp = 0;
     unsigned int use_XXT_denoiser = 0;
+    unsigned int use_freeze = 0;
     unsigned int learn_vars = 1;
     double alpha_scale = 1.0; 
     unsigned int CV;
     unsigned int redglob = 0;
     unsigned int C = 0;
+    unsigned int init_est = 0;
     double probit_var = 1;
     double gamw_init;
     double gam1_init = -1;
+    double gamma_damp = 1;
 
 
     // unsigned int meth_imp = 0;

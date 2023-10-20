@@ -38,6 +38,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     gam2(0),
     eta1(0),
     eta2(0),
+    init_est(opt.get_init_est()),
     max_iter(max_iter),
     rho(rho),
     vars(vars),
@@ -45,8 +46,12 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     out_dir(out_dir),
     out_name(out_name),
     true_signal(true_signal),
+    estimate_file(opt.get_estimate_file()),
     learn_vars(opt.get_learn_vars()),
     model(model),
+    gamma_damp(opt.get_gamma_damp()),
+    use_freeze(opt.get_use_freeze()),
+    freeze_index_file(opt.get_freeze_index_file()),
     redglob(opt.get_redglob()),
     rank(rank)  {
     x1_hat = std::vector<double> (M, 0.0);
@@ -93,7 +98,12 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     true_signal(true_signal),
     model(opt.get_model()),
     redglob(opt.get_redglob()),
+    init_est(opt.get_init_est()),
+    use_freeze(opt.get_use_freeze()),
+    freeze_index_file(opt.get_freeze_index_file()),
+    estimate_file(opt.get_estimate_file()),
     store_pvals(opt.get_store_pvals()),
+    gamma_damp(opt.get_gamma_damp()),
     rank(rank),
     reverse(opt.get_use_XXT_denoiser()),
     use_lmmse_damp(opt.get_use_lmmse_damp())  {
@@ -185,6 +195,12 @@ std::vector<double> vamp::infere_linear(data* dataset){
         N = 4*SB_cross;
     }
 
+    // loading freeze index file
+
+    std::vector<double> freeze_ind;
+    if (use_freeze == 1)
+        freeze_ind = read_vec_from_file(freeze_index_file, M, (*dataset).get_S());
+
     std::vector<double> x1_hat_d(M, 0.0);
     std::vector<double> x1_hat_d_prev(M, 0.0);
     std::vector<double> x1_hat_stored(M, 0.0);
@@ -217,6 +233,22 @@ std::vector<double> vamp::infere_linear(data* dataset){
     //double scale_rho = exp( log(0.3)/max_iter );
     //scale_rho = 1;
 
+    // in case we initialize with an estimate of the signal
+    if (init_est == 1){
+        std::vector<double> x_est;
+        int pos_dot = estimate_file.find(".");
+        std::string end_est_file_name = estimate_file.substr(pos_dot + 1);
+        if (end_est_file_name == "bin")
+            x_est = mpi_read_vec_from_file(estimate_file, M, (*dataset).get_S());
+        else
+            x_est = read_vec_from_file(estimate_file, M, (*dataset).get_S());
+
+        for (int i0 = 0; i0 < x_est.size(); i0++)
+            x_est[i0] *= sqrt( (double) N );
+
+        x1_hat = x_est;
+        r1 = x_est;
+    }
 
     // starting VAMP iterations
     for (int it = 1; it <= max_iter; it++)
@@ -253,6 +285,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
             for (int i = 0; i < M; i++)
                 x1_hat[i] = g1(r1[i], gam1);
 
+            if (it==1 && init_est==1)
+                x1_hat = r1;
+
             std::vector<double> x1_hat_m_r1 = x1_hat;
             //std::transform (x1_hat_m_r1.begin(), x1_hat_m_r1.end(), r1.begin(), x1_hat_m_r1.begin(), std::minus<double>());
             for (int i0 = 0; i0 < x1_hat_m_r1.size(); i0++)
@@ -263,7 +298,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
             for (int i=0; i<M; i++)
             {
                 x1_hat_d[i] = g1d(r1[i], gam1);
-                sum_d += x1_hat_d[i];
+                if (!use_freeze || (use_freeze && freeze_ind[i]==0))
+                    sum_d += x1_hat_d[i];
             }
 
             alpha1 = 0;
@@ -279,7 +315,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
             //updatePrior(0);
 
             gam1_reEst_prev = gam1;
-            gam1 = std::min( std::max(  1.0 / (1.0/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
+            if (it > 1)
+                gam1 = std::min( std::max(  1.0 / (1.0/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
+            else
+                break;
 
             updatePrior(0);
 
@@ -304,7 +343,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::vector<double> x1_hat_temp = x1_hat;
             // change in damping
             for (int i = 0; i < M; i++)
-                x1_hat[i] = rho * x1_hat[i] + (1-rho) * x1_hat_prev[i];
+                if (!use_freeze || (use_freeze && freeze_ind[i] == 0))
+                    x1_hat[i] = rho * x1_hat[i] + (1-rho) * x1_hat_prev[i];
 
             //for (int i = 0; i < M; i++)
             //    x1_hat[i] = rho * x1_hat[i] + (1-rho) * x2_hat[i];
@@ -503,6 +543,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "______________________" << std::endl<< "->LMMSE" << std::endl;
 
 
+        // gamma_damp
+        // gam2 = gam2 * gamma_damp;
+
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
         if (reverse == 0){
@@ -588,6 +631,9 @@ std::vector<double> vamp::infere_linear(data* dataset){
         
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
+
+        // gamma_damp back
+        // gam2 = gam2 / gamma_damp;
 
         // onsager approx
         if (it > 1){
@@ -739,7 +785,7 @@ std::vector<double> vamp::infere_linear(data* dataset){
     return x1_hat_stored;          
 }
 
-double vamp::g1(double y, double gam1) { 
+double vamp::g1(double y, double gam1) { //fchecked
     
     double sigma = 1 / gam1;
 

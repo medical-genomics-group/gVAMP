@@ -86,6 +86,11 @@ int main(int argc, char** argv)
     std::vector<double> vars_true{0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1};
     std::vector<double> probs_true{0.9595661, 0.0008876436,  0.0367001, 0.002712435, 0.0001066884, 8.915961e-6, 1.814535e-5}; 
 
+    double expe_varg = Mt * inner_prod(vars_true, probs_true, 0);
+    // double scale_fact_vars = expe_varg / 2;
+    // scaling variances so that expe_varg = 0.5
+    for (int i0 = 0; i0 < 7; i0++)
+        vars_true[i0] /= (2*expe_varg);
 
     //scaling variances
     if (rank == 0)
@@ -126,14 +131,9 @@ int main(int argc, char** argv)
     if (rank ==0)
         std::cout << std::endl;
 
-    // noise precision calculation
-    double gamw = 1 / (1 - h2);
-    if (rank == 0)
-        std::cout << "true gamw = " << gamw << std::endl;
-
-
     std::vector<double> beta_true(M, 0.0); 
     std::vector<double> y;
+    double gamw;
 
     // loading true signal and phenotype in case they are user-provided
     std::vector< std::string > true_signal_files = opt.get_true_signal_files();
@@ -185,6 +185,26 @@ int main(int argc, char** argv)
         std::string filepath_out = opt.get_out_dir() + opt.get_out_name() + "_beta_true.bin";
         mpi_store_vec_to_file(filepath_out, beta_true, S, M);
 
+        std::vector<double> beta_true_scaled = beta_true;
+        for (int i0=0; i0<M; i0++)
+            beta_true_scaled[i0] *= sqrt(N);
+        
+        y = dataset.Ax(beta_true_scaled.data());
+
+        if (rank == 0)
+            std::cout << "Var(Ax) = " << pow(calc_stdev(y), 2) << std::endl;
+
+        if (rank == 0){
+            std::string filepath_out_Ax = opt.get_out_dir() + opt.get_out_name() + "_Ax.txt";
+            store_vec_to_file(filepath_out_Ax, y);
+        }
+
+        
+        // noise precision calculation
+        double std = calc_stdev(y, 0);
+        gamw = 1.0 / std / std; // so that h2 = 0.5
+        if (rank == 0)
+            std::cout << "true gamw = " << gamw << std::endl;
 
         std::random_device rand_dev;
         std::mt19937 generator(rand_dev());  
@@ -207,20 +227,6 @@ int main(int argc, char** argv)
 
         if (rank != 0)
             MPI_Recv(noise_val, N, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        std::vector<double> beta_true_scaled = beta_true;
-        for (int i0=0; i0<M; i0++)
-            beta_true_scaled[i0] *= sqrt(N);
-        
-        y = dataset.Ax(beta_true_scaled.data());
-
-        if (rank == 0)
-            std::cout << "Var(Ax) = " << pow(calc_stdev(y), 2) << std::endl;
-
-        if (rank == 0){
-            std::string filepath_out_Ax = opt.get_out_dir() + opt.get_out_name() + "_Ax.txt";
-            store_vec_to_file(filepath_out_Ax, y);
-        }
 
         for (int i = 0; i < N; i++)
             if (rank != 0)
