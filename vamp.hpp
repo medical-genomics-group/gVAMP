@@ -9,10 +9,10 @@ class vamp{
 private:
     int N, M, Mt, C, max_iter, rank, nranks;
     double gam1, gam2, gam_before, eta1, eta2;  // linear model precisions
-    std::vector<double> gam1s, gam2s;
+    std::vector<double> gam1s, gam2s, R2trains;
     double tau1, tau2;                          // probit model precisions
     double alpha1, alpha2;                      // Onsager corrections
-    double rho;                                 // damping factor
+    double rho = 0.15;                          // damping factor
     double gamw;                                // linear model noise precision 
 
     std::vector<double> x1_hat, x2_hat, true_signal;
@@ -38,6 +38,7 @@ private:
     int calc_state_evo = 0;
     int learn_vars;
     int init_est;
+    int seed;
     double damp_max = 1;
     double damp_min = 0.05;
     double stop_criteria_thr; // = 1e-5;

@@ -17,6 +17,7 @@
 #include "denoiserXXT.cpp"
 #include "utilities.hpp"
 #include <boost/math/distributions/students_t.hpp> // contains Student's t distribution needed for pvals calculation
+#include <stdexcept>
 
 
 //******************
@@ -42,6 +43,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     max_iter(max_iter),
     rho(rho),
     vars(vars),
+    seed(opt.get_seed()),
     probs(probs),
     out_dir(out_dir),
     out_name(out_name),
@@ -59,7 +61,6 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     r1 = std::vector<double> (M, 0.0);
     r2 = std::vector<double> (M, 0.0);
     p1 = std::vector<double> (N, 0.0);
-
     
     EM_max_iter = opt.get_EM_max_iter();
     EM_err_thr = opt.get_EM_err_thr();
@@ -73,8 +74,22 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     gam1_init = opt.get_gam1_init();
     gamw_init = opt.get_gamw_init();
     r1_init_file = opt.get_estimate_file();  
-    
+
+    if (probs.length()==0 || vars.length==0){
+        double probs_1 = (1-50000.0/Mt)/ (2 - 1.0/pow(2,22)); // pow(-,-) requires <cmath>
+        if (Mt <= 50000)
+            throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
+        double curr_prob = prob_1;
+        probs.push_back(50000.0/Mt);
+        for (int i0 = 0; i0 < 22; i0++){
+            probs.push_back(curr_prob);
+            curr_prob /= 2;
+        }
+        vars = std::vector<double>{0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773};
+    }
+
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
+
 }
 
 
@@ -95,6 +110,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     out_dir(opt.get_out_dir()),
     out_name(opt.get_out_name()),
     learn_vars(opt.get_learn_vars()),
+    seed(opt.get_seed()),
     true_signal(true_signal),
     model(opt.get_model()),
     redglob(opt.get_redglob()),
@@ -127,6 +143,19 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     gam1_init = opt.get_gam1_init();
     gamw_init = opt.get_gamw_init();
     r1_init_file = opt.get_estimate_file(); 
+
+    if (probs.length()==0 || vars.length==0){
+        double probs_1 = (1-50000.0/Mt)/ (2 - 1.0/pow(2,22)); // pow(-,-) requires <cmath>
+        if (Mt <= 50000)
+            throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
+        double curr_prob = prob_1;
+        probs.push_back(50000.0/Mt);
+        for (int i0 = 0; i0 < 22; i0++){
+            probs.push_back(curr_prob);
+            curr_prob /= 2;
+        }
+        vars = std::vector<double>{0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773};
+    }
 
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);   
 }
@@ -780,6 +809,12 @@ std::vector<double> vamp::infere_linear(data* dataset){
     if (rank == 0)
         std::cout << "gam2s filepath_out is " << filepath_out_gam2s << std::endl;
 
+    // saving R2 train
+    std::string filepath_out_R2trains = out_dir + out_name + "_R2trains.csv";
+    store_vec_to_file(filepath_out_R2trains, R2trains);
+    if (rank == 0)
+        std::cout << "R2trains filepath_out is " << filepath_out_R2trains << std::endl;
+
     MPI_Barrier(MPI_COMM_WORLD);
     // returning scaled version of the effects
     return x1_hat_stored;          
@@ -853,7 +888,9 @@ double vamp::g1d(double y, double gam1) {
 
 double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared between linear and binary classification model
     
-    std::random_device rd;
+    // std::random_device rd;
+
+    std::mt19937 rd{seed}; // rng
 
     std::bernoulli_distribution bern(0.5);
 
@@ -1289,6 +1326,8 @@ void vamp::err_measures(data *dataset, int ind){
             std::cout << "l2 prediction error = " << l2_pred_err << std::endl;
 
         double R2 = 1 - l2_pred_err * l2_pred_err;
+
+        R2trains.push_back(R2);
 
         if (rank == 0)
             std::cout << "R2 = " << R2 << std::endl;

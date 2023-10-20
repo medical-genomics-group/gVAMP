@@ -70,6 +70,7 @@ Currently supported input options to C++ version of the code:
 | `init-est` | indicates whether or not we initialze gVAMP with an estimate provided in estimate-file |
 | `use-freeze` | indicates whether or not to freeze certain position in the inference process |
 | `freeze-index-file` | a file containing 0/1 assigned to the indices that are being freezed in the inference process |
+| `seed` | defines a seed for the gVAMP run (must be a non-negative integer) |
 
 
 

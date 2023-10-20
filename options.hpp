@@ -50,6 +50,7 @@ public:
     unsigned int get_store_pvals() const { return store_pvals; }
     unsigned int get_CV() const { return CV; }
     unsigned int get_C() const { return C; }
+    unsigned int get_seed() const {return seed;}
     unsigned int get_redglob() const { return redglob; }
     unsigned int get_learn_vars() const { return learn_vars; }
     unsigned int get_init_est() const { return init_est; }
@@ -117,6 +118,7 @@ private:
     unsigned int use_XXT_denoiser = 0;
     unsigned int use_freeze = 0;
     unsigned int learn_vars = 1;
+    unsigned int seed = 1;
     double alpha_scale = 1.0; 
     unsigned int CV;
     unsigned int redglob = 0;

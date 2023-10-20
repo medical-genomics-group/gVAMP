@@ -187,6 +187,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             use_freeze = (unsigned int) atoi(argv[++i]);
             ss << "--use-freeze " << use_freeze << "\n";
         }
+        else if (!strcmp(argv[i], "--seed")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            if (atoi(argv[i + 1]) < 0) {
+                std::cout << "FATAL  : option --seed has to be a non-negative integer! (" << argv[i + 1] << " was passed)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            seed = (unsigned int) atoi(argv[++i]);
+            ss << "--seed " << seed << "\n";
+        }
         else if (!strcmp(argv[i], "--learn-vars")) {
             if (i == argc - 1) fail_if_last(argv, i);
             if (atoi(argv[i + 1]) < 0) {
