@@ -16,6 +16,8 @@ int check_int_overflow(const size_t n, const int linenumber, const char* filenam
 
 double round_dp(double in);
 
+void initialize_prior(std::vector<double>& probs, std::vector<double>& vars, int N, int Mt, int rank);
+
 double generate_mixture_gaussians(int K_grp, std::vector<double> eta, std::vector<double> pi, long unsigned int seed = 1);
 
 std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double> pi, long unsigned int seed = 1);

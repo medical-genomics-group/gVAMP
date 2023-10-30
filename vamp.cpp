@@ -75,39 +75,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     gamw_init = opt.get_gamw_init();
     r1_init_file = opt.get_estimate_file();  
 
-    if (probs.size()==0 || vars.size()==0){
-        double probs_1 = std::min(50000.0/Mt, 1.0) / (2 - 1.0/pow(2,21)); // pow(-,-) requires <cmath>
-        if (Mt <= 50000)
-            throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
-        double curr_prob = probs_1;
-        probs.push_back(1 - 50000.0/Mt);
-        for (int i0 = 0; i0 < 22; i0++){
-            probs.push_back(curr_prob);
-            curr_prob /= 2;
-        }
-        vars = std::vector<double>{0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773};
-        for (int i0 = 0; i0 < vars.size(); i0++)
-            vars[i0] *= N;
-
-        //printing out the prior details
-        if (rank == 0)
-            std::cout << "scaled variances = ";
-        for (int i = 0; i < vars.size(); i++)
-            if (rank == 0)
-                std::cout << vars[i] << ' ';
-        
-        if (rank ==0)
-            std::cout << std::endl;
-
-        if (rank == 0)
-            std::cout << "probs = ";
-        for (int i = 0; i < probs.size(); i++){
-            if (rank == 0)
-                std::cout << probs[i] << ' ';
-        }
-        if (rank ==0)
-            std::cout << std::endl;  
-    }
+    initialize_prior(this->probs, this->vars, N, Mt, rank);
 
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);
 
@@ -165,39 +133,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     gamw_init = opt.get_gamw_init();
     r1_init_file = opt.get_estimate_file(); 
 
-    if (probs.size()==0 || vars.size()==0){
-        double probs_1 = std::min(50000.0/Mt,1.0)/ (2 - 1.0/pow(2,21)); // pow(-,-) requires <cmath>
-        if (Mt <= 50000)
-            throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
-        double curr_prob = probs_1;
-        probs.push_back(1 - 50000.0/Mt);
-        for (int i0 = 0; i0 < 22; i0++){
-            probs.push_back(curr_prob);
-            curr_prob /= 2;
-        }
-        vars = std::vector<double>{0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773};
-        for (int i0 = 0; i0 < vars.size(); i0++)
-            vars[i0] *= N;
-
-        //printing out the prior details
-        if (rank == 0)
-            std::cout << "scaled variances = ";
-        for (int i = 0; i < vars.size(); i++)
-            if (rank == 0)
-                std::cout << vars[i] << ' ';
-        
-        if (rank ==0)
-            std::cout << std::endl;
-
-        if (rank == 0)
-            std::cout << "probs = ";
-        for (int i = 0; i < probs.size(); i++){
-            if (rank == 0)
-                std::cout << probs[i] << ' ';
-        }
-        if (rank ==0)
-            std::cout << std::endl;  
-    }
+    initialize_prior(this->probs, this->vars, N, Mt, rank);
 
     MPI_Comm_size(MPI_COMM_WORLD, &nranks);   
 }
@@ -1154,6 +1090,7 @@ std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* da
         res_temp = (*dataset).Ax(v.data());
         
         res = (*dataset).ATx(res_temp.data());
+
     } 
     else
     {
@@ -1206,7 +1143,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
 
     for (int i0=0; i0<M; i0++)
         r[i0] = v[i0] - r[i0];
-
+    
     std::vector<double> z(M, 0.0);
 
     //for (int j=0; j<M; j++)
@@ -1224,6 +1161,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
     for (int i = 0; i < CG_max_iter; i++){
 
         // d = A*p
+
         d = lmmse_mult(p, tau, dataset, red);
 
         alpha = inner_prod(r, z, 1) / inner_prod(d, p, 1);
@@ -1250,7 +1188,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
             prev_onsager = onsager;
 
             if (rank == 0)
-                std::cout << "[CG onsager] it = " << i << ": relative error for onsager is " << rel_err << std::endl;
+                std::cout << "[CG onsager] it = " << i << ": relative error for onsager is " << std::setprecision(10) << rel_err << std::endl;
 
         }
 
@@ -1279,7 +1217,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         double err_tol = 1e-5;
 
         if (rank == 0)
-            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " << norm_z /  norm_v << std::endl;
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << std::setprecision(10) << rel_err << ", ||x_it|| = " << std::setprecision(10) << norm_mu << ", ||z|| / ||RHS|| = " << std::setprecision(10) <<  norm_z /  norm_v << std::endl;
 
         if (rel_err < err_tol) 
             break;

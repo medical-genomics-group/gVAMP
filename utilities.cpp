@@ -82,10 +82,63 @@ std::vector<double> simulate(int M, std::vector<double> eta, std::vector<double>
     //    #pragma omp parallel for // not to mess with seeds
     //#endif
     for (int i = 0; i < M; i++){
-        signal[i] = generate_mixture_gaussians(K_grp, eta, pi, seed);
+        signal[i] = generate_mixture_gaussians(K_grp, eta, pi, seed+i);
     }
     return signal;
  }
+
+
+void initialize_prior(std::vector<double>& probs,  std::vector<double>& vars, int N, int Mt, int rank){
+
+    if (probs.size()!=0 || vars.size()!=0) 
+        return;
+
+    int num_mix = 23;
+    double probs_1 = std::min(50000.0/Mt, 1.0) / (2 - 1.0/pow(2,21)); // pow(-,-) requires <cmath>
+    if (Mt <= 50000)
+        throw std::invalid_argument("No probabilities or variances were specified and Mt < 50,000.");
+    double curr_prob = probs_1;
+    probs.push_back(1 - 50000.0/Mt);
+    for (int i0 = 0; i0 < num_mix-1; i0++){
+        probs.push_back(curr_prob);
+        curr_prob /= 2;
+    }
+
+    //printing out the prior details
+    if (rank == 0)
+        std::cout << "probs = ";
+    for (int i = 0; i < probs.size(); i++){
+        if (rank == 0)
+            std::cout << probs[i] << ' ';
+    }
+    if (rank ==0)
+        std::cout << std::endl;  
+
+    double start_var = 1e-5;
+    double stop_var = 1e2;
+    double temp_var = start_var;
+    double c_var = pow(10, log10(stop_var/start_var)/(num_mix-1-1));
+    
+    vars.push_back(0);
+    for (int i0=0; i0<num_mix-1; i0++){
+        vars.push_back(temp_var);
+        temp_var *= c_var;
+    }
+   
+    for (int i0 = 0; i0 < vars.size(); i0++)
+        vars[i0] /= N;
+
+    //printing out prior details
+    if (rank == 0)
+        std::cout << "scaled variances = ";
+    for (int i = 0; i < vars.size(); i++)
+        if (rank == 0)
+            std::cout << vars[i] * N << ' ';
+    
+    if (rank ==0)
+        std::cout << std::endl;
+}
+
 
 // calculation of noise precision based on the signal-to-noise ratio (SNR) and prior distribution of the signal
 double noise_prec_calc(double SNR, std::vector<double> vars, std::vector<double> probs, int Mt, int N){

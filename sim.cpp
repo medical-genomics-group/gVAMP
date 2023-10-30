@@ -231,6 +231,8 @@ int main(int argc, char** argv)
             std::cout << "true R2 = " << 1 - true_R2_tmp*true_R2_tmp << std::endl;
 
         }
+
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

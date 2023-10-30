@@ -775,6 +775,7 @@ void data::compute_people_statistics() {
                     }
                     
             }
+
             return sigma_inv * (dpa - mu * dpb);
 
         #endif
@@ -819,7 +820,6 @@ std::vector<double> data::ATx(double* __restrict__ phen, int SB, int LB) {
     #endif
     for (int mloc=0; mloc < M; mloc++)
          ATx[mloc] = dot_product(mloc, phen, mave[mloc], msig[mloc], SB, LB);
-
 
     // for stability reasons we scale design matrix A with 1/sqrt(number of people)
     double scale;
