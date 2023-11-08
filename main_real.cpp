@@ -354,46 +354,101 @@ int main(int argc, char** argv)
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         std::string est_file_name = opt.get_estimate_file();
-        int pos_dot = est_file_name.find(".");
+        int pos_dot = est_file_name.rfind(".");
         std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
+
+        int pos_it = est_file_name.rfind("it");
+        std::vector<int> iter_range = opt.get_test_iter_range();
+        int min_it = iter_range[0];
+        int max_it = iter_range[1];
         if (rank == 0)
-            std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
+            std::cout << "iter range = [" << min_it << ", " << max_it << "]" << std::endl;
 
-        std::vector<double> x_est;
-        if (end_est_file_name == "bin")
-            x_est = mpi_read_vec_from_file(est_file_name, M, S);
+        double maxR2 = -1;
+        int maxind = -1;
+
+        std::vector< std::vector<double> > z1_hats;
+        std::vector< std::vector<double> > x1_hats;
+        std::vector< std::string > filepaths_out_pvals;
+        std::vector< std::string > filepaths_out_pvals_LOCO;
+        int store_pvals = opt.get_store_pvals(); // 0 = run LOO and LOCO, 1 = run only LOO, 2 = run only LOCO
+
+        if (min_it != -1){
+            for (int it = min_it; it <= max_it; it++){
+                std::vector<double> x_est;
+                std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
+
+                if (end_est_file_name == "bin")
+                    x_est = mpi_read_vec_from_file(est_file_name_it, M, S);
+                else
+                    x_est = read_vec_from_file(est_file_name_it, M, S);
+
+                for (int i0 = 0; i0 < x_est.size(); i0++)
+                    x_est[i0] *= sqrt( (double) N );
+
+                x1_hats.push_back(x_est);
+                
+                std::vector<double> z1_hat = dataset.Ax(x_est.data());
+
+                z1_hats.push_back(z1_hat);
+
+                std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_it_" + std::to_string(it);
+                std::string filepath_out_pvals_LOCO = opt.get_out_dir() + opt.get_out_name() + "_it_" + std::to_string(it);
+                if (rank == 0)
+                    std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
+                if (rank == 0)
+                    std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;
+                filepaths_out_pvals.push_back(filepath_out_pvals + "_pvals.bin");
+                filepaths_out_pvals_LOCO.push_back(filepath_out_pvals_LOCO + "_pvals_LOCO.bin");
+            }
+        }
         else
-            x_est = read_vec_from_file(est_file_name, M, S);
+        {
 
-        for (int i0 = 0; i0 < x_est.size(); i0++)
-            x_est[i0] *= sqrt( (double) N );
+            std::string est_file_name = opt.get_estimate_file();
+            int pos_dot = est_file_name.rfind(".");
+            std::string end_est_file_name = est_file_name.substr(pos_dot + 1);
+            if (rank == 0)
+                std::cout << "end_est_file_name = " << end_est_file_name << std::endl;
 
-        //if (rank==0)
-        //    std::cout << "x_est[1] = " << x_est[1] << std::endl;
+            std::vector<double> x_est;
+            if (end_est_file_name == "bin")
+                x_est = mpi_read_vec_from_file(est_file_name, M, S);
+            else
+                x_est = read_vec_from_file(est_file_name, M, S);
+
+            for (int i0 = 0; i0 < x_est.size(); i0++)
+                x_est[i0] *= sqrt( (double) N );
+
+            x1_hats.push_back(x_est);
+
+            std::vector<double> z1_hat = dataset.Ax(x_est.data());
+
+            z1_hats.push_back(z1_hat);
+
+            std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_pvals.bin";
+            std::string filepath_out_pvals_LOCO = opt.get_out_dir() + opt.get_out_name() + "_pvals_LOCO.bin";
+            if (rank == 0)
+                std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
+            if (rank == 0)
+                std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;
+            filepaths_out_pvals.push_back(filepath_out_pvals);
+            filepaths_out_pvals_LOCO.push_back(filepath_out_pvals_LOCO);
+        }
+
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%
         //   obtaining p-values 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-        std::vector<double> z1 = dataset.Ax(x_est.data());
-
-        //if (rank==0)
-        //    std::cout << "z1[1] = " << z1[1] << std::endl;
-
         std::vector<double> y =  dataset.filter_pheno();
-        // saving pvals vector
-        std::string filepath_out_pvals = opt.get_out_dir() + opt.get_out_name() + "_pvals.bin";
-        if (rank == 0)
-            std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
-        std::vector<double> pvals = dataset.pvals_calc(z1, y, x_est, filepath_out_pvals);
+
+        if (store_pvals == 0 || store_pvals == 1)
+            std::vector< std::vector<double> > pvals = dataset.pvals_calc(z1_hats, y, x1_hats, filepaths_out_pvals);
 
         // calculating p-values using LOCO method, if .bim file is specified
-        if (dataset.get_bimfp() != ""){
-            std::string filepath_out_pvals_LOCO = opt.get_out_dir() + opt.get_out_name();
-            std::vector<double> pvals_LOCO = dataset.pvals_calc_LOCO(z1, y, x_est, filepath_out_pvals_LOCO);
-            if (rank == 0)
-                std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;
-        }
+        if (dataset.get_bimfp() != "" && (store_pvals == 0 || store_pvals == 2) )
+            std::vector< std::vector<double> > pvals_LOCO = dataset.pvals_calc_LOCO(z1_hats, y, x1_hats, filepaths_out_pvals_LOCO);
     }
     else if (opt.get_run_mode() == "restart"){ 
 

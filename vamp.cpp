@@ -762,14 +762,14 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
         // calculating p-values using LOO method
         std::string filepath_out_pvals = out_dir + out_name + "_pvals.bin";
-        std::vector<double> pvals = (*dataset).pvals_calc(z1, y, x1_hat, filepath_out_pvals);
+        std::vector< std::vector<double> > pvals = (*dataset).pvals_calc(std::vector< std::vector<double> > {z1}, y, std::vector< std::vector<double> > {x1_hat}, std::vector< std::string > {filepath_out_pvals});
         if (rank == 0)
             std::cout << "filepath_out_pvals = " << filepath_out_pvals << std::endl;
 
         // calculating p-values using LOCO method, if .bim file is specified
         if ((*dataset).get_bimfp() != ""){
             std::string filepath_out_pvals_LOCO = out_dir + out_name;
-            std::vector<double> pvals_LOCO = (*dataset).pvals_calc_LOCO(z1, y, x1_hat, filepath_out_pvals_LOCO);
+            std::vector< std::vector<double> > pvals_LOCO = (*dataset).pvals_calc_LOCO(std::vector< std::vector<double> > {z1}, y, std::vector< std::vector<double> > {x1_hat}, std::vector< std::string > {filepath_out_pvals_LOCO});
             if (rank == 0)
                 std::cout << "filepath_out_pvals_LOCO = " << filepath_out_pvals_LOCO << std::endl;
         }
@@ -1217,7 +1217,7 @@ std::vector<double> vamp::precondCG_solver(std::vector<double> v, std::vector<do
         double err_tol = 1e-5;
 
         if (rank == 0)
-            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << std::setprecision(10) << rel_err << ", ||x_it|| = " << std::setprecision(10) << norm_mu << ", ||z|| / ||RHS|| = " << std::setprecision(10) <<  norm_z /  norm_v << std::endl;
+            std::cout << "[CG] it = " << i << ": ||r_it|| / ||RHS|| = " << std::setprecision(10) << rel_err << ", ||x_it|| = " << norm_mu << ", ||z|| / ||RHS|| = " <<  norm_z /  norm_v << std::endl;
 
         if (rel_err < err_tol) 
             break;

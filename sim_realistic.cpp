@@ -48,8 +48,8 @@ int main(int argc, char** argv)
 
     //std::vector<double> vars_init = opt.get_vars();
     //std::vector<double> probs_init = opt.get_probs();
-    std::vector<double> vars_init;
-    std::vector<double> probs_init;
+    std::vector<double> vars_init = opt.get_vars();
+    std::vector<double> probs_init = opt.get_probs();
     //int CV = opt.get_CV();
     double h2 = 0.5525262;
     //int CVhat = CV / 3;
