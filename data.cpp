@@ -1274,7 +1274,7 @@ std::vector< std::vector<double> >  data::pvals_calc_LOCO(std::vector< std::vect
                         for (int j=0; j<4; j++) 
                             for (int ie=0; ie<nE; ie++){
                                 double gen_part = (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] / sqrt(N);
-                                y_mark[ie][4*i+j] += gen_part * x1_hat[ie][m];
+                                y_chrom_tmp[ie][4*i+j] += gen_part * x1_hat[ie][m];
                             }
                         //    y_chrom_tmp[ie][4*i+j] += (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] * x1_hat[ie][m] / sqrt(N);
                     }
