@@ -46,8 +46,8 @@ int main(int argc, char** argv)
 
     // simulating data for realistic values of parameters
 
-    std::vector<double> vars_init; // = opt.get_vars();
-    std::vector<double> probs_init; //  = opt.get_probs();
+    std::vector<double> vars_init = opt.get_vars();
+    std::vector<double> probs_init = opt.get_probs();
     int CV = opt.get_CV();
     double h2 = opt.get_h2();
     //int CVhat = 2*CV;

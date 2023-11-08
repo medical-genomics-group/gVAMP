@@ -1060,7 +1060,7 @@ std::vector<double> data::Zx(std::vector<double> phen){
 
 //****************************
 // FILTERING PHENOTYPE VALUES
-//*****************************
+//****************************
 
 std::vector<double> data::filter_pheno(){
 
@@ -1105,12 +1105,17 @@ std::vector<double> data::filter_pheno(int *nonnan){
 // finding p-values from t-test on regression coefficient = 0 
 // in leave-one-out setting, i.e. y - A_{-k}x_{-k} = alpha_k * x_k, H0: alpha_k = 0
 // Supports only full - individual version of the algorithm.
-std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath){
-    std::vector<double> pvals(M, 0.0);
+std::vector< std::vector<double> > data::pvals_calc(std::vector< std::vector<double> > z1, std::vector<double> y, std::vector< std::vector<double> > x1_hat, std::vector< std::string > filepath){
+    
+    // finding number of different estimators to run LOO on
+    int nE = z1.size();
+    std::vector< std::vector<double> > pvals(nE, std::vector<double>(M,0.0));
     // phenotypic values corrected for genetic predictors
-    std::vector<double> y_mod = std::vector<double> (4*mbytes, 0.0);
-    for (int i=0; i<N; i++)
-        y_mod[i] = y[i] - z1[i];
+    std::vector< std::vector<double> > y_mod(nE, std::vector<double>(4*mbytes, 0.0));
+    for (int ie=0; ie<nE; ie++)
+        for (int i=0; i<N; i++)
+            y_mod[ie][i] = y[i] - z1[ie][i];
+
     double* mave = get_mave();
     double* msig = get_msig();
 
@@ -1122,17 +1127,23 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
                 std::cout << "so far worker 0 has calculated " << k << " pvals." << std::endl;
 
             // phenotype values after marker specific correction
-            std::vector<double> y_mark = std::vector<double> (4*mbytes, 0.0);
+            std::vector< std::vector<double> > y_mark(nE, std::vector<double> (4*mbytes, 0.0));
 
-            for (int i=0; i<N; i++)
-                y_mark[i] = y_mod[i];
+            for (int ie=0; ie<nE; ie++)
+                for (int i=0; i<N; i++)
+                    y_mark[ie][i] = y_mod[ie][i];
 
             unsigned char* bed = &bed_data[k * mbytes];
-            double sumx = 0, sumsqx = 0, sumxy = 0, sumy = 0, sumsqy = 0;
+            double sumx = 0, sumsqx = 0;
+            std::vector<double> sumxy(nE, 0.0), sumy(nE, 0.0), sumsqy(nE, 0.0);
             int count = 0;
             
             #ifdef _OPENMP
-            #pragma omp parallel for reduction(+ : sumx, sumsqx, sumxy, sumy, sumsqy, count)
+            #pragma omp declare reduction(vec_double_plus : std::vector<double> : \
+                              std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<double>())) \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
+            #pragma omp parallel for reduction(+ : sumx, sumsqx, count) reduction(vec_double_plus : sumxy, sumy, sumsqy)
             #endif
             for (int i=0; i<mbytes; i++) {
 
@@ -1140,7 +1151,12 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
                 #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
                 #endif
                 for (int j=0; j<4; j++) 
-                    y_mark[4*i+j] += (dotp_lut_a[bed[i] * 4 + j] - mave[k]) * msig[k] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] * x1_hat[k] / sqrt(N);
+                    for (int ie=0; ie<nE; ie++){
+                        double gen_part = (dotp_lut_a[bed[i] * 4 + j] - mave[k]) * msig[k] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] / sqrt(N);
+                        y_mark[ie][4*i+j] += gen_part * x1_hat[ie][k];
+                    }
+                            
+                
 
                 //#ifdef _OPENMP
                 //#pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32) reduction(+:sumx, sumsqx, sumxy)
@@ -1151,39 +1167,51 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
 
                     sumx += value;
                     sumsqx += value * value;
-                    sumxy += value * y_mark[4*i+j];   
-                    sumy += y_mark[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
-                    sumsqy += y_mark[4*i+j] * y_mark[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                    for (int ie=0; ie<nE; ie++){
+                        sumxy[ie] += value * y_mark[ie][4*i+j];   
+                        sumy[ie] += y_mark[ie][4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                        sumsqy[ie] += y_mark[ie][4*i+j] * y_mark[ie][4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                    }
                     count += dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
 
                 }
             }
 
-            pvals[k] = linear_reg1d_pvals(sumx, sumsqx, sumxy, sumy, sumsqy, count);
-        }  
-        mpi_store_vec_to_file(filepath, pvals, S, M);
+            for (int ie=0; ie<nE; ie++)
+                pvals[ie][k] = linear_reg1d_pvals(sumx, sumsqx, sumxy[ie], sumy[ie], sumsqy[ie], count);
+        }
+
+        for (int ie; ie<nE; ie++)  
+            mpi_store_vec_to_file(filepath[ie], pvals[ie], S, M);
     }
     else if (type_data == "meth"){ // add normalization to expressions & take into account scaling & account for missing data points & reduction 
         // not yet properly implemented
         for (int k=0; k<M; k++){
 
-            std::vector<double> y_mark = y_mod;
+            int nE = z1.size();
+            std::vector< std::vector<double> > y_mark = y_mod;
             double* meth = &meth_data[k * N];
 
-            double sumx = 0, sumsqx = 0, sumxy = 0;
+            double sumx = 0, sumsqx = 0; 
+            std::vector<double> sumxy(nE, 0.0);
             #ifdef _OPENMP
                 #pragma omp simd
             #endif
             for (int i=0; i<N; i++) 
-                y_mark[i] += meth[i] * x1_hat[k];
-            
+                for (int ie=0; ie<nE; ie++)
+                    y_mark[ie][i] += meth[i] * x1_hat[ie][k];
             #ifdef _OPENMP
-                #pragma omp simd reduction(+:sumx, sumsqx, sumxy)
+            #pragma omp declare reduction(vec_double_plus : std::vector<double> : \
+                              std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<double>())) \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+            #pragma omp simd reduction(+:sumx, sumsqx) reduction(vec_double_plus : sumxy)
             #endif
             for (int i=0; i<N; i++) {
-                sumx += meth[i];
-                sumsqx += meth[i]*meth[i];
-                sumxy += meth[i]*y_mark[i];
+                for (int ie=0; ie<nE; ie++) {
+                    sumx += meth[i];
+                    sumsqx += meth[i]*meth[i];
+                    sumxy[ie] += meth[i]*y_mark[ie][i];
+                }
             }
 
             sumx = 0.0;
@@ -1204,29 +1232,32 @@ std::vector<double> data::pvals_calc(std::vector<double> z1, std::vector<double>
 // S contains markers from all the other chromosome except the one that contains marker
 // with index k.
 // !! Currently implemented only for .bed type of data !!
-std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath){
+std::vector< std::vector<double> >  data::pvals_calc_LOCO(std::vector< std::vector<double> > z1, std::vector<double> y, std::vector< std::vector<double> > x1_hat, std::vector< std::string > filepath){
 
-    std::vector<double> pvals(M, 0.0);
+    // finding number of different estimators to run LOCO on
+    int nE = z1.size();
+    std::vector< std::vector<double> > pvals(nE, std::vector<double>(M,0.0));
     // phenotypic values corrected for genetic predictors
-    std::vector<double> y_mod = std::vector<double> (4*mbytes, 0.0);
-    for (int i=0; i<N; i++)
-        y_mod[i] = y[i] - z1[i];
+    std::vector< std::vector<double> > y_mod(nE, std::vector<double>(4*mbytes, 0.0));
+    for (int ie = 0; ie < nE; ie++)
+        for (int i=0; i<N; i++)
+            y_mod[ie][i] = y[i] - z1[ie][i];
 
     // fetch mean and inverse standard deviation values per markers
     double* mave = get_mave();
     double* msig = get_msig();
 
     // phenotype values after chromosome specific correction
-    std::vector<double> y_chrom; 
+    std::vector< std::vector<double> > y_chrom; 
 
     std::vector<int> ch_info = read_chromosome_info(bimfp);
 
     // we iterate over 22 non-sex chromosomes in humans
     for (int ch=1; ch<=23; ch++){
 
-        y_chrom = std::vector<double> (4*mbytes, 0.0);
+        y_chrom = std::vector< std::vector<double> > (nE, std::vector<double> (4*mbytes, 0.0));
 
-        std::vector<double> y_chrom_tmp = std::vector<double> (4*mbytes, 0.0);
+        std::vector< std::vector<double> > y_chrom_tmp (nE, std::vector<double>(4*mbytes, 0.0));
 
         for (int m=0; m<M; m++){    
 
@@ -1234,63 +1265,89 @@ std::vector<double> data::pvals_calc_LOCO(std::vector<double> z1, std::vector<do
 
                 unsigned char* bed = &bed_data[m * mbytes];
 
-                for (int i=0; i<mbytes; i++) {
+                //for (int ie=0; ie<nE; ie++){
+                    for (int i=0; i<mbytes; i++) {
 
-                    #ifdef _OPENMP
-                    #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
-                    #endif
-                    for (int j=0; j<4; j++) 
-                        y_chrom_tmp[4*i+j] += (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] * x1_hat[m] / sqrt(N);
-                }
+                        #ifdef _OPENMP
+                        #pragma omp simd aligned(dotp_lut_a,dotp_lut_b:32)
+                        #endif
+                        for (int j=0; j<4; j++) 
+                            for (int ie=0; ie<nE; ie++){
+                                double gen_part = (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] / sqrt(N);
+                                y_chrom_tmp[ie][4*i+j] += gen_part * x1_hat[ie][m];
+                            }
+                        //    y_chrom_tmp[ie][4*i+j] += (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j] * x1_hat[ie][m] / sqrt(N);
+                    }
+                //}
             }
         }
-    
-        MPI_Allreduce(y_chrom_tmp.data(), y_chrom.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        MPI_Request * requests = new MPI_Request[nE];
+        for (int ie=0; ie<nE; ie++){ 
+            MPI_Iallreduce(y_chrom_tmp[ie].data(), y_chrom[ie].data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD, &requests[ie]);
+        }
+        MPI_Waitall(nE, requests, MPI_STATUSES_IGNORE);
+        
 
         // saving predictors for a particular chromosome
-        std::string filepath_predictors = filepath + "_LOCO_chr_" + std::to_string(ch) + ".csv";
-        if (rank == 0)
-            store_vec_to_file(filepath_predictors, y_chrom);
+        for (int ie=0; ie<nE; ie++){
+            std::string filepath_predictors = filepath[ie] + "_LOCO_chr_" + std::to_string(ch) + ".csv";
+            if (rank == 0)
+                store_vec_to_file(filepath_predictors, y_chrom[ie]);
 
-        if (rank == 0)
-           std::cout << "filepath predictors = " << filepath_predictors << std::endl;
+            if (rank == 0)
+            std::cout << "filepath predictors = " << filepath_predictors << std::endl;
 
-        std::transform (y_chrom.begin(), y_chrom.end(), y_mod.begin(), y_chrom.begin(), std::plus<double>());
+            std::transform (y_chrom[ie].begin(), y_chrom[ie].end(), y_mod[ie].begin(), y_chrom[ie].begin(), std::plus<double>());
+        }
+
+        
     
         for (int m=0; m<M; m++){    
             if (ch_info[m] == ch){
 
-                unsigned char* bed = &bed_data[m * mbytes];
-                double sumx = 0, sumsqx = 0, sumxy = 0, sumy = 0, sumsqy = 0;
-                int count = 0;
-                
-                #ifdef _OPENMP
-                #pragma omp parallel for reduction(+ : sumx, sumsqx, sumxy, sumy, sumsqy, count)
-                #endif
-                for (int i=0; i<mbytes; i++) {
+                    unsigned char* bed = &bed_data[m * mbytes];
+                    std::vector<double> sumxy(nE, 0.0), sumy(nE, 0.0), sumsqy(nE, 0.0);
+                    double sumx=0, sumsqx=0;
+                    int count = 0;
+                    
+                    #ifdef _OPENMP
+                    #pragma omp declare reduction(vec_double_plus : std::vector<double> : \
+                              std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<double>())) \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
-                    for (int j=0; j<4; j++) {
+                    
+                    #pragma omp parallel for reduction(+ : sumx, sumsqx, count) reduction(vec_double_plus : sumxy, sumy, sumsqy)
+                    #endif
+                    for (int i=0; i<mbytes; i++) {
 
-                        double value = (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                        for (int j=0; j<4; j++) {
 
-                        sumx += value;
-                        sumsqx += value * value;
-                        sumxy += value * y_chrom[4*i+j];   
-                        sumy += y_chrom[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
-                        sumsqy += y_chrom[4*i+j] * y_chrom[4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
-                        count += dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                            double value = (dotp_lut_a[bed[i] * 4 + j] - mave[m]) * msig[m] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
 
+                            sumx += value;
+                            sumsqx += value * value;
+                            for (int ie=0; ie<nE; ie++){
+                                sumxy[ie] += value * y_chrom[ie][4*i+j];   
+                                sumy[ie] += y_chrom[ie][4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                                sumsqy[ie] += y_chrom[ie][4*i+j] * y_chrom[ie][4*i+j] * dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+                            }
+                            count += dotp_lut_b[bed[i] * 4 + j] * na_lut[mask4[i] * 4 + j];
+
+                        }
                     }
-                }
 
-                pvals[m] = linear_reg1d_pvals(sumx, sumsqx, sumxy, sumy, sumsqy, count);   
+                    for (int ie=0; ie<nE; ie++)
+                        pvals[ie][m] = linear_reg1d_pvals(sumx, sumsqx, sumxy[ie], sumy[ie], sumsqy[ie], count); 
             }
         }
         
     }
 
-    std::string filepath_pvals = filepath + "_pvals_LOCO.bin";
-    mpi_store_vec_to_file(filepath_pvals, pvals, S, M);
+    for (int ie=0; ie <nE; ie++){
+        std::string filepath_pvals = filepath[ie] + "_pvals_LOCO.bin";
+        mpi_store_vec_to_file(filepath_pvals, pvals[ie], S, M);
+    }
 
     return pvals;
 }

@@ -136,8 +136,10 @@ public:
     //*****************************************************
     // CALCULATION OF p-values using LOO and LOCO APPROACH
     //*****************************************************
-    std::vector<double> pvals_calc(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath);
-    std::vector<double> pvals_calc_LOCO(std::vector<double> z1, std::vector<double> y, std::vector<double> x1_hat, std::string filepath);
+    std::vector< std::vector<double> > pvals_calc(std::vector< std::vector<double> > z1, std::vector<double> y, std::vector< std::vector<double> > x1_hat, std::vector< std::string > filepath);
+    std::vector< std::vector<double> > pvals_calc_LOCO(std::vector< std::vector<double> > z1, std::vector<double> y, std::vector< std::vector<double> > x1_hat, std::vector< std::string > filepath);
+
+    
 
 };
 
