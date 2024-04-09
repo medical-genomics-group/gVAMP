@@ -15,7 +15,7 @@ mpirun -np ${NUM_MPI_WORKERS} --allow-run-as-root main_real.exe \
 	--run-mode infere \
 	--bim-file ${DATA_DIR}/... \
 	--bed-file ${DATA_DIR}/... \
-	--phen-file ${DATA_DIR}/... \
+	--phen-files ${DATA_DIR}/... \
 	--N ... \
 	--Mt ... \
 	--out-dir ${OUT_DIR}/ \
