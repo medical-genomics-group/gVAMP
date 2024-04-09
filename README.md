@@ -1,6 +1,7 @@
 ## Table of contents
 * [General info](#general-info)
 * [Setup and supported options](#setup-and-supported-options)
+* [Docker setup](#docker-setup)
 
 ## General info
 This repository contains a software implementation of Vector Approximate Message Passing algorithm suitable for doing inference in Genome-Wide Association Studies (GWAS).  
@@ -72,8 +73,25 @@ Currently supported input options to C++ version of the code:
 | `freeze-index-file` | a file containing 0/1 assigned to the indices that are being freezed in the inference process |
 | `seed` | defines a seed for the gVAMP run (must be a non-negative integer) |
 
+## Docker setup
+Running the docker application step-by-step.
 
+First, clone the repository to the local workspace.
+```
+git clone https://github.com/medical-genomics-group/gVAMP.git
+```
+Change the working directory.
+```
+cd gVAMP
+```
+Modify ``run_gvamp.sh`` script and set paths to your data. In the run time, the data directory can be mounted to a specific location in the container.
 
-
-
-
+Then, build docker image.
+```
+docker build -t gvamp .
+```
+Finnaly, run docker application in detached mode (``-d``). ``-v`` allows mounting local data to your container. Note, that you can specify arbitrary mounted directory instead of ``/home/mnt``, but this has to be consistent with the paths specified in ``run_gvamp.sh``.
+```
+docker run -d -v {local data directory}:/home/mnt gvamp:latest
+```
+By default, the output logs will show in ``{local data directory}/output/gvamp.log``.
