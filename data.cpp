@@ -142,14 +142,14 @@ void data::read_phen() {
 
             std::sregex_token_iterator first{line.begin(), line.end(), re, -1}, last;
             std::vector<std::string> tokens{first, last};
-            if (tokens[2] == "NA") {
+            if (tokens.back() == "NA") {
                 nas += 1;
                 phen_data.push_back(std::numeric_limits<double>::max());
                 mask4.at(int(line_n / 4)) &= ~(0b1 << m4);
             } else {
                 nonas += 1;
-                phen_data.push_back(atof(tokens[2].c_str()));
-                sum += atof(tokens[2].c_str());
+                phen_data.push_back(atof(tokens.back().c_str()));
+                sum += atof(tokens.back().c_str());
             }
 
             line_n += 1;
