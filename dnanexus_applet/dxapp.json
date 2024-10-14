@@ -1,0 +1,82 @@
+{
+  "name": "gvamp",
+  "title": "gVAMP",
+  "summary": "Software implementation of Vector Approximate Message Passing algorithm suitable for doing inference in Genome-Wide Association Studies",
+  "dxapi": "1.0.0",
+  "version": "0.0.1",
+  "access": {
+    "network": ["*"]
+  },
+  "inputSpec": [
+    {
+      "name": "bed_file",
+      "label": "PLINK bed file",
+      "class": "file",
+      "optional": false,
+      "patterns": ["*"],
+      "help": ""
+    },
+    {
+      "name": "bim_file",
+      "label": "PLINK bim file",
+      "class": "file",
+      "optional": false,
+      "patterns": ["*"],
+      "help": ""
+    },
+    {
+      "name": "phen_file",
+      "label": "PLINK phen file",
+      "class": "file",
+      "optional": false,
+      "patterns": ["*"],
+      "help": ""
+    },
+    {
+      "name": "iterations",
+      "label": "Number of gVAMP iterations",
+      "class": "string",
+      "optional": false,
+      "help": ""
+    },
+    {
+      "name": "out",
+      "label": "Output name",
+      "class": "string",
+      "optional": false,
+      "help": ""
+    }
+  ],
+  "outputSpec": [
+    {
+      "name": "marker_estimates",
+      "label": "Genomic marker estimates and associations file",
+      "class": "file",
+      "patterns": [
+        "*"
+      ],
+      "help": ""
+    }
+  ],
+  "runSpec": {
+    "timeoutPolicy": {
+      "*": {
+        "days": 30
+      }
+    },
+    "interpreter": "bash",
+    "file": "src/gvamp.sh",
+    "distribution": "Ubuntu",
+    "release": "20.04",
+    "version": "0"
+  },
+  "regionalOptions": {
+    "aws:eu-west-2": {
+      "systemRequirements": {
+        "*": {
+          "instanceType": "mem1_ssd1_v2_x8"
+        }
+      }
+    }
+  }
+}
