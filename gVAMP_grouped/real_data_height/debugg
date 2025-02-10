@@ -1,0 +1,11 @@
+kkoegler@bea81:~/gVAMP_grouped/real_data_height$ sbatch slurm_test10
+Submitted batch job 27836437
+kkoegler@bea81:~/gVAMP_grouped/real_data_height$ sbatch slurm_test20
+Submitted batch job 27836439
+kkoegler@bea81:~/gVAMP_grouped/real_data_height$ sbatch slurm_test30
+Submitted batch job 27836441
+kkoegler@bea81:~/gVAMP_grouped/real_data_height$ squeue -u kkoegler
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          27836437  defaultp gVAMP_la kkoegler  R       0:11      5 eta[295,297,299-301]
+          27836439  defaultp gVAMP_la kkoegler  R       0:08     12 eta[303-305,307-312,318,320-321]
+          27836441  defaultp gVAMP_la kkoegler  R       0:03      1 zeta243

@@ -1,0 +1,4105 @@
+
+Currently Loaded Modules:
+  1) gcc/10.3    (T)   3) hwloc/1.11.13   5) boost/1.80.0
+  2) cuda/11.2.2       4) openmpi/4.1.4
+
+  Where:
+   T:  Testing
+
+ 
+
+bed_name =  ukb22828_UKB_EST_v3_ldp08_fd_train
+phen_name =  ukb_ldp08_fd_R050_HT_train
+
+ardyh command line options:
+--bed-file /nfs/scistore13/robingrp/human_data/adepope_preprocessing/geno_testVAMP/ukb22828_UKB_EST_v3_ldp08_fd_train.bed
+--phen-files /nfs/scistore13/robingrp/human_data/adepope_preprocessing/geno_testVAMP/ukb_ldp08_fd_R050_HT_train.phen
+--N 399055
+--Mt 2174071
+--out-dir /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/
+--out-name x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars
+--iterations 35
+--num-mix-comp 5
+--CG-max-iter 15
+--probs 0.97,0.01,0.01,0.005,0.005
+--vars 0,0.0000001,0.000001,0.00001,0.0001
+--model linear
+--run-mode infere
+--use-lmmse-damp 0
+--store-pvals 1
+--rho 0.5
+
+INFO   : rank    0 has 72470 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 0
+INFO   : rank    1 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 72470
+INFO   : rank    2 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 144939
+INFO   : rank   14 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1014567
+INFO   : rank    4 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 289877
+INFO   : rank    5 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 362346
+INFO   : rank   25 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1811726
+INFO   : rank    9 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 652222
+INFO   : rank   22 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1594319
+INFO   : rank   10 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 724691
+INFO   : rank   23 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1666788
+INFO   : rank    8 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 579753
+INFO   : rank    6 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 434815
+INFO   : rank   11 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 797160
+INFO   : rank    7 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 507284
+INFO   : rank   12 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 869629
+INFO   : rank   24 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1739257
+INFO   : rank   13 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 942098
+INFO   : rank   26 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1884195
+INFO   : rank   28 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 2029133
+INFO   : rank    3 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 217408
+INFO   : rank   21 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1521850
+INFO   : rank   29 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 2101602
+INFO   : rank   20 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1449381
+INFO   : rank   27 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1956664
+INFO   : rank   18 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1304443
+INFO   : rank   19 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1376912
+INFO   : rank   17 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1231974
+INFO   : rank   15 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1087036
+INFO   : rank   16 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1159505
+rank = 5: setting last 1 bits to NAs
+rank = 4: setting last 1 bits to NAs
+rank = 3: setting last 1 bits to NAs
+rank = 2: setting last 1 bits to NAs
+rank = 1: setting last 1 bits to NAs
+rank = 0: setting last 1 bits to NAs
+rank = 21: setting last 1 bits to NAs
+rank = 25: setting last 1 bits to NAs
+rank = 11: setting last 1 bits to NAs
+rank = 14: setting last 1 bits to NAs
+rank = 8: setting last 1 bits to NAs
+rank = 7: setting last 1 bits to NAs
+rank = 13: setting last 1 bits to NAs
+rank = 6: setting last 1 bits to NAs
+rank = 26: setting last 1 bits to NAs
+rank = 23: setting last 1 bits to NAs
+rank = 15: setting last 1 bits to NAs
+rank = 16: setting last 1 bits to NAs
+rank = 17: setting last 1 bits to NAs
+rank = 27: setting last 1 bits to NAs
+rank = 12: setting last 1 bits to NAs
+rank = 29: setting last 1 bits to NAs
+rank = 9: setting last 1 bits to NAs
+rank = 10: setting last 1 bits to NAs
+rank = 24: setting last 1 bits to NAs
+rank = 19: setting last 1 bits to NAs
+rank = 28: setting last 1 bits to NAs
+rank = 22: setting last 1 bits to NAs
+rank = 20: setting last 1 bits to NAs
+rank = 18: setting last 1 bits to NAs
+INFO   : rank 0 has allocated 7229897080 bytes (7.230 GB) for raw data.
+INFO   : rank 1 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 2 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 3 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 14 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 25 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 24 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 27 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 19 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 11 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 8 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 5 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 9 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 26 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 21 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 23 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 16 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 13 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 7 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 4 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 10 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 22 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 15 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 29 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 20 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 12 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 6 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 17 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 28 has allocated 7229797316 bytes (7.230 GB) for raw data.
+INFO   : rank 18 has allocated 7229797316 bytes (7.230 GB) for raw data.
+reading genotype data took 133.556 seconds.
+rank = 0: statistics took 65.2723 seconds to run.
+rank = 0: people statistics took 362.299 seconds to run.
+msig_people filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_msig_people.csv
+max = 1.0934, min = 0
+c_scale = 0.00158301
+gam2 = 0.0001
+
+********************
+iteration = 1
+********************
+->LMMSE
+l2_norm(p_last, 0) = 0
+l2_norm(mu_CG_last, 0) = 0
+alpha = 0.0386315
+eta = 0.187434
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.02093, ||x_it|| = 0.00488076
+alpha = 0.00726239
+eta = 0.680666
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.80963, ||x_it|| = 0.0059118
+alpha = 0.00244024
+eta = 1.04419
+[CG] it = 2: ||r_it|| / ||RHS|| = 2.14061, ||x_it|| = 0.00713423
+alpha = 0.00232599
+eta = 0.606929
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.50354, ||x_it|| = 0.00893022
+alpha = 0.00399675
+eta = 0.364768
+[CG] it = 4: ||r_it|| / ||RHS|| = 1.00838, ||x_it|| = 0.0105752
+alpha = 0.00662716
+eta = 0.577005
+[CG] it = 5: ||r_it|| / ||RHS|| = 1.16302, ||x_it|| = 0.011893
+alpha = 0.00418677
+eta = 0.924818
+[CG] it = 6: ||r_it|| / ||RHS|| = 1.39744, ||x_it|| = 0.01308
+alpha = 0.00408081
+eta = 0.353251
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.743054, ||x_it|| = 0.0148788
+alpha = 0.0118854
+eta = 0.389092
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.681694, ||x_it|| = 0.0164891
+alpha = 0.0146789
+eta = 0.349285
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.554576, ||x_it|| = 0.0183346
+alpha = 0.0123301
+eta = 0.506088
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.603999, ||x_it|| = 0.0194548
+alpha = 0.00859417
+eta = 0.403226
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.473826, ||x_it|| = 0.0204502
+alpha = 0.0118055
+eta = 0.462493
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.454326, ||x_it|| = 0.0213539
+alpha = 0.00948962
+eta = 0.402885
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.372625, ||x_it|| = 0.0220687
+alpha = 0.012827
+eta = 0.452061
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.352376, ||x_it|| = 0.0227642
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 1.05825e-05, <w, mu> / Mt = 0.022202
+inner_prod(v, mu, 0) / Mt = 0.022202
+correction = -6.14208e-10
+ksis.back() = 4.4404e-06, other part = 1.19179e-10
+new_vars = 1.177e+09
+new_vars = 1.177e+09
+CG took 1378.71 seconds.
+onsager took 6.8e-08 seconds.
+alpha2 = 0.999994
+gam1 = 8.49617e-10
+true gam1 = 8.4961e-10
+l2_norm2(temp) / N = 0.124168
+trace_correction / N = 1.67312e-05
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.352376
+R2 = 0.875831
+prior variances = 0 0.0399055 0.399055 3.99055 39.9055 
+prior probabilities = 0.97 0.01 0.01 0.005 0.005 
+gamw = 8.05249
+lmmse step took 1510.59 seconds.
+->DENOISING
+A total of 1 variance and prior tuning iterations were performed
+time needed to calculate z1 = 66.1001 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_1.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_1.bin
+time needed to save beta1 to an external file = 0.708428 seconds
+gam2 = 6.22057
+true gam2 = 2.27642e+22
+it = 0: dist_probs = 2.34101e-15 & dist_vars = 2.8776e-13
+Final number of prior EM iterations = 1 / 2
+time needed to calculate conditional expectation = 0.174025 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.999969
+R2 = 6.19328e-05
+prior variances = 0 0.0399055 0.399055 3.99055 39.9055 
+prior probabilities = 0.97 0.01 0.01 0.005 0.005 
+gamw = 8.05249
+denoising step took 133.564 seconds.
+total iteration time = 1644.15
+total computation time so far = 1644.15
+
+
+
+********************
+iteration = 2
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2603.13
+l2_norm(mu_CG_last, 0) = 113.821
+alpha = 0.00905453
+eta = 0.0336139
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.963433, ||x_it|| = 286.511
+alpha = 0.00176449
+eta = 0.111648
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.67054, ||x_it|| = 342.586
+alpha = 0.000590291
+eta = 0.156892
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.92458, ||x_it|| = 406.295
+alpha = 0.000556373
+eta = 0.0781439
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.30189, ||x_it|| = 494.517
+alpha = 0.000956813
+eta = 0.0371554
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.841588, ||x_it|| = 569.928
+alpha = 0.00158698
+eta = 0.0491626
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.935859, ||x_it|| = 626.437
+alpha = 0.00100316
+eta = 0.0682685
+[CG] it = 6: ||r_it|| / ||RHS|| = 1.08479, ||x_it|| = 674.125
+alpha = 0.000959819
+eta = 0.0182336
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.54623, ||x_it|| = 740.638
+alpha = 0.00277959
+eta = 0.0135838
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.471859, ||x_it|| = 794.257
+alpha = 0.00336522
+eta = 0.00678132
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.354326, ||x_it|| = 848.307
+alpha = 0.0028841
+eta = 0.00584261
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.363431, ||x_it|| = 877.174
+alpha = 0.00201101
+eta = 0.00159656
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.268606, ||x_it|| = 900.148
+alpha = 0.00274761
+eta = -0.00053238
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.241343, ||x_it|| = 918.724
+alpha = 0.00222108
+eta = -0.00228703
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.186533, ||x_it|| = 931.802
+alpha = 0.00297124
+eta = -0.00386601
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.164514, ||x_it|| = 943.067
+alpha = 0.0023966
+eta = -0.0044079
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.125416, ||x_it|| = 950.665
+alpha = 0.00339881
+eta = -0.00665206
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.125728, ||x_it|| = 957.397
+alpha = 0.000405215
+eta = -0.0103597
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.138998, ||x_it|| = 958.24
+alpha = 0.00157986
+eta = -0.00582338
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.0814707, ||x_it|| = 962.42
+alpha = 0.0029993
+eta = -0.00640577
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.0685165, ||x_it|| = 965.326
+alpha = 0.00305838
+eta = -0.00572941
+[CG] it = 20: ||r_it|| / ||RHS|| = 0.0501074, ||x_it|| = 967.556
+alpha = 0.00444791
+eta = -0.00564434
+[CG] it = 21: ||r_it|| / ||RHS|| = 0.0381899, ||x_it|| = 969.411
+alpha = 0.00340761
+eta = -0.016191
+[CG] it = 22: ||r_it|| / ||RHS|| = 0.0598642, ||x_it|| = 970.288
+alpha = 0.000501115
+eta = -0.0082256
+[CG] it = 23: ||r_it|| / ||RHS|| = 0.0361424, ||x_it|| = 970.616
+alpha = 0.00250214
+eta = -0.00630949
+[CG] it = 24: ||r_it|| / ||RHS|| = 0.0251465, ||x_it|| = 971.235
+alpha = 0.00273619
+eta = -0.0193639
+[CG] it = 25: ||r_it|| / ||RHS|| = 0.041318, ||x_it|| = 971.577
+alpha = 0.000698008
+eta = -0.00633965
+[CG] it = 26: ||r_it|| / ||RHS|| = 0.0187994, ||x_it|| = 971.821
+alpha = 0.0039003
+eta = -0.00629276
+[CG] it = 27: ||r_it|| / ||RHS|| = 0.0148583, ||x_it|| = 972.115
+alpha = 0.00410921
+eta = -0.0059941
+[CG] it = 28: ||r_it|| / ||RHS|| = 0.0113324, ||x_it|| = 972.319
+alpha = 0.00448073
+eta = -0.00737205
+[CG] it = 29: ||r_it|| / ||RHS|| = 0.0103891, ||x_it|| = 972.455
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0265275, <w, mu> / Mt = 0.00403961
+inner_prod(v, mu, 0) / Mt = 0.00403961
+correction = 1.09371
+ksis.back() = 0.202348, other part = 0.0540175
+new_vars = 0.610608
+new_vars = 0.610609
+CG took 2746.14 seconds.
+onsager took 1.19e-07 seconds.
+alpha2 = 0.824179
+gam1 = 1.63771
+true gam1 = 1.2964
+l2_norm2(temp) / N = 0.0366544
+trace_correction / N = 0.118955
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.191454
+R2 = 0.963346
+prior variances = 0 0.0399055 0.399055 3.99055 39.9055 
+prior probabilities = 0.97 0.01 0.01 0.005 0.005 
+gamw = 6.42636
+lmmse step took 2878.43 seconds.
+->DENOISING
+A total of 1 variance and prior tuning iterations were performed
+time needed to calculate z1 = 66.1592 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_2.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_2.bin
+time needed to save beta1 to an external file = 1.08676 seconds
+gam2 = 8.64328
+true gam2 = 79.8736
+it = 0: dist_probs = 0.00249503 & dist_vars = 2.27849
+it = 1: dist_probs = 0.00374641 & dist_vars = 0.250067
+Final number of prior EM iterations = 2 / 2
+time needed to calculate conditional expectation = 0.211043 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.786176
+R2 = 0.381928
+prior variances = 0 0.0405944 0.493957 4.34839 9.1084 
+prior probabilities = 0.965397 0.0100359 0.0110399 0.00837574 0.00515179 
+gamw = 6.42636
+denoising step took 133.326 seconds.
+total iteration time = 3011.76
+total computation time so far = 4655.91
+
+
+
+********************
+iteration = 3
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2682
+l2_norm(mu_CG_last, 0) = 19.4137
+alpha = 0.0112933
+eta = 0.129227
+[CG] it = 0: ||r_it|| / ||RHS|| = 2.00434, ||x_it|| = 351.296
+alpha = 0.000332693
+eta = 0.0566546
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.16743, ||x_it|| = 393.419
+alpha = 0.00102886
+eta = 0.104063
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.49571, ||x_it|| = 440.144
+alpha = 0.00154998
+eta = 0.0862708
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.30756, ||x_it|| = 572.395
+alpha = 0.00157914
+eta = 0.0464849
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.924296, ||x_it|| = 689.327
+alpha = 0.00127448
+eta = 0.0401202
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.83681, ||x_it|| = 740.301
+alpha = 0.00144207
+eta = 0.0358205
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.782273, ||x_it|| = 790.964
+alpha = 0.00226245
+eta = 0.0140406
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.506345, ||x_it|| = 867.769
+alpha = 0.00282883
+eta = 0.00671723
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.396014, ||x_it|| = 912.401
+alpha = 0.00356379
+eta = 0.00359209
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.379238, ||x_it|| = 950.459
+alpha = 0.00207742
+eta = -0.00138465
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.249596, ||x_it|| = 972.737
+alpha = 0.0046291
+eta = -0.00410758
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.190594, ||x_it|| = 996.431
+alpha = 0.00363166
+eta = -0.00665632
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.168005, ||x_it|| = 1008.39
+alpha = 0.00344338
+eta = -0.00671231
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.115142, ||x_it|| = 1018
+alpha = 0.00462798
+eta = -0.00902411
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.102906, ||x_it|| = 1024.62
+alpha = 0.0016672
+eta = -0.0309569
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.1789, ||x_it|| = 1026.65
+alpha = 0.000419625
+eta = -0.0105165
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0839404, ||x_it|| = 1028.25
+alpha = 0.00314573
+eta = -0.00922207
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0606671, ||x_it|| = 1031.03
+alpha = 0.00338645
+eta = -0.00979451
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.0491388, ||x_it|| = 1032.69
+alpha = 0.0037172
+eta = -0.00930143
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.036976, ||x_it|| = 1033.97
+alpha = 0.00396801
+eta = -0.00908538
+[CG] it = 20: ||r_it|| / ||RHS|| = 0.0279723, ||x_it|| = 1034.8
+alpha = 0.00461077
+eta = -0.00966504
+[CG] it = 21: ||r_it|| / ||RHS|| = 0.0225379, ||x_it|| = 1035.38
+alpha = 0.00145798
+eta = -0.0241769
+[CG] it = 22: ||r_it|| / ||RHS|| = 0.0327514, ||x_it|| = 1035.51
+alpha = 0.00139456
+eta = -0.00928806
+[CG] it = 23: ||r_it|| / ||RHS|| = 0.0156473, ||x_it|| = 1035.77
+alpha = 0.00439237
+eta = -0.00860314
+[CG] it = 24: ||r_it|| / ||RHS|| = 0.0112863, ||x_it|| = 1035.97
+alpha = 0.00466731
+eta = -0.0165402
+[CG] it = 25: ||r_it|| / ||RHS|| = 0.0137497, ||x_it|| = 1036.08
+alpha = 0.000807104
+eta = -0.0120468
+[CG] it = 26: ||r_it|| / ||RHS|| = 0.00972541, ||x_it|| = 1036.11
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0314198, <w, mu> / Mt = 0.00368901
+inner_prod(v, mu, 0) / Mt = 0.00374096
+correction = 1.52443
+ksis.back() = 0.207791, other part = 0.0768379
+new_vars = 0.371361
+new_vars = 0.371362
+CG took 2485.37 seconds.
+onsager took 6.39993e-08 seconds.
+alpha2 = 0.823629
+gam1 = 2.69279
+true gam1 = 2.01697
+l2_norm2(temp) / N = 0.0652147
+trace_correction / N = 0.149522
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.255372
+R2 = 0.934785
+prior variances = 0 0.0405944 0.493957 4.34839 9.1084 
+prior probabilities = 0.965397 0.0100359 0.0110399 0.00837574 0.00515179 
+gamw = 4.65687
+lmmse step took 2617.09 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 2.26493
+[old] it_revar = 2: gam1 = 2.1958
+[old] it_revar = 3: gam1 = 2.19009
+[old] it_revar = 4: gam1 = 2.19308
+[old] it_revar = 5: gam1 = 2.19728
+[old] it_revar = 6: gam1 = 2.20149
+[old] it_revar = 7: gam1 = 2.2055
+[old] it_revar = 8: gam1 = 2.20925
+[old] it_revar = 9: gam1 = 2.21274
+[old] it_revar = 10: gam1 = 2.21597
+[old] it_revar = 11: gam1 = 2.21895
+[old] it_revar = 12: gam1 = 2.22066
+[old] it_revar = 13: gam1 = 2.22209
+[old] it_revar = 14: gam1 = 2.22341
+[old] it_revar = 15: gam1 = 2.22467
+[old] it_revar = 16: gam1 = 2.22588
+[old] it_revar = 17: gam1 = 2.22703
+[old] it_revar = 18: gam1 = 2.22814
+[old] it_revar = 19: gam1 = 2.2292
+[old] it_revar = 20: gam1 = 2.23022
+[old] it_revar = 21: gam1 = 2.2312
+A total of 20 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.8308 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_3.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_3.bin
+time needed to save beta1 to an external file = 0.656027 seconds
+gam2 = 10.2255
+true gam2 = 84.7145
+time needed to calculate conditional expectation = 2.39999e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.691083
+R2 = 0.522404
+prior variances = 0 0.0413637 0.916866 1.79077 
+prior probabilities = 0.955826 0.00999746 0.0159657 0.0182112 
+gamw = 4.65687
+denoising step took 139.224 seconds.
+total iteration time = 2756.32
+total computation time so far = 7412.23
+
+
+
+********************
+iteration = 4
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2597.71
+l2_norm(mu_CG_last, 0) = 18.6536
+alpha = 0.0150522
+eta = 0.117177
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.58389, ||x_it|| = 391.48
+alpha = 0.000547813
+eta = 0.0782144
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.15069, ||x_it|| = 427.818
+alpha = 0.00131817
+eta = 0.13746
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.44617, ||x_it|| = 477.018
+alpha = 0.0017762
+eta = 0.0998881
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.17783, ||x_it|| = 596.918
+alpha = 0.00198163
+eta = 0.0544778
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.83021, ||x_it|| = 697.798
+alpha = 0.00152185
+eta = 0.0404718
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.685055, ||x_it|| = 739.509
+alpha = 0.00211597
+eta = 0.0350853
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.61953, ||x_it|| = 782.073
+alpha = 0.00317539
+eta = 0.0137002
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.383225, ||x_it|| = 840.47
+alpha = 0.00388696
+eta = 0.00738686
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.291236, ||x_it|| = 871.127
+alpha = 0.00478023
+eta = 0.00484217
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.261086, ||x_it|| = 895.444
+alpha = 0.0027472
+eta = 0.00076133
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.172693, ||x_it|| = 907.811
+alpha = 0.00563584
+eta = -0.00120367
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.123489, ||x_it|| = 920.058
+alpha = 0.00485779
+eta = -0.00252542
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.102453, ||x_it|| = 926.037
+alpha = 0.00453715
+eta = -0.00284717
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0671062, ||x_it|| = 930.238
+alpha = 0.00642223
+eta = -0.00337809
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0498914, ||x_it|| = 933.037
+alpha = 0.00465939
+eta = -0.00731182
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0636123, ||x_it|| = 934.255
+alpha = 0.000501206
+eta = -0.00592423
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0476378, ||x_it|| = 934.477
+alpha = 0.00312069
+eta = -0.0037304
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0269573, ||x_it|| = 935.285
+alpha = 0.00585286
+eta = -0.00385005
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.0197914, ||x_it|| = 935.806
+alpha = 0.00560656
+eta = -0.00412666
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.0152445, ||x_it|| = 936.094
+alpha = 0.0040625
+eta = -0.00527841
+[CG] it = 20: ||r_it|| / ||RHS|| = 0.013908, ||x_it|| = 936.225
+alpha = 0.00256161
+eta = -0.0102036
+[CG] it = 21: ||r_it|| / ||RHS|| = 0.0175019, ||x_it|| = 936.297
+alpha = 0.000974717
+eta = -0.00431938
+[CG] it = 22: ||r_it|| / ||RHS|| = 0.00861907, ||x_it|| = 936.341
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0681735, <w, mu> / Mt = 0.00417416
+inner_prod(v, mu, 0) / Mt = 0.00403503
+correction = 1.26765
+ksis.back() = 0.192143, other part = 0.0865965
+new_vars = 0.573838
+new_vars = 0.573835
+CG took 2145.54 seconds.
+onsager took 5.80003e-08 seconds.
+alpha2 = 0.876031
+gam1 = 1.74266
+true gam1 = 1.44116
+l2_norm2(temp) / N = 0.101365
+trace_correction / N = 0.145031
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.318379
+R2 = 0.898635
+prior variances = 0 0.0413637 0.916866 1.79077 
+prior probabilities = 0.955826 0.00999746 0.0159657 0.0182112 
+gamw = 4.05851
+lmmse step took 2277.48 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.59462
+[old] it_revar = 2: gam1 = 1.57699
+[old] it_revar = 3: gam1 = 1.57453
+[old] it_revar = 4: gam1 = 1.57354
+A total of 3 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.9467 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_4.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_4.bin
+time needed to save beta1 to an external file = 0.806269 seconds
+gam2 = 9.81484
+true gam2 = 74.4709
+time needed to calculate conditional expectation = 6.8e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.635704
+R2 = 0.595881
+prior variances = 0 0.0414761 0.916563 2.31085 
+prior probabilities = 0.955071 0.0100018 0.0163619 0.0185654 
+gamw = 4.05851
+denoising step took 134.209 seconds.
+total iteration time = 2411.69
+total computation time so far = 9823.91
+
+
+
+********************
+iteration = 5
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2534.88
+l2_norm(mu_CG_last, 0) = 19.6633
+alpha = 0.0167733
+eta = 0.123204
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.50322, ||x_it|| = 377.86
+alpha = 0.000634528
+eta = 0.0876806
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.12286, ||x_it|| = 410.722
+alpha = 0.00156577
+eta = 0.154522
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.4109, ||x_it|| = 459.203
+alpha = 0.00193112
+eta = 0.111321
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.13945, ||x_it|| = 567.57
+alpha = 0.00222919
+eta = 0.0585308
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.780069, ||x_it|| = 660.518
+alpha = 0.00177017
+eta = 0.0456751
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.651868, ||x_it|| = 698.105
+alpha = 0.00237357
+eta = 0.0401941
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.585502, ||x_it|| = 736.126
+alpha = 0.00359097
+eta = 0.0162602
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.353986, ||x_it|| = 788.151
+alpha = 0.00443834
+eta = 0.0103492
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.271765, ||x_it|| = 814.566
+alpha = 0.0052082
+eta = 0.00829102
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.240147, ||x_it|| = 834.983
+alpha = 0.00320088
+eta = 0.00340946
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.155273, ||x_it|| = 845.79
+alpha = 0.00641158
+eta = 0.00149582
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.112056, ||x_it|| = 855.796
+alpha = 0.00529601
+eta = 0.000605022
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0907412, ||x_it|| = 860.562
+alpha = 0.0052726
+eta = -0.000185507
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0586844, ||x_it|| = 863.966
+alpha = 0.00728426
+eta = -0.000578452
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0438789, ||x_it|| = 866.127
+alpha = 0.00470555
+eta = -0.00167696
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0628991, ||x_it|| = 866.971
+alpha = 0.000538054
+eta = -0.00116629
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0399216, ||x_it|| = 867.177
+alpha = 0.00367634
+eta = -0.000954477
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0249372, ||x_it|| = 867.77
+alpha = 0.00496638
+eta = -0.001151
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.0205337, ||x_it|| = 868.102
+alpha = 0.00457079
+eta = -0.00104961
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.0141032, ||x_it|| = 868.322
+alpha = 0.00598415
+eta = -0.00101549
+[CG] it = 20: ||r_it|| / ||RHS|| = 0.00980338, ||x_it|| = 868.467
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0811414, <w, mu> / Mt = 0.00472336
+inner_prod(v, mu, 0) / Mt = 0.00465976
+correction = 1.02539
+ksis.back() = 0.185615, other part = 0.0854803
+new_vars = 0.832849
+new_vars = 0.832847
+CG took 1990.78 seconds.
+onsager took 1.49999e-07 seconds.
+alpha2 = 0.895526
+gam1 = 1.2007
+true gam1 = 1.0492
+l2_norm2(temp) / N = 0.114824
+trace_correction / N = 0.140243
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.338857
+R2 = 0.885176
+prior variances = 0 0.0414761 0.916563 2.31085 
+prior probabilities = 0.955071 0.0100018 0.0163619 0.0185654 
+gamw = 3.92054
+lmmse step took 2123.19 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.1392
+[old] it_revar = 2: gam1 = 1.13381
+[old] it_revar = 3: gam1 = 1.13285
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 66.1535 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_5.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_5.bin
+time needed to save beta1 to an external file = 0.640786 seconds
+gam2 = 9.53703
+true gam2 = 62.3834
+time needed to calculate conditional expectation = 2.45e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.600945
+R2 = 0.638865
+prior variances = 0 0.0415032 0.865331 3.13067 
+prior probabilities = 0.956117 0.0100162 0.0162152 0.017652 
+gamw = 3.92054
+denoising step took 135.126 seconds.
+total iteration time = 2258.32
+total computation time so far = 12082.2
+
+
+
+********************
+iteration = 6
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2521.34
+l2_norm(mu_CG_last, 0) = 21.8023
+alpha = 0.0172643
+eta = 0.154274
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.68184, ||x_it|| = 370.68
+alpha = 0.0005916
+eta = 0.085343
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.09937, ||x_it|| = 407.17
+alpha = 0.00157616
+eta = 0.146056
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.35364, ||x_it|| = 451.371
+alpha = 0.00222657
+eta = 0.114635
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.14152, ||x_it|| = 560.132
+alpha = 0.00236235
+eta = 0.0575359
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.763044, ||x_it|| = 654.068
+alpha = 0.00190242
+eta = 0.0468459
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.652971, ||x_it|| = 690.858
+alpha = 0.00237126
+eta = 0.0407214
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.583993, ||x_it|| = 727.118
+alpha = 0.00375152
+eta = 0.0160038
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.349736, ||x_it|| = 778.581
+alpha = 0.00457527
+eta = 0.0102321
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.271469, ||x_it|| = 803.889
+alpha = 0.00531094
+eta = 0.00801876
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.239966, ||x_it|| = 823.656
+alpha = 0.00332999
+eta = 0.0029589
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.15189, ||x_it|| = 834.342
+alpha = 0.00683844
+eta = 0.00111815
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.111696, ||x_it|| = 844.075
+alpha = 0.00520538
+eta = 0.000161159
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0906855, ||x_it|| = 848.506
+alpha = 0.00553069
+eta = -0.000576498
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.05768, ||x_it|| = 851.899
+alpha = 0.00727102
+eta = -0.00110954
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0499865, ||x_it|| = 853.879
+alpha = 0.00285678
+eta = -0.0031738
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0748229, ||x_it|| = 854.504
+alpha = 0.000589112
+eta = -0.00152148
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.03826, ||x_it|| = 854.803
+alpha = 0.00512026
+eta = -0.00131392
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0242515, ||x_it|| = 855.516
+alpha = 0.00573063
+eta = -0.0015682
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.0196282, ||x_it|| = 855.86
+alpha = 0.00557111
+eta = -0.00139826
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.0129979, ||x_it|| = 856.094
+alpha = 0.00660023
+eta = -0.0020682
+[CG] it = 20: ||r_it|| / ||RHS|| = 0.0127988, ||x_it|| = 856.224
+alpha = 0.00124928
+eta = -0.00241627
+[CG] it = 21: ||r_it|| / ||RHS|| = 0.0116173, ||x_it|| = 856.248
+alpha = 0.00383192
+eta = -0.0014076
+[CG] it = 22: ||r_it|| / ||RHS|| = 0.00622752, ||x_it|| = 856.313
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0796503, <w, mu> / Mt = 0.00492602
+inner_prod(v, mu, 0) / Mt = 0.00498387
+correction = 1.01758
+ksis.back() = 0.186348, other part = 0.0860291
+new_vars = 0.819115
+new_vars = 0.819116
+CG took 2147.6 seconds.
+onsager took 1.47e-07 seconds.
+alpha2 = 0.893302
+gam1 = 1.22083
+true gam1 = 1.06866
+l2_norm2(temp) / N = 0.11958
+trace_correction / N = 0.14827
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.345803
+R2 = 0.88042
+prior variances = 0 0.0415032 0.865331 3.13067 
+prior probabilities = 0.956117 0.0100162 0.0162152 0.017652 
+gamw = 3.73345
+lmmse step took 2278.95 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16356
+[old] it_revar = 2: gam1 = 1.15451
+[old] it_revar = 3: gam1 = 1.15176
+[old] it_revar = 4: gam1 = 1.14998
+[old] it_revar = 5: gam1 = 1.14842
+[old] it_revar = 6: gam1 = 1.14695
+[old] it_revar = 7: gam1 = 1.14556
+[old] it_revar = 8: gam1 = 1.14422
+[old] it_revar = 9: gam1 = 1.14295
+[old] it_revar = 10: gam1 = 1.14174
+[old] it_revar = 11: gam1 = 1.14058
+[old] it_revar = 12: gam1 = 1.13949
+[old] it_revar = 13: gam1 = 1.13845
+[old] it_revar = 14: gam1 = 1.13747
+A total of 13 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.7262 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_6.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_6.bin
+time needed to save beta1 to an external file = 0.733867 seconds
+gam2 = 10.5868
+true gam2 = 54.4206
+time needed to calculate conditional expectation = 2.49e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.625029
+R2 = 0.609339
+prior variances = 0 0.0415527 0.681762 4.75047 
+prior probabilities = 0.9648 0.010114 0.0156119 0.00947366 
+gamw = 3.73345
+denoising step took 138.14 seconds.
+total iteration time = 2417.1
+total computation time so far = 14499.3
+
+
+
+********************
+iteration = 7
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2539.32
+l2_norm(mu_CG_last, 0) = 22.902
+alpha = 0.0180271
+eta = 0.162356
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.6911, ||x_it|| = 398.151
+alpha = 0.00061976
+eta = 0.084671
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.07505, ||x_it|| = 437.909
+alpha = 0.00154835
+eta = 0.140898
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.30391, ||x_it|| = 480.492
+alpha = 0.00245954
+eta = 0.106289
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.07803, ||x_it|| = 595.195
+alpha = 0.00246592
+eta = 0.0503137
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.69903, ||x_it|| = 685.475
+alpha = 0.00203095
+eta = 0.0417728
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.604766, ||x_it|| = 719.542
+alpha = 0.00247186
+eta = 0.0363761
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.542687, ||x_it|| = 753.134
+alpha = 0.00369627
+eta = 0.0129855
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.310415, ||x_it|| = 798.545
+alpha = 0.0047898
+eta = 0.00830849
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.242521, ||x_it|| = 820.219
+alpha = 0.00525929
+eta = 0.00597249
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.207132, ||x_it|| = 836.452
+alpha = 0.00354576
+eta = 0.0020285
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.129872, ||x_it|| = 845.272
+alpha = 0.00694844
+eta = 0.000565115
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0940042, ||x_it|| = 852.802
+alpha = 0.00536838
+eta = -0.000220711
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0738822, ||x_it|| = 856.174
+alpha = 0.00572294
+eta = -0.000708167
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.047411, ||x_it|| = 858.603
+alpha = 0.00696535
+eta = -0.00116326
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0407066, ||x_it|| = 859.936
+alpha = 0.00258202
+eta = -0.00358593
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.064704, ||x_it|| = 860.323
+alpha = 0.000687258
+eta = -0.00137819
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0291162, ||x_it|| = 860.593
+alpha = 0.00539243
+eta = -0.00124721
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0190229, ||x_it|| = 861.045
+alpha = 0.00601088
+eta = -0.00137859
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.0144169, ||x_it|| = 861.276
+alpha = 0.00580136
+eta = -0.00133571
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.0100631, ||x_it|| = 861.412
+alpha = 0.00622675
+eta = -0.00177498
+[CG] it = 20: ||r_it|| / ||RHS|| = 0.00917252, ||x_it|| = 861.488
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0856848, <w, mu> / Mt = 0.00471476
+inner_prod(v, mu, 0) / Mt = 0.00470674
+correction = 1.0624
+ksis.back() = 0.186035, other part = 0.0914355
+new_vars = 0.792864
+new_vars = 0.792878
+CG took 1963.12 seconds.
+onsager took 5.80003e-08 seconds.
+alpha2 = 0.899649
+gam1 = 1.26123
+true gam1 = 1.10338
+l2_norm2(temp) / N = 0.133491
+trace_correction / N = 0.146437
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.365365
+R2 = 0.866508
+prior variances = 0 0.0415527 0.681762 4.75047 
+prior probabilities = 0.9648 0.010114 0.0156119 0.00947366 
+gamw = 3.57234
+lmmse step took 2094.12 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.1892
+[old] it_revar = 2: gam1 = 1.18123
+[old] it_revar = 3: gam1 = 1.17955
+[old] it_revar = 4: gam1 = 1.17859
+A total of 3 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4019 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_7.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_7.bin
+time needed to save beta1 to an external file = 0.730038 seconds
+gam2 = 11.4856
+true gam2 = 46.6775
+time needed to calculate conditional expectation = 1.63e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.637039
+R2 = 0.594182
+prior variances = 0 0.0415921 0.677238 5.58576 
+prior probabilities = 0.965877 0.0101298 0.0157063 0.0082869 
+gamw = 3.57234
+denoising step took 134.186 seconds.
+total iteration time = 2228.31
+total computation time so far = 16727.6
+
+
+
+********************
+iteration = 8
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2554.59
+l2_norm(mu_CG_last, 0) = 21.7959
+alpha = 0.0185666
+eta = 0.170108
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.69861, ||x_it|| = 417.943
+alpha = 0.000647904
+eta = 0.0841642
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.05225, ||x_it|| = 460.691
+alpha = 0.00151005
+eta = 0.134063
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.24507, ||x_it|| = 501.147
+alpha = 0.00269005
+eta = 0.100665
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.02619, ||x_it|| = 617.786
+alpha = 0.00255188
+eta = 0.044924
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.643642, ||x_it|| = 704.463
+alpha = 0.00216796
+eta = 0.0383836
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.563961, ||x_it|| = 736.092
+alpha = 0.00254046
+eta = 0.0333429
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.504642, ||x_it|| = 766.965
+alpha = 0.00370561
+eta = 0.011196
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.277569, ||x_it|| = 807.514
+alpha = 0.00499734
+eta = 0.00744222
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.218625, ||x_it|| = 826.169
+alpha = 0.0052491
+eta = 0.00518464
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.180753, ||x_it|| = 839.768
+alpha = 0.00373103
+eta = 0.00189961
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.112151, ||x_it|| = 847.075
+alpha = 0.00712581
+eta = 0.000723072
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0798088, ||x_it|| = 853.035
+alpha = 0.00548139
+eta = 0.000143656
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0621193, ||x_it|| = 855.605
+alpha = 0.00580421
+eta = -0.000272926
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.039162, ||x_it|| = 857.408
+alpha = 0.00691796
+eta = -0.000544966
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0333643, ||x_it|| = 858.341
+alpha = 0.00400869
+eta = -0.000709772
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0269501, ||x_it|| = 858.763
+alpha = 0.00107178
+eta = -0.00143377
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0332271, ||x_it|| = 858.839
+alpha = 0.00259527
+eta = -0.000629382
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.014408, ||x_it|| = 859.133
+alpha = 0.00655628
+eta = -0.000716493
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.010814, ||x_it|| = 859.283
+alpha = 0.00597004
+eta = -0.000709886
+[CG] it = 19: ||r_it|| / ||RHS|| = 0.00752346, ||x_it|| = 859.365
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0920315, <w, mu> / Mt = 0.00454386
+inner_prod(v, mu, 0) / Mt = 0.00450516
+correction = 1.06607
+ksis.back() = 0.184849, other part = 0.0950887
+new_vars = 0.820064
+new_vars = 0.820067
+CG took 1878.02 seconds.
+onsager took 6.80011e-08 seconds.
+alpha2 = 0.907182
+gam1 = 1.21941
+true gam1 = 1.0735
+l2_norm2(temp) / N = 0.145059
+trace_correction / N = 0.141553
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.380866
+R2 = 0.854941
+prior variances = 0 0.0415921 0.677238 5.58576 
+prior probabilities = 0.965877 0.0101298 0.0157063 0.0082869 
+gamw = 3.48904
+lmmse step took 2008.88 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.15479
+[old] it_revar = 2: gam1 = 1.14786
+[old] it_revar = 3: gam1 = 1.1464
+[old] it_revar = 4: gam1 = 1.14556
+A total of 3 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4074 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_8.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_8.bin
+time needed to save beta1 to an external file = 0.76254 seconds
+gam2 = 11.9445
+true gam2 = 41.482
+time needed to calculate conditional expectation = 2.65001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.645741
+R2 = 0.583019
+prior variances = 0 0.0416285 0.67858 6.55185 
+prior probabilities = 0.966858 0.010144 0.0158324 0.00716541 
+gamw = 3.48904
+denoising step took 133.101 seconds.
+total iteration time = 2141.98
+total computation time so far = 18869.6
+
+
+
+********************
+iteration = 9
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2562.81
+l2_norm(mu_CG_last, 0) = 20.9445
+alpha = 0.0189608
+eta = 0.172035
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.69027, ||x_it|| = 430.192
+alpha = 0.000655971
+eta = 0.0832347
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.0354, ||x_it|| = 473.382
+alpha = 0.00154902
+eta = 0.131834
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.22157, ||x_it|| = 513.881
+alpha = 0.00274698
+eta = 0.0980414
+[CG] it = 3: ||r_it|| / ||RHS|| = 1.00222, ||x_it|| = 629.532
+alpha = 0.00258809
+eta = 0.0415863
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.611659, ||x_it|| = 714.217
+alpha = 0.00227675
+eta = 0.0364535
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.542981, ||x_it|| = 744.558
+alpha = 0.00255678
+eta = 0.0317171
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.486489, ||x_it|| = 773.727
+alpha = 0.00369281
+eta = 0.0101009
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.260152, ||x_it|| = 811.785
+alpha = 0.00514845
+eta = 0.00684502
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.206779, ||x_it|| = 828.913
+alpha = 0.00523873
+eta = 0.00458777
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.167451, ||x_it|| = 841.238
+alpha = 0.00383111
+eta = 0.00167591
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.103479, ||x_it|| = 847.777
+alpha = 0.00721534
+eta = 0.00064537
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0735752, ||x_it|| = 852.997
+alpha = 0.0054764
+eta = 0.00012509
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0561023, ||x_it|| = 855.213
+alpha = 0.00592915
+eta = -0.000228615
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0361438, ||x_it|| = 856.737
+alpha = 0.00639789
+eta = -0.00045858
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0306489, ||x_it|| = 857.482
+alpha = 0.00395499
+eta = -0.000868828
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0341413, ||x_it|| = 857.836
+alpha = 0.000616954
+eta = -0.000664141
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0220564, ||x_it|| = 857.907
+alpha = 0.00506638
+eta = -0.000531531
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0128708, ||x_it|| = 858.163
+alpha = 0.00663783
+eta = -0.000590169
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.00939141, ||x_it|| = 858.285
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.0946553, <w, mu> / Mt = 0.00446409
+inner_prod(v, mu, 0) / Mt = 0.00443008
+correction = 1.07463
+ksis.back() = 0.184624, other part = 0.0971143
+new_vars = 0.821398
+new_vars = 0.821398
+CG took 1797.14 seconds.
+onsager took 1.19999e-07 seconds.
+alpha2 = 0.910032
+gam1 = 1.21744
+true gam1 = 1.07312
+l2_norm2(temp) / N = 0.151707
+trace_correction / N = 0.140483
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.389496
+R2 = 0.848293
+prior variances = 0 0.0416285 0.67858 6.55185 
+prior probabilities = 0.966858 0.010144 0.0158324 0.00716541 
+gamw = 3.42243
+lmmse step took 1927.92 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.15375
+[old] it_revar = 2: gam1 = 1.14711
+[old] it_revar = 3: gam1 = 1.14574
+[old] it_revar = 4: gam1 = 1.14496
+A total of 3 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4261 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_9.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_9.bin
+time needed to save beta1 to an external file = 0.6696 seconds
+gam2 = 12.4648
+true gam2 = 37.7073
+time needed to calculate conditional expectation = 2.31001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.65444
+R2 = 0.571709
+prior variances = 0 0.0416641 0.682467 7.64843 
+prior probabilities = 0.967763 0.0101574 0.0159743 0.00610493 
+gamw = 3.42243
+denoising step took 133.098 seconds.
+total iteration time = 2061.01
+total computation time so far = 20930.6
+
+
+
+********************
+iteration = 10
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2573
+l2_norm(mu_CG_last, 0) = 20.5947
+alpha = 0.0192705
+eta = 0.172147
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.67609, ||x_it|| = 443.478
+alpha = 0.000672177
+eta = 0.0825683
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.02389, ||x_it|| = 487.625
+alpha = 0.00153905
+eta = 0.128266
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.19584, ||x_it|| = 527.515
+alpha = 0.00280578
+eta = 0.0945943
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.977207, ||x_it|| = 642.299
+alpha = 0.00263327
+eta = 0.0382814
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.581844, ||x_it|| = 725.51
+alpha = 0.00239208
+eta = 0.0341644
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.521645, ||x_it|| = 754.87
+alpha = 0.00254978
+eta = 0.029822
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.468731, ||x_it|| = 782.226
+alpha = 0.00365201
+eta = 0.00906724
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.245324, ||x_it|| = 817.833
+alpha = 0.00520999
+eta = 0.00612999
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.195444, ||x_it|| = 833.549
+alpha = 0.00521269
+eta = 0.00392865
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.155609, ||x_it|| = 844.722
+alpha = 0.00393117
+eta = 0.00135677
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.095275, ||x_it|| = 850.635
+alpha = 0.00734418
+eta = 0.00045875
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0677456, ||x_it|| = 855.235
+alpha = 0.00534417
+eta = -8.62659e-06
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0509545, ||x_it|| = 857.107
+alpha = 0.00612937
+eta = -0.000298193
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0324225, ||x_it|| = 858.434
+alpha = 0.00630302
+eta = -0.000523812
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0277226, ||x_it|| = 859.036
+alpha = 0.00399422
+eta = -0.000981958
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0313878, ||x_it|| = 859.335
+alpha = 0.000607677
+eta = -0.000667812
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0188937, ||x_it|| = 859.395
+alpha = 0.00551616
+eta = -0.000539383
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0109478, ||x_it|| = 859.604
+alpha = 0.00732287
+eta = -0.000569991
+[CG] it = 18: ||r_it|| / ||RHS|| = 0.00750321, ||x_it|| = 859.704
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.096739, <w, mu> / Mt = 0.00436512
+inner_prod(v, mu, 0) / Mt = 0.00432809
+correction = 1.09561
+ksis.back() = 0.184636, other part = 0.0993321
+new_vars = 0.805578
+new_vars = 0.805578
+CG took 1799.61 seconds.
+onsager took 5.80003e-08 seconds.
+alpha2 = 0.912103
+gam1 = 1.24135
+true gam1 = 1.09265
+l2_norm2(temp) / N = 0.158164
+trace_correction / N = 0.13992
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.397699
+R2 = 0.841835
+prior variances = 0 0.0416641 0.682467 7.64843 
+prior probabilities = 0.967763 0.0101574 0.0159743 0.00610493 
+gamw = 3.35476
+lmmse step took 1930.36 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17568
+[old] it_revar = 2: gam1 = 1.16923
+[old] it_revar = 3: gam1 = 1.16805
+[old] it_revar = 4: gam1 = 1.16745
+A total of 3 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3598 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_10.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_10.bin
+time needed to save beta1 to an external file = 0.825584 seconds
+gam2 = 13.0103
+true gam2 = 34.6615
+time needed to calculate conditional expectation = 4.74e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.661658
+R2 = 0.562208
+prior variances = 0 0.0417004 0.692513 8.8105 
+prior probabilities = 0.968382 0.0101677 0.0161529 0.00529697 
+gamw = 3.35476
+denoising step took 133.178 seconds.
+total iteration time = 2063.54
+total computation time so far = 22994.2
+
+
+
+********************
+iteration = 11
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2583.26
+l2_norm(mu_CG_last, 0) = 20.1525
+alpha = 0.0195325
+eta = 0.172493
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.66245, ||x_it|| = 455.964
+alpha = 0.000691053
+eta = 0.0818583
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.01145, ||x_it|| = 501.266
+alpha = 0.00151784
+eta = 0.124212
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.16641, ||x_it|| = 540.185
+alpha = 0.00288169
+eta = 0.0912382
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.951175, ||x_it|| = 653.948
+alpha = 0.00267661
+eta = 0.0352093
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.551895, ||x_it|| = 735.403
+alpha = 0.0025205
+eta = 0.0320107
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.49942, ||x_it|| = 763.759
+alpha = 0.00255172
+eta = 0.0281364
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.450504, ||x_it|| = 789.359
+alpha = 0.00359782
+eta = 0.00821604
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.230674, ||x_it|| = 822.42
+alpha = 0.00527114
+eta = 0.00559455
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.184139, ||x_it|| = 836.769
+alpha = 0.00517947
+eta = 0.00348716
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.144154, ||x_it|| = 846.83
+alpha = 0.0040516
+eta = 0.00119602
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.087394, ||x_it|| = 852.173
+alpha = 0.00746282
+eta = 0.000404681
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0612736, ||x_it|| = 856.195
+alpha = 0.00543976
+eta = 1.05069e-05
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0460639, ||x_it|| = 857.79
+alpha = 0.00610533
+eta = -0.000236178
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.029126, ||x_it|| = 858.895
+alpha = 0.00624199
+eta = -0.000416583
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0245, ||x_it|| = 859.386
+alpha = 0.00441431
+eta = -0.00057846
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0216307, ||x_it|| = 859.65
+alpha = 0.000762031
+eta = -0.000686307
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0186828, ||x_it|| = 859.687
+alpha = 0.00424176
+eta = -0.000437574
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00957998, ||x_it|| = 859.848
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.099378, <w, mu> / Mt = 0.00426519
+inner_prod(v, mu, 0) / Mt = 0.0042252
+correction = 1.10635
+ksis.back() = 0.184415, other part = 0.10137
+new_vars = 0.805842
+new_vars = 0.805841
+CG took 1705.02 seconds.
+onsager took 4.15002e-07 seconds.
+alpha2 = 0.914963
+gam1 = 1.24094
+true gam1 = 1.09324
+l2_norm2(temp) / N = 0.164688
+trace_correction / N = 0.138097
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.405818
+R2 = 0.835312
+prior variances = 0 0.0417004 0.692513 8.8105 
+prior probabilities = 0.968382 0.0101677 0.0161529 0.00529697 
+gamw = 3.30267
+lmmse step took 1836.28 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17614
+[old] it_revar = 2: gam1 = 1.17018
+[old] it_revar = 3: gam1 = 1.16925
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.5799 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_11.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_11.bin
+time needed to save beta1 to an external file = 0.707369 seconds
+gam2 = 13.383
+true gam2 = 32.3733
+time needed to calculate conditional expectation = 2.08001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.666174
+R2 = 0.556212
+prior variances = 0 0.041732 0.70413 9.71506 
+prior probabilities = 0.96865 0.0101738 0.0163168 0.00485941 
+gamw = 3.30267
+denoising step took 132.834 seconds.
+total iteration time = 1969.12
+total computation time so far = 24963.3
+
+
+
+********************
+iteration = 12
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2589.64
+l2_norm(mu_CG_last, 0) = 19.7003
+alpha = 0.0197332
+eta = 0.173064
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.65321, ||x_it|| = 464.219
+alpha = 0.000705939
+eta = 0.081271
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.00117, ||x_it|| = 510.347
+alpha = 0.00150289
+eta = 0.121451
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.14487, ||x_it|| = 548.378
+alpha = 0.00295208
+eta = 0.0885174
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.929703, ||x_it|| = 661.566
+alpha = 0.00271389
+eta = 0.0332163
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.531034, ||x_it|| = 741.245
+alpha = 0.00261644
+eta = 0.0305269
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.482976, ||x_it|| = 768.806
+alpha = 0.00257033
+eta = 0.0271144
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.438028, ||x_it|| = 793.227
+alpha = 0.0035409
+eta = 0.00771396
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.220864, ||x_it|| = 824.374
+alpha = 0.00530143
+eta = 0.00529677
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.17652, ||x_it|| = 837.768
+alpha = 0.00516683
+eta = 0.00323537
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.136055, ||x_it|| = 847.107
+alpha = 0.00414522
+eta = 0.00114025
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0823537, ||x_it|| = 852.04
+alpha = 0.00759205
+eta = 0.000395129
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.056149, ||x_it|| = 855.725
+alpha = 0.0056263
+eta = 6.81181e-05
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.043207, ||x_it|| = 857.13
+alpha = 0.00596807
+eta = -0.000159547
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0265587, ||x_it|| = 858.094
+alpha = 0.00636814
+eta = -0.00030974
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0227105, ||x_it|| = 858.518
+alpha = 0.00420199
+eta = -0.000549749
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0242287, ||x_it|| = 858.736
+alpha = 0.000619988
+eta = -0.00039755
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0146185, ||x_it|| = 858.775
+alpha = 0.00597744
+eta = -0.000333489
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00847858, ||x_it|| = 858.915
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.101177, <w, mu> / Mt = 0.00420311
+inner_prod(v, mu, 0) / Mt = 0.00416773
+correction = 1.11125
+ksis.back() = 0.184212, other part = 0.102745
+new_vars = 0.808166
+new_vars = 0.808166
+CG took 1718.15 seconds.
+onsager took 1.44999e-07 seconds.
+alpha2 = 0.916965
+gam1 = 1.23737
+true gam1 = 1.091
+l2_norm2(temp) / N = 0.169538
+trace_correction / N = 0.136973
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.411751
+R2 = 0.830461
+prior variances = 0 0.041732 0.70413 9.71506 
+prior probabilities = 0.96865 0.0101738 0.0163168 0.00485941 
+gamw = 3.26252
+lmmse step took 1848.96 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17407
+[old] it_revar = 2: gam1 = 1.16844
+[old] it_revar = 3: gam1 = 1.16764
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3551 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_12.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_12.bin
+time needed to save beta1 to an external file = 0.798886 seconds
+gam2 = 13.6833
+true gam2 = 30.6572
+time needed to calculate conditional expectation = 1.63e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.669349
+R2 = 0.551972
+prior variances = 0 0.0417625 0.716926 10.5851 
+prior probabilities = 0.968836 0.0101789 0.0164859 0.00449962 
+gamw = 3.26252
+denoising step took 132.895 seconds.
+total iteration time = 1981.85
+total computation time so far = 26945.1
+
+
+
+********************
+iteration = 13
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2594.54
+l2_norm(mu_CG_last, 0) = 19.4327
+alpha = 0.0198963
+eta = 0.1732
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.64451, ||x_it|| = 471.004
+alpha = 0.000716852
+eta = 0.0805612
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.991385, ||x_it|| = 517.651
+alpha = 0.00149599
+eta = 0.119415
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.12858, ||x_it|| = 554.995
+alpha = 0.00301367
+eta = 0.0859905
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.910766, ||x_it|| = 668.085
+alpha = 0.00273849
+eta = 0.0316451
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.514529, ||x_it|| = 745.89
+alpha = 0.00268175
+eta = 0.0293372
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.469897, ||x_it|| = 772.656
+alpha = 0.00260153
+eta = 0.0262856
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.428171, ||x_it|| = 796.299
+alpha = 0.00348344
+eta = 0.007289
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.212787, ||x_it|| = 825.885
+alpha = 0.00533557
+eta = 0.0050626
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.170742, ||x_it|| = 838.526
+alpha = 0.00514988
+eta = 0.00303003
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.129809, ||x_it|| = 847.325
+alpha = 0.00422998
+eta = 0.00107746
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0782059, ||x_it|| = 851.957
+alpha = 0.00766565
+eta = 0.000392891
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0531793, ||x_it|| = 855.35
+alpha = 0.00561548
+eta = 9.62929e-05
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0406632, ||x_it|| = 856.623
+alpha = 0.00601864
+eta = -0.00011465
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.024995, ||x_it|| = 857.494
+alpha = 0.00629145
+eta = -0.000239781
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0211078, ||x_it|| = 857.868
+alpha = 0.00444868
+eta = -0.000384283
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0203578, ||x_it|| = 858.07
+alpha = 0.000666034
+eta = -0.00034639
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0140976, ||x_it|| = 858.1
+alpha = 0.00547786
+eta = -0.000270412
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00781697, ||x_it|| = 858.221
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.102545, <w, mu> / Mt = 0.0041542
+inner_prod(v, mu, 0) / Mt = 0.00412362
+correction = 1.11576
+ksis.back() = 0.184087, other part = 0.103842
+new_vars = 0.808925
+new_vars = 0.808925
+CG took 1706.82 seconds.
+onsager took 1.18001e-07 seconds.
+alpha2 = 0.918459
+gam1 = 1.23621
+true gam1 = 1.09043
+l2_norm2(temp) / N = 0.173447
+trace_correction / N = 0.136165
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.41647
+R2 = 0.826553
+prior variances = 0 0.0417625 0.716926 10.5851 
+prior probabilities = 0.968836 0.0101789 0.0164859 0.00449962 
+gamw = 3.22985
+lmmse step took 1837.7 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17398
+[old] it_revar = 2: gam1 = 1.16862
+[old] it_revar = 3: gam1 = 1.16804
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3926 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_13.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_13.bin
+time needed to save beta1 to an external file = 0.62144 seconds
+gam2 = 13.9397
+true gam2 = 29.3309
+time needed to calculate conditional expectation = 2.06001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.671239
+R2 = 0.549438
+prior variances = 0 0.0417878 0.727148 11.1919 
+prior probabilities = 0.968888 0.0101822 0.016617 0.00431244 
+gamw = 3.22985
+denoising step took 132.41 seconds.
+total iteration time = 1970.11
+total computation time so far = 28915.2
+
+
+
+********************
+iteration = 14
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2598.66
+l2_norm(mu_CG_last, 0) = 19.2245
+alpha = 0.0200442
+eta = 0.170854
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.62435, ||x_it|| = 477.118
+alpha = 0.000731577
+eta = 0.080052
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.983266, ||x_it|| = 523.83
+alpha = 0.00149128
+eta = 0.118503
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.11879, ||x_it|| = 560.658
+alpha = 0.00303495
+eta = 0.083882
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.894939, ||x_it|| = 673.295
+alpha = 0.00275931
+eta = 0.0304782
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.50191, ||x_it|| = 749.538
+alpha = 0.00272968
+eta = 0.0283657
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.459125, ||x_it|| = 775.668
+alpha = 0.0026264
+eta = 0.0255431
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.419432, ||x_it|| = 798.658
+alpha = 0.00344595
+eta = 0.00698288
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.206632, ||x_it|| = 826.994
+alpha = 0.00535089
+eta = 0.0048616
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.165646, ||x_it|| = 839.053
+alpha = 0.00515897
+eta = 0.00288789
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.124978, ||x_it|| = 847.423
+alpha = 0.00428661
+eta = 0.00103703
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.074878, ||x_it|| = 851.815
+alpha = 0.00771606
+eta = 0.00040316
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0509575, ||x_it|| = 854.976
+alpha = 0.00557989
+eta = 0.00012865
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0386341, ||x_it|| = 856.148
+alpha = 0.0060837
+eta = -7.07709e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.023745, ||x_it|| = 856.95
+alpha = 0.00624557
+eta = -0.000176089
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0200508, ||x_it|| = 857.288
+alpha = 0.00386338
+eta = -0.000462133
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0275848, ||x_it|| = 857.448
+alpha = 0.00061771
+eta = -0.000213945
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0118096, ||x_it|| = 857.498
+alpha = 0.0070083
+eta = -0.000212024
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00726509, ||x_it|| = 857.608
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.1037, <w, mu> / Mt = 0.00411272
+inner_prod(v, mu, 0) / Mt = 0.00408624
+correction = 1.11902
+ksis.back() = 0.183975, other part = 0.104742
+new_vars = 0.8103
+new_vars = 0.8103
+CG took 1709.23 seconds.
+onsager took 5.69999e-08 seconds.
+alpha2 = 0.919724
+gam1 = 1.23411
+true gam1 = 1.08901
+l2_norm2(temp) / N = 0.176714
+trace_correction / N = 0.135407
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.420374
+R2 = 0.823285
+prior variances = 0 0.0417878 0.727148 11.1919 
+prior probabilities = 0.968888 0.0101822 0.016617 0.00431244 
+gamw = 3.20388
+lmmse step took 1840 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17315
+[old] it_revar = 2: gam1 = 1.16796
+[old] it_revar = 3: gam1 = 1.16742
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3648 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_14.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_14.bin
+time needed to save beta1 to an external file = 0.801367 seconds
+gam2 = 14.1448
+true gam2 = 28.2993
+time needed to calculate conditional expectation = 2.31001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.672257
+R2 = 0.548071
+prior variances = 0 0.0418124 0.737248 11.7799 
+prior probabilities = 0.968931 0.0101853 0.0167467 0.0041374 
+gamw = 3.20388
+denoising step took 133.206 seconds.
+total iteration time = 1973.21
+total computation time so far = 30888.4
+
+
+
+********************
+iteration = 15
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2601.95
+l2_norm(mu_CG_last, 0) = 19.0482
+alpha = 0.0201608
+eta = 0.168786
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.60724, ||x_it|| = 481.949
+alpha = 0.000743722
+eta = 0.0796307
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.976593, ||x_it|| = 528.648
+alpha = 0.00149024
+eta = 0.117899
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.11154, ||x_it|| = 565.119
+alpha = 0.00304309
+eta = 0.0822557
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.882522, ||x_it|| = 677.152
+alpha = 0.00277791
+eta = 0.0296438
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.492588, ||x_it|| = 752.212
+alpha = 0.00276461
+eta = 0.0276021
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.45054, ||x_it|| = 777.861
+alpha = 0.00264478
+eta = 0.0249404
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.412242, ||x_it|| = 800.308
+alpha = 0.00342444
+eta = 0.00677308
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.202118, ||x_it|| = 827.698
+alpha = 0.00535142
+eta = 0.0047028
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.161432, ||x_it|| = 839.315
+alpha = 0.00518551
+eta = 0.00279681
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.121396, ||x_it|| = 847.362
+alpha = 0.00431811
+eta = 0.00101484
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0723215, ||x_it|| = 851.566
+alpha = 0.0077632
+eta = 0.000419133
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.04924, ||x_it|| = 854.556
+alpha = 0.00555185
+eta = 0.000162203
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.037095, ||x_it|| = 855.653
+alpha = 0.00613954
+eta = -2.99146e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0227579, ||x_it|| = 856.404
+alpha = 0.00623368
+eta = -0.000117433
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0188959, ||x_it|| = 856.716
+alpha = 0.00490745
+eta = -0.000139165
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0109136, ||x_it|| = 856.899
+alpha = 0.00761981
+eta = -0.000267516
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0119209, ||x_it|| = 857
+alpha = 0.000657264
+eta = -0.000224607
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00807484, ||x_it|| = 857.011
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.104629, <w, mu> / Mt = 0.00408002
+inner_prod(v, mu, 0) / Mt = 0.00405749
+correction = 1.12096
+ksis.back() = 0.183878, other part = 0.105444
+new_vars = 0.812217
+new_vars = 0.812222
+CG took 1706.06 seconds.
+onsager took 1.14e-07 seconds.
+alpha2 = 0.920751
+gam1 = 1.23119
+true gam1 = 1.08687
+l2_norm2(temp) / N = 0.179348
+trace_correction / N = 0.134759
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.423495
+R2 = 0.820652
+prior variances = 0 0.0418124 0.737248 11.7799 
+prior probabilities = 0.968931 0.0101853 0.0167467 0.0041374 
+gamw = 3.18363
+lmmse step took 1836.97 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.1713
+[old] it_revar = 2: gam1 = 1.16627
+[old] it_revar = 3: gam1 = 1.16576
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4324 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_15.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_15.bin
+time needed to save beta1 to an external file = 0.783938 seconds
+gam2 = 14.307
+true gam2 = 27.4957
+time needed to calculate conditional expectation = 2.17005e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.672865
+R2 = 0.547253
+prior variances = 0 0.0418363 0.747227 12.3301 
+prior probabilities = 0.968956 0.0101882 0.0168749 0.0039809 
+gamw = 3.18363
+denoising step took 132.564 seconds.
+total iteration time = 1969.54
+total computation time so far = 32858
+
+
+
+********************
+iteration = 16
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2604.53
+l2_norm(mu_CG_last, 0) = 18.911
+alpha = 0.020223
+eta = 0.170749
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.61297, ||x_it|| = 485.061
+alpha = 0.00074139
+eta = 0.0790806
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.970768, ||x_it|| = 532.099
+alpha = 0.00149771
+eta = 0.116241
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.10027, ||x_it|| = 568.428
+alpha = 0.00308567
+eta = 0.08091
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.872354, ||x_it|| = 680.151
+alpha = 0.00279435
+eta = 0.0290276
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.485588, ||x_it|| = 754.253
+alpha = 0.00278789
+eta = 0.0270008
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.443765, ||x_it|| = 779.511
+alpha = 0.00266016
+eta = 0.0244496
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.40642, ||x_it|| = 801.532
+alpha = 0.00341103
+eta = 0.006622
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.198768, ||x_it|| = 828.194
+alpha = 0.00534348
+eta = 0.00457501
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.158042, ||x_it|| = 839.472
+alpha = 0.00521671
+eta = 0.00273311
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.118734, ||x_it|| = 847.273
+alpha = 0.00433534
+eta = 0.000998518
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0703396, ||x_it|| = 851.334
+alpha = 0.00781089
+eta = 0.000431568
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0478854, ||x_it|| = 854.197
+alpha = 0.00553518
+eta = 0.000188498
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0359217, ||x_it|| = 855.237
+alpha = 0.00617905
+eta = 1.74879e-06
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0219933, ||x_it|| = 855.95
+alpha = 0.00622226
+eta = -7.32088e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0182016, ||x_it|| = 856.243
+alpha = 0.00495368
+eta = -0.000102061
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0105702, ||x_it|| = 856.415
+alpha = 0.00557433
+eta = -0.000483651
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0210509, ||x_it|| = 856.484
+alpha = 0.000666285
+eta = -0.000127608
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00667002, ||x_it|| = 856.519
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.105359, <w, mu> / Mt = 0.00405453
+inner_prod(v, mu, 0) / Mt = 0.00403536
+correction = 1.12231
+ksis.back() = 0.183804, other part = 0.105993
+new_vars = 0.813913
+new_vars = 0.813912
+CG took 1704.99 seconds.
+onsager took 1.12996e-07 seconds.
+alpha2 = 0.921555
+gam1 = 1.22863
+true gam1 = 1.08491
+l2_norm2(temp) / N = 0.181414
+trace_correction / N = 0.134241
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.425928
+R2 = 0.818585
+prior variances = 0 0.0418363 0.747227 12.3301 
+prior probabilities = 0.968956 0.0101882 0.0168749 0.0039809 
+gamw = 3.16802
+lmmse step took 1835.69 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16961
+[old] it_revar = 2: gam1 = 1.16472
+[old] it_revar = 3: gam1 = 1.16424
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.372 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_16.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_16.bin
+time needed to save beta1 to an external file = 1.16871 seconds
+gam2 = 14.4406
+true gam2 = 26.856
+time needed to calculate conditional expectation = 2.80001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.673229
+R2 = 0.546763
+prior variances = 0 0.0418596 0.757147 12.8369 
+prior probabilities = 0.968962 0.0101907 0.017002 0.00384576 
+gamw = 3.16802
+denoising step took 132.962 seconds.
+total iteration time = 1968.65
+total computation time so far = 34826.6
+
+
+
+********************
+iteration = 17
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2606.67
+l2_norm(mu_CG_last, 0) = 18.8047
+alpha = 0.0203444
+eta = 0.163325
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.56966, ||x_it|| = 489.416
+alpha = 0.000769827
+eta = 0.0789594
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.966094, ||x_it|| = 535.834
+alpha = 0.00148716
+eta = 0.118074
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.10627, ||x_it|| = 571.706
+alpha = 0.00302346
+eta = 0.0796793
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.863482, ||x_it|| = 682.808
+alpha = 0.00280638
+eta = 0.0285227
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.479999, ||x_it|| = 756.01
+alpha = 0.0028026
+eta = 0.0264993
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.438321, ||x_it|| = 780.925
+alpha = 0.00267521
+eta = 0.0240275
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.401703, ||x_it|| = 802.631
+alpha = 0.00339622
+eta = 0.00649592
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.196196, ||x_it|| = 828.686
+alpha = 0.00533127
+eta = 0.00445806
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.155311, ||x_it|| = 839.698
+alpha = 0.00524381
+eta = 0.00267089
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.116673, ||x_it|| = 847.305
+alpha = 0.00434629
+eta = 0.000974214
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.068766, ||x_it|| = 851.255
+alpha = 0.00785792
+eta = 0.000428386
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0467485, ||x_it|| = 854.021
+alpha = 0.00553312
+eta = 0.000196272
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0350152, ||x_it|| = 855.017
+alpha = 0.00619464
+eta = 1.51471e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0213778, ||x_it|| = 855.7
+alpha = 0.00622499
+eta = -5.28966e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0176569, ||x_it|| = 855.978
+alpha = 0.0049587
+eta = -8.67429e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0110187, ||x_it|| = 856.141
+alpha = 0.00205344
+eta = -0.000316508
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0187144, ||x_it|| = 856.168
+alpha = 0.00176431
+eta = -0.000103564
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00630167, ||x_it|| = 856.24
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.105901, <w, mu> / Mt = 0.00403353
+inner_prod(v, mu, 0) / Mt = 0.00401693
+correction = 1.12442
+ksis.back() = 0.183766, other part = 0.106446
+new_vars = 0.813879
+new_vars = 0.813879
+CG took 1704.86 seconds.
+onsager took 1.14e-07 seconds.
+alpha2 = 0.922135
+gam1 = 1.22868
+true gam1 = 1.08493
+l2_norm2(temp) / N = 0.183083
+trace_correction / N = 0.133905
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.427882
+R2 = 0.816917
+prior variances = 0 0.0418596 0.757147 12.8369 
+prior probabilities = 0.968962 0.0101907 0.017002 0.00384576 
+gamw = 3.1547
+lmmse step took 1835.61 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17019
+[old] it_revar = 2: gam1 = 1.16541
+[old] it_revar = 3: gam1 = 1.16495
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3753 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_17.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_17.bin
+time needed to save beta1 to an external file = 0.77506 seconds
+gam2 = 14.559
+true gam2 = 26.3253
+time needed to calculate conditional expectation = 2.23998e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.673337
+R2 = 0.546617
+prior variances = 0 0.0418827 0.767051 13.2992 
+prior probabilities = 0.968947 0.0101931 0.0171288 0.00373086 
+gamw = 3.1547
+denoising step took 132.915 seconds.
+total iteration time = 1968.52
+total computation time so far = 36795.2
+
+
+
+********************
+iteration = 18
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2608.55
+l2_norm(mu_CG_last, 0) = 18.7164
+alpha = 0.0203822
+eta = 0.164786
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.57455, ||x_it|| = 491.65
+alpha = 0.00076643
+eta = 0.0784839
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.961582, ||x_it|| = 538.273
+alpha = 0.00149265
+eta = 0.116776
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.09782, ||x_it|| = 574.03
+alpha = 0.00306337
+eta = 0.0783989
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.854462, ||x_it|| = 685.244
+alpha = 0.00281995
+eta = 0.0280881
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.475061, ||x_it|| = 757.544
+alpha = 0.00281135
+eta = 0.0260809
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.433593, ||x_it|| = 782.121
+alpha = 0.00269238
+eta = 0.023675
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.397572, ||x_it|| = 803.59
+alpha = 0.00337736
+eta = 0.00639859
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.194001, ||x_it|| = 829.08
+alpha = 0.00531786
+eta = 0.00437117
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.152995, ||x_it|| = 839.864
+alpha = 0.00526367
+eta = 0.00262918
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.114893, ||x_it|| = 847.304
+alpha = 0.00435943
+eta = 0.000962715
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0674046, ||x_it|| = 851.163
+alpha = 0.00790055
+eta = 0.000435141
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0457573, ||x_it|| = 853.847
+alpha = 0.00553659
+eta = 0.000213618
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0342318, ||x_it|| = 854.806
+alpha = 0.0062017
+eta = 3.59948e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0208618, ||x_it|| = 855.463
+alpha = 0.00622784
+eta = -2.3966e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.017169, ||x_it|| = 855.729
+alpha = 0.0050083
+eta = -5.94421e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0101195, ||x_it|| = 855.885
+alpha = 0.00375563
+eta = -0.000306312
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0209525, ||x_it|| = 855.928
+alpha = 0.000975599
+eta = -7.89196e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00614288, ||x_it|| = 855.978
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.106406, <w, mu> / Mt = 0.00401491
+inner_prod(v, mu, 0) / Mt = 0.00400002
+correction = 1.12559
+ksis.back() = 0.183718, other part = 0.10683
+new_vars = 0.814861
+new_vars = 0.814862
+CG took 1707.97 seconds.
+onsager took 1.20999e-07 seconds.
+alpha2 = 0.922688
+gam1 = 1.2272
+true gam1 = 1.08372
+l2_norm2(temp) / N = 0.184518
+trace_correction / N = 0.133515
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.429556
+R2 = 0.815482
+prior variances = 0 0.0418827 0.767051 13.2992 
+prior probabilities = 0.968947 0.0101931 0.0171288 0.00373086 
+gamw = 3.14433
+lmmse step took 1839.05 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16933
+[old] it_revar = 2: gam1 = 1.16465
+[old] it_revar = 3: gam1 = 1.16421
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4782 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_18.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_18.bin
+time needed to save beta1 to an external file = 0.596696 seconds
+gam2 = 14.6497
+true gam2 = 25.8815
+time needed to calculate conditional expectation = 2.15005e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.673249
+R2 = 0.546736
+prior variances = 0 0.0419053 0.776868 13.7203 
+prior probabilities = 0.968917 0.0101952 0.0172549 0.00363325 
+gamw = 3.14433
+denoising step took 132.38 seconds.
+total iteration time = 1971.43
+total computation time so far = 38766.6
+
+
+
+********************
+iteration = 19
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2610
+l2_norm(mu_CG_last, 0) = 18.6369
+alpha = 0.0204135
+eta = 0.165833
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.57783, ||x_it|| = 493.39
+alpha = 0.000764243
+eta = 0.0780931
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.957875, ||x_it|| = 540.163
+alpha = 0.00149683
+eta = 0.115852
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.09163, ||x_it|| = 575.809
+alpha = 0.00309554
+eta = 0.0772898
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.846756, ||x_it|| = 687.207
+alpha = 0.00283241
+eta = 0.0277378
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.471078, ||x_it|| = 758.731
+alpha = 0.00281623
+eta = 0.0257622
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.429947, ||x_it|| = 783.013
+alpha = 0.00270963
+eta = 0.0234109
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.394445, ||x_it|| = 804.33
+alpha = 0.0033561
+eta = 0.00632841
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.192394, ||x_it|| = 829.347
+alpha = 0.00530184
+eta = 0.00430782
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.151288, ||x_it|| = 839.952
+alpha = 0.00527624
+eta = 0.00259765
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.113556, ||x_it|| = 847.266
+alpha = 0.00437546
+eta = 0.000952607
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0663421, ||x_it|| = 851.062
+alpha = 0.00794173
+eta = 0.000439097
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0449829, ||x_it|| = 853.685
+alpha = 0.00554341
+eta = 0.000225908
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0336403, ||x_it|| = 854.616
+alpha = 0.00619749
+eta = 5.10748e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.020483, ||x_it|| = 855.252
+alpha = 0.0062297
+eta = -3.15156e-06
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0168076, ||x_it|| = 855.509
+alpha = 0.00491952
+eta = -4.17822e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.012733, ||x_it|| = 855.656
+alpha = 0.000941181
+eta = -8.3463e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0129065, ||x_it|| = 855.673
+alpha = 0.00392361
+eta = -5.94199e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00596396, ||x_it|| = 855.749
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.106789, <w, mu> / Mt = 0.00400073
+inner_prod(v, mu, 0) / Mt = 0.00398761
+correction = 1.12647
+ksis.back() = 0.183683, other part = 0.107125
+new_vars = 0.815582
+new_vars = 0.815582
+CG took 1705.88 seconds.
+onsager took 1.56004e-07 seconds.
+alpha2 = 0.923106
+gam1 = 1.22612
+true gam1 = 1.08277
+l2_norm2(temp) / N = 0.185636
+trace_correction / N = 0.133231
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.430855
+R2 = 0.814364
+prior variances = 0 0.0419053 0.776868 13.7203 
+prior probabilities = 0.968917 0.0101952 0.0172549 0.00363325 
+gamw = 3.1361
+lmmse step took 1836.87 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16878
+[old] it_revar = 2: gam1 = 1.16417
+[old] it_revar = 3: gam1 = 1.16375
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4076 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_19.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_19.bin
+time needed to save beta1 to an external file = 0.679775 seconds
+gam2 = 14.7253
+true gam2 = 25.5056
+time needed to calculate conditional expectation = 2.35006e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.672999
+R2 = 0.547072
+prior variances = 0 0.0419277 0.786596 14.0999 
+prior probabilities = 0.968873 0.0101971 0.0173803 0.00354999 
+gamw = 3.1361
+denoising step took 132.777 seconds.
+total iteration time = 1969.65
+total computation time so far = 40736.2
+
+
+
+********************
+iteration = 20
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2611.24
+l2_norm(mu_CG_last, 0) = 18.5776
+alpha = 0.0204482
+eta = 0.165445
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.57392, ||x_it|| = 495.094
+alpha = 0.000766724
+eta = 0.0778053
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.954791, ||x_it|| = 541.87
+alpha = 0.00149826
+eta = 0.115537
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.0887, ||x_it|| = 577.384
+alpha = 0.00310681
+eta = 0.0764074
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.840641, ||x_it|| = 688.838
+alpha = 0.00284209
+eta = 0.0274229
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.467597, ||x_it|| = 759.752
+alpha = 0.00282207
+eta = 0.0254992
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.426981, ||x_it|| = 783.789
+alpha = 0.00272407
+eta = 0.0231956
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.39195, ||x_it|| = 804.987
+alpha = 0.00333551
+eta = 0.00626794
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.191086, ||x_it|| = 829.608
+alpha = 0.00528528
+eta = 0.00425501
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.149947, ||x_it|| = 840.063
+alpha = 0.00528399
+eta = 0.00256788
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.112465, ||x_it|| = 847.277
+alpha = 0.00439253
+eta = 0.000940472
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0654502, ||x_it|| = 851.024
+alpha = 0.00798306
+eta = 0.000438471
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0443255, ||x_it|| = 853.598
+alpha = 0.00555149
+eta = 0.000232269
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0331644, ||x_it|| = 854.507
+alpha = 0.0061846
+eta = 6.01283e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0201783, ||x_it|| = 855.125
+alpha = 0.00623123
+eta = 9.88227e-06
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0165471, ||x_it|| = 855.376
+alpha = 0.00461402
+eta = -2.17934e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0177528, ||x_it|| = 855.51
+alpha = 0.000637491
+eta = -4.05598e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0102971, ||x_it|| = 855.532
+alpha = 0.0061949
+eta = -4.7643e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.0058551, ||x_it|| = 855.608
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.107091, <w, mu> / Mt = 0.00398867
+inner_prod(v, mu, 0) / Mt = 0.00397704
+correction = 1.12751
+ksis.back() = 0.18366, other part = 0.107371
+new_vars = 0.815764
+new_vars = 0.815764
+CG took 1707.33 seconds.
+onsager took 1.18001e-07 seconds.
+alpha2 = 0.923431
+gam1 = 1.22584
+true gam1 = 1.08245
+l2_norm2(temp) / N = 0.186548
+trace_correction / N = 0.133016
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.431913
+R2 = 0.813451
+prior variances = 0 0.0419277 0.786596 14.0999 
+prior probabilities = 0.968873 0.0101971 0.0173803 0.00354999 
+gamw = 3.12926
+lmmse step took 1838.44 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16893
+[old] it_revar = 2: gam1 = 1.16437
+[old] it_revar = 3: gam1 = 1.16397
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3867 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_20.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_20.bin
+time needed to save beta1 to an external file = 0.591298 seconds
+gam2 = 14.7906
+true gam2 = 25.1825
+time needed to calculate conditional expectation = 4.05002e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.6726
+R2 = 0.547609
+prior variances = 0 0.0419498 0.796176 14.4411 
+prior probabilities = 0.968818 0.0101989 0.0175049 0.00347857 
+gamw = 3.12926
+denoising step took 132.785 seconds.
+total iteration time = 1971.23
+total computation time so far = 42707.5
+
+
+
+********************
+iteration = 21
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2612.34
+l2_norm(mu_CG_last, 0) = 18.5276
+alpha = 0.0204637
+eta = 0.166659
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.57886, ||x_it|| = 496.242
+alpha = 0.000763317
+eta = 0.0775187
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.952322, ||x_it|| = 543.171
+alpha = 0.00150194
+eta = 0.114658
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.08334, ||x_it|| = 578.638
+alpha = 0.00313343
+eta = 0.0757511
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.835991, ||x_it|| = 690.146
+alpha = 0.0028494
+eta = 0.0271451
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.464541, ||x_it|| = 760.611
+alpha = 0.00282996
+eta = 0.0252809
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.424494, ||x_it|| = 784.454
+alpha = 0.00273443
+eta = 0.0230159
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.389841, ||x_it|| = 805.541
+alpha = 0.00331931
+eta = 0.00621653
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.189955, ||x_it|| = 829.84
+alpha = 0.00527001
+eta = 0.00421273
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.148824, ||x_it|| = 840.165
+alpha = 0.00529062
+eta = 0.00254392
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.11153, ||x_it|| = 847.296
+alpha = 0.00440812
+eta = 0.000931205
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0646807, ||x_it|| = 851.004
+alpha = 0.00802154
+eta = 0.000439258
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0437645, ||x_it|| = 853.536
+alpha = 0.00555671
+eta = 0.000239144
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0327572, ||x_it|| = 854.425
+alpha = 0.00617429
+eta = 6.91036e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0199181, ||x_it|| = 855.029
+alpha = 0.0062348
+eta = 2.20146e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0162455, ||x_it|| = 855.274
+alpha = 0.00481211
+eta = -7.31085e-06
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0150148, ||x_it|| = 855.409
+alpha = 0.000707335
+eta = -3.04943e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0108114, ||x_it|| = 855.427
+alpha = 0.0053711
+eta = -3.64502e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00576659, ||x_it|| = 855.5
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.107353, <w, mu> / Mt = 0.00397805
+inner_prod(v, mu, 0) / Mt = 0.00396768
+correction = 1.12832
+ksis.back() = 0.183639, other part = 0.107578
+new_vars = 0.816049
+new_vars = 0.816049
+CG took 1705.37 seconds.
+onsager took 5.79967e-08 seconds.
+alpha2 = 0.923714
+gam1 = 1.22542
+true gam1 = 1.08199
+l2_norm2(temp) / N = 0.187317
+trace_correction / N = 0.132814
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.432802
+R2 = 0.812683
+prior variances = 0 0.0419498 0.796176 14.4411 
+prior probabilities = 0.968818 0.0101989 0.0175049 0.00347857 
+gamw = 3.12372
+lmmse step took 1836.35 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16891
+[old] it_revar = 2: gam1 = 1.16433
+[old] it_revar = 3: gam1 = 1.16393
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4087 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_21.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_21.bin
+time needed to save beta1 to an external file = 0.612364 seconds
+gam2 = 14.8442
+true gam2 = 24.9052
+time needed to calculate conditional expectation = 2.41998e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.672251
+R2 = 0.548079
+prior variances = 0 0.0419624 0.802151 14.7167 
+prior probabilities = 0.968789 0.0101999 0.017584 0.00342677 
+gamw = 3.12372
+denoising step took 132.553 seconds.
+total iteration time = 1968.9
+total computation time so far = 44676.4
+
+
+
+********************
+iteration = 22
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2613.27
+l2_norm(mu_CG_last, 0) = 18.4838
+alpha = 0.0204779
+eta = 0.167471
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.58194, ||x_it|| = 497.229
+alpha = 0.000761142
+eta = 0.0772962
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.95036, ||x_it|| = 544.266
+alpha = 0.00150489
+eta = 0.113991
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.07923, ||x_it|| = 579.696
+alpha = 0.00315134
+eta = 0.0752948
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.832681, ||x_it|| = 691.155
+alpha = 0.00285431
+eta = 0.0269168
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.462056, ||x_it|| = 761.303
+alpha = 0.00283773
+eta = 0.025104
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.422505, ||x_it|| = 785
+alpha = 0.00274128
+eta = 0.0228628
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.388091, ||x_it|| = 805.985
+alpha = 0.00330871
+eta = 0.00617361
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.189043, ||x_it|| = 830.039
+alpha = 0.00525507
+eta = 0.00417677
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.147915, ||x_it|| = 840.255
+alpha = 0.00529784
+eta = 0.0025228
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.110775, ||x_it|| = 847.321
+alpha = 0.00442106
+eta = 0.000921796
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0640412, ||x_it|| = 850.997
+alpha = 0.00805694
+eta = 0.000438434
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0433146, ||x_it|| = 853.496
+alpha = 0.00555748
+eta = 0.00024278
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0324154, ||x_it|| = 854.369
+alpha = 0.00617158
+eta = 7.4808e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0197056, ||x_it|| = 854.961
+alpha = 0.00623372
+eta = 2.9955e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0160102, ||x_it|| = 855.202
+alpha = 0.00491858
+eta = -1.04765e-06
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0133781, ||x_it|| = 855.336
+alpha = 0.000799689
+eta = -2.27086e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0113676, ||x_it|| = 855.352
+alpha = 0.00466067
+eta = -2.89025e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00569571, ||x_it|| = 855.422
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.107561, <w, mu> / Mt = 0.00396922
+inner_prod(v, mu, 0) / Mt = 0.00396005
+correction = 1.1291
+ksis.back() = 0.183624, other part = 0.107749
+new_vars = 0.8161
+new_vars = 0.816101
+CG took 1704.36 seconds.
+onsager took 5.00004e-08 seconds.
+alpha2 = 0.923937
+gam1 = 1.22534
+true gam1 = 1.08182
+l2_norm2(temp) / N = 0.187947
+trace_correction / N = 0.132661
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.433529
+R2 = 0.812053
+prior variances = 0 0.0419624 0.802151 14.7167 
+prior probabilities = 0.968789 0.0101999 0.017584 0.00342677 
+gamw = 3.11907
+lmmse step took 1835.46 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.1691
+[old] it_revar = 2: gam1 = 1.16455
+[old] it_revar = 3: gam1 = 1.16416
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.4943 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_22.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_22.bin
+time needed to save beta1 to an external file = 0.666123 seconds
+gam2 = 14.8902
+true gam2 = 24.6673
+time needed to calculate conditional expectation = 2.72004e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.671923
+R2 = 0.54852
+prior variances = 0 0.0419749 0.807968 14.9708 
+prior probabilities = 0.968758 0.0102009 0.0176621 0.00337921 
+gamw = 3.11907
+denoising step took 132.815 seconds.
+total iteration time = 1968.27
+total computation time so far = 46644.6
+
+
+
+********************
+iteration = 23
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2614.09
+l2_norm(mu_CG_last, 0) = 18.4481
+alpha = 0.0204847
+eta = 0.168795
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.5879, ||x_it|| = 497.954
+alpha = 0.000757117
+eta = 0.0770859
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.948717, ||x_it|| = 545.143
+alpha = 0.00150888
+eta = 0.113205
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.07472, ||x_it|| = 580.578
+alpha = 0.00317214
+eta = 0.0749575
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.830173, ||x_it|| = 691.968
+alpha = 0.00285794
+eta = 0.026734
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.460062, ||x_it|| = 761.884
+alpha = 0.00284271
+eta = 0.0249547
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.42084, ||x_it|| = 785.455
+alpha = 0.00274668
+eta = 0.0227254
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.386546, ||x_it|| = 806.352
+alpha = 0.00330355
+eta = 0.00613478
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.188233, ||x_it|| = 830.219
+alpha = 0.00524234
+eta = 0.00414592
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.147138, ||x_it|| = 840.339
+alpha = 0.00530547
+eta = 0.00250458
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.110131, ||x_it|| = 847.352
+alpha = 0.00443067
+eta = 0.000913276
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0634835, ||x_it|| = 851
+alpha = 0.00809122
+eta = 0.000437732
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0429409, ||x_it|| = 853.471
+alpha = 0.00555235
+eta = 0.000245426
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0321095, ||x_it|| = 854.33
+alpha = 0.00617774
+eta = 7.94811e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0195266, ||x_it|| = 854.912
+alpha = 0.00622574
+eta = 3.62415e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0157905, ||x_it|| = 855.149
+alpha = 0.00513146
+eta = -6.12582e-06
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.00909426, ||x_it|| = 855.285
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.10774, <w, mu> / Mt = 0.00396145
+inner_prod(v, mu, 0) / Mt = 0.00395336
+correction = 1.12969
+ksis.back() = 0.183609, other part = 0.107875
+new_vars = 0.816462
+new_vars = 0.816463
+CG took 1549.43 seconds.
+onsager took 6.89979e-08 seconds.
+alpha2 = 0.924132
+gam1 = 1.22479
+true gam1 = 1.08128
+l2_norm2(temp) / N = 0.188481
+trace_correction / N = 0.132518
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.434145
+R2 = 0.811518
+prior variances = 0 0.0419749 0.807968 14.9708 
+prior probabilities = 0.968758 0.0102009 0.0176621 0.00337921 
+gamw = 3.11527
+lmmse step took 1680.81 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16885
+[old] it_revar = 2: gam1 = 1.16432
+[old] it_revar = 3: gam1 = 1.16394
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.6385 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_23.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_23.bin
+time needed to save beta1 to an external file = 0.643692 seconds
+gam2 = 14.9271
+true gam2 = 24.4651
+time needed to calculate conditional expectation = 2.64001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.671595
+R2 = 0.54896
+prior variances = 0 0.0419873 0.813714 15.2002 
+prior probabilities = 0.968722 0.0102018 0.0177397 0.00333689 
+gamw = 3.11527
+denoising step took 132.7 seconds.
+total iteration time = 1813.51
+total computation time so far = 48458.1
+
+
+
+********************
+iteration = 24
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2615.03
+l2_norm(mu_CG_last, 0) = 18.4155
+alpha = 0.0204879
+eta = 0.170116
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.59398, ||x_it|| = 498.47
+alpha = 0.000753362
+eta = 0.0769266
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.947521, ||x_it|| = 545.823
+alpha = 0.0015122
+eta = 0.112475
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.07061, ||x_it|| = 581.271
+alpha = 0.00318952
+eta = 0.0748399
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.829061, ||x_it|| = 692.51
+alpha = 0.00285774
+eta = 0.0265962
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.458559, ||x_it|| = 762.305
+alpha = 0.00284922
+eta = 0.024853
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.419688, ||x_it|| = 785.802
+alpha = 0.00274683
+eta = 0.0225949
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.385139, ||x_it|| = 806.612
+alpha = 0.00330696
+eta = 0.00610768
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.187659, ||x_it|| = 830.361
+alpha = 0.0052339
+eta = 0.00411284
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.146374, ||x_it|| = 840.415
+alpha = 0.00530031
+eta = 0.00248558
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.109511, ||x_it|| = 847.357
+alpha = 0.00447315
+eta = 0.000913217
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0633035, ||x_it|| = 851.003
+alpha = 0.00791101
+eta = 0.000456975
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0436351, ||x_it|| = 853.407
+alpha = 0.00548338
+eta = 0.000244233
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.031674, ||x_it|| = 854.282
+alpha = 0.0063001
+eta = 8.6357e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.019732, ||x_it|| = 854.861
+alpha = 0.00610078
+eta = 4.1519e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0156643, ||x_it|| = 855.097
+alpha = 0.00515259
+eta = 4.31215e-06
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0107316, ||x_it|| = 855.232
+alpha = 0.00140983
+eta = -7.82701e-06
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0145722, ||x_it|| = 855.25
+alpha = 0.00249145
+eta = -1.77705e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00572224, ||x_it|| = 855.312
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.107879, <w, mu> / Mt = 0.00395547
+inner_prod(v, mu, 0) / Mt = 0.0039483
+correction = 1.13034
+ksis.back() = 0.183604, other part = 0.108014
+new_vars = 0.816129
+new_vars = 0.816129
+CG took 1711.93 seconds.
+onsager took 1.11002e-07 seconds.
+alpha2 = 0.924276
+gam1 = 1.2253
+true gam1 = 1.08157
+l2_norm2(temp) / N = 0.188919
+trace_correction / N = 0.132428
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.434649
+R2 = 0.81108
+prior variances = 0 0.0419873 0.813714 15.2002 
+prior probabilities = 0.968722 0.0102018 0.0177397 0.00333689 
+gamw = 3.1119
+lmmse step took 1843.09 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16952
+[old] it_revar = 2: gam1 = 1.16501
+[old] it_revar = 3: gam1 = 1.16463
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.5445 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_24.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_24.bin
+time needed to save beta1 to an external file = 0.812672 seconds
+gam2 = 14.9621
+true gam2 = 24.2869
+time needed to calculate conditional expectation = 2.02002e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.671239
+R2 = 0.549438
+prior variances = 0 0.0419997 0.819267 15.4117 
+prior probabilities = 0.968682 0.0102027 0.0178163 0.00329851 
+gamw = 3.1119
+denoising step took 132.646 seconds.
+total iteration time = 1975.74
+total computation time so far = 50433.9
+
+
+
+********************
+iteration = 25
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2615.73
+l2_norm(mu_CG_last, 0) = 18.3931
+alpha = 0.0205018
+eta = 0.169901
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.59211, ||x_it|| = 499.251
+alpha = 0.000753889
+eta = 0.0768278
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.946413, ||x_it|| = 546.568
+alpha = 0.00151449
+eta = 0.112298
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.06922, ||x_it|| = 582.021
+alpha = 0.00318797
+eta = 0.0746429
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.827524, ||x_it|| = 693.022
+alpha = 0.00286103
+eta = 0.0264997
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.457468, ||x_it|| = 762.711
+alpha = 0.00284763
+eta = 0.024729
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.418358, ||x_it|| = 786.109
+alpha = 0.0027511
+eta = 0.0224889
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.383953, ||x_it|| = 806.843
+alpha = 0.00330893
+eta = 0.00607181
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.18692, ||x_it|| = 830.489
+alpha = 0.00523181
+eta = 0.0040935
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.145831, ||x_it|| = 840.474
+alpha = 0.00532254
+eta = 0.00248159
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.109239, ||x_it|| = 847.404
+alpha = 0.0044314
+eta = 0.000898125
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0625276, ||x_it|| = 851.003
+alpha = 0.00819989
+eta = 0.000432343
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0421238, ||x_it|| = 853.44
+alpha = 0.00556304
+eta = 0.000250582
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0316735, ||x_it|| = 854.271
+alpha = 0.00614734
+eta = 8.67241e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0192112, ||x_it|| = 854.837
+alpha = 0.00622598
+eta = 4.6473e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0154756, ||x_it|| = 855.067
+alpha = 0.00501507
+eta = 1.76085e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0123327, ||x_it|| = 855.196
+alpha = 0.000874595
+eta = 2.89576e-06
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0115069, ||x_it|| = 855.21
+alpha = 0.00420086
+eta = -1.26735e-05
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00553774, ||x_it|| = 855.275
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108013, <w, mu> / Mt = 0.00394959
+inner_prod(v, mu, 0) / Mt = 0.00394312
+correction = 1.13084
+ksis.back() = 0.183594, other part = 0.108122
+new_vars = 0.816191
+new_vars = 0.816191
+CG took 1713.07 seconds.
+onsager took 1.32997e-07 seconds.
+alpha2 = 0.924419
+gam1 = 1.2252
+true gam1 = 1.08139
+l2_norm2(temp) / N = 0.189311
+trace_correction / N = 0.13232
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.435099
+R2 = 0.810689
+prior variances = 0 0.0419997 0.819267 15.4117 
+prior probabilities = 0.968682 0.0102027 0.0178163 0.00329851 
+gamw = 3.10915
+lmmse step took 1844.58 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16964
+[old] it_revar = 2: gam1 = 1.16515
+[old] it_revar = 3: gam1 = 1.16477
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.6968 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_25.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_25.bin
+time needed to save beta1 to an external file = 0.708422 seconds
+gam2 = 14.99
+true gam2 = 24.1316
+time needed to calculate conditional expectation = 1.39997e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.670861
+R2 = 0.549946
+prior variances = 0 0.042012 0.824676 15.6035 
+prior probabilities = 0.96864 0.0102035 0.017892 0.00326435 
+gamw = 3.10915
+denoising step took 133.255 seconds.
+total iteration time = 1977.84
+total computation time so far = 52411.7
+
+
+
+********************
+iteration = 26
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2616.25
+l2_norm(mu_CG_last, 0) = 18.3691
+alpha = 0.0205024
+eta = 0.171222
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.59841, ||x_it|| = 499.615
+alpha = 0.00074919
+eta = 0.0766587
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.945231, ||x_it|| = 547.039
+alpha = 0.00152082
+eta = 0.111741
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.06612, ||x_it|| = 582.571
+alpha = 0.00320232
+eta = 0.0744202
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.825908, ||x_it|| = 693.505
+alpha = 0.00286424
+eta = 0.0264221
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.456594, ||x_it|| = 763.061
+alpha = 0.00284381
+eta = 0.0246303
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.417306, ||x_it|| = 786.36
+alpha = 0.00275702
+eta = 0.0224076
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.383055, ||x_it|| = 807.053
+alpha = 0.00330899
+eta = 0.00603423
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.186206, ||x_it|| = 830.614
+alpha = 0.00523728
+eta = 0.00407576
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.145389, ||x_it|| = 840.543
+alpha = 0.00532313
+eta = 0.00246676
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.108785, ||x_it|| = 847.439
+alpha = 0.0044312
+eta = 0.000892756
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0622093, ||x_it|| = 851.012
+alpha = 0.00822945
+eta = 0.000429309
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0418102, ||x_it|| = 853.437
+alpha = 0.00556656
+eta = 0.000251755
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0315235, ||x_it|| = 854.257
+alpha = 0.0061389
+eta = 8.82884e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0190647, ||x_it|| = 854.818
+alpha = 0.00623499
+eta = 4.91708e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0153503, ||x_it|| = 855.045
+alpha = 0.0051755
+eta = 6.13665e-06
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.00888696, ||x_it|| = 855.176
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108115, <w, mu> / Mt = 0.00394478
+inner_prod(v, mu, 0) / Mt = 0.00393904
+correction = 1.13129
+ksis.back() = 0.183584, other part = 0.108192
+new_vars = 0.816328
+new_vars = 0.816327
+CG took 1539.11 seconds.
+onsager took 1.45999e-07 seconds.
+alpha2 = 0.92453
+gam1 = 1.225
+true gam1 = 1.08114
+l2_norm2(temp) / N = 0.189635
+trace_correction / N = 0.132242
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.435471
+R2 = 0.810365
+prior variances = 0 0.042012 0.824676 15.6035 
+prior probabilities = 0.96864 0.0102035 0.017892 0.00326435 
+gamw = 3.10677
+lmmse step took 1670.51 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16965
+[old] it_revar = 2: gam1 = 1.16518
+[old] it_revar = 3: gam1 = 1.16481
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.6407 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_26.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_26.bin
+time needed to save beta1 to an external file = 0.725973 seconds
+gam2 = 15.0145
+true gam2 = 23.9962
+time needed to calculate conditional expectation = 5.30003e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.670455
+R2 = 0.550491
+prior variances = 0 0.0420242 0.829998 15.7746 
+prior probabilities = 0.968594 0.0102043 0.0179671 0.00323453 
+gamw = 3.10677
+denoising step took 132.725 seconds.
+total iteration time = 1803.23
+total computation time so far = 54215
+
+
+
+********************
+iteration = 27
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2616.97
+l2_norm(mu_CG_last, 0) = 18.3489
+alpha = 0.0205088
+eta = 0.171558
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.59963, ||x_it|| = 500.076
+alpha = 0.000747882
+eta = 0.0765603
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.944356, ||x_it|| = 547.516
+alpha = 0.00152409
+eta = 0.111485
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.06451, ||x_it|| = 583.08
+alpha = 0.00320636
+eta = 0.0743228
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.825088, ||x_it|| = 693.892
+alpha = 0.00286306
+eta = 0.0263532
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.455829, ||x_it|| = 763.33
+alpha = 0.00284592
+eta = 0.0245782
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.41672, ||x_it|| = 786.585
+alpha = 0.00275646
+eta = 0.022304
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.38201, ||x_it|| = 807.232
+alpha = 0.00331381
+eta = 0.00601592
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.185844, ||x_it|| = 830.718
+alpha = 0.00524081
+eta = 0.00405013
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.144849, ||x_it|| = 840.624
+alpha = 0.00530842
+eta = 0.00244913
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.108291, ||x_it|| = 847.455
+alpha = 0.00447515
+eta = 0.000897016
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0623015, ||x_it|| = 851.034
+alpha = 0.0079931
+eta = 0.000449678
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0427244, ||x_it|| = 853.396
+alpha = 0.00549734
+eta = 0.000248739
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0312024, ||x_it|| = 854.24
+alpha = 0.00626194
+eta = 9.30384e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0193488, ||x_it|| = 854.801
+alpha = 0.0061173
+eta = 5.1335e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0153115, ||x_it|| = 855.029
+alpha = 0.00523636
+eta = 9.15246e-06
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.00917506, ||x_it|| = 855.161
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108202, <w, mu> / Mt = 0.00394068
+inner_prod(v, mu, 0) / Mt = 0.00393556
+correction = 1.13177
+ksis.back() = 0.183581, other part = 0.108271
+new_vars = 0.816156
+new_vars = 0.816159
+CG took 1543.21 seconds.
+onsager took 1.09998e-07 seconds.
+alpha2 = 0.924621
+gam1 = 1.22525
+true gam1 = 1.08125
+l2_norm2(temp) / N = 0.189922
+trace_correction / N = 0.132184
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.435801
+R2 = 0.810078
+prior variances = 0 0.0420242 0.829998 15.7746 
+prior probabilities = 0.968594 0.0102043 0.0179671 0.00323453 
+gamw = 3.10457
+lmmse step took 1674.75 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17007
+[old] it_revar = 2: gam1 = 1.16561
+[old] it_revar = 3: gam1 = 1.16524
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.8133 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_27.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_27.bin
+time needed to save beta1 to an external file = 0.791991 seconds
+gam2 = 15.0364
+true gam2 = 23.8762
+time needed to calculate conditional expectation = 3.06005e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.670017
+R2 = 0.551077
+prior variances = 0 0.0420364 0.835118 15.9318 
+prior probabilities = 0.968546 0.0102051 0.0180411 0.0032073 
+gamw = 3.10457
+denoising step took 133.177 seconds.
+total iteration time = 1807.92
+total computation time so far = 56022.9
+
+
+
+********************
+iteration = 28
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2617.68
+l2_norm(mu_CG_last, 0) = 18.3327
+alpha = 0.0204849
+eta = 0.175459
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.61932, ||x_it|| = 499.759
+alpha = 0.000736483
+eta = 0.0762881
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.943051, ||x_it|| = 547.647
+alpha = 0.00153436
+eta = 0.110288
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05837, ||x_it|| = 583.354
+alpha = 0.00324359
+eta = 0.0743013
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.824692, ||x_it|| = 694.21
+alpha = 0.00285987
+eta = 0.0262734
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.454924, ||x_it|| = 763.546
+alpha = 0.00284923
+eta = 0.0245464
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.416252, ||x_it|| = 786.751
+alpha = 0.00275576
+eta = 0.0222175
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.381042, ||x_it|| = 807.361
+alpha = 0.00331957
+eta = 0.0059912
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.185291, ||x_it|| = 830.786
+alpha = 0.00524882
+eta = 0.00403946
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.144472, ||x_it|| = 840.658
+alpha = 0.00530696
+eta = 0.00244381
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.107963, ||x_it|| = 847.457
+alpha = 0.00447763
+eta = 0.000895228
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0619972, ||x_it|| = 851.02
+alpha = 0.00802831
+eta = 0.000450267
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0424238, ||x_it|| = 853.371
+alpha = 0.00551063
+eta = 0.000253971
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0310776, ||x_it|| = 854.207
+alpha = 0.00623059
+eta = 9.86014e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0192679, ||x_it|| = 854.761
+alpha = 0.00612554
+eta = 5.79846e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0151939, ||x_it|| = 854.988
+alpha = 0.00519553
+eta = 2.16024e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0103855, ||x_it|| = 855.117
+alpha = 0.00145194
+eta = 3.49543e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0143162, ||x_it|| = 855.134
+alpha = 0.0024113
+eta = -1.52476e-06
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00556572, ||x_it|| = 855.192
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108301, <w, mu> / Mt = 0.00393719
+inner_prod(v, mu, 0) / Mt = 0.00393246
+correction = 1.13183
+ksis.back() = 0.183573, other part = 0.108356
+new_vars = 0.816371
+new_vars = 0.81637
+CG took 1714.23 seconds.
+onsager took 1.29003e-07 seconds.
+alpha2 = 0.924727
+gam1 = 1.22493
+true gam1 = 1.08091
+l2_norm2(temp) / N = 0.19017
+trace_correction / N = 0.132092
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.436085
+R2 = 0.80983
+prior variances = 0 0.0420364 0.835118 15.9318 
+prior probabilities = 0.968546 0.0102051 0.0180411 0.0032073 
+gamw = 3.10307
+lmmse step took 1845.81 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.16995
+[old] it_revar = 2: gam1 = 1.1655
+[old] it_revar = 3: gam1 = 1.16513
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.6541 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_28.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_28.bin
+time needed to save beta1 to an external file = 0.780412 seconds
+gam2 = 15.0523
+true gam2 = 23.7697
+time needed to calculate conditional expectation = 2.85996e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.669587
+R2 = 0.551653
+prior variances = 0 0.0420485 0.839937 16.0826 
+prior probabilities = 0.968499 0.0102059 0.0181135 0.00318132 
+gamw = 3.10307
+denoising step took 132.918 seconds.
+total iteration time = 1978.73
+total computation time so far = 58001.6
+
+
+
+********************
+iteration = 29
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2618.03
+l2_norm(mu_CG_last, 0) = 18.3197
+alpha = 0.0205078
+eta = 0.173321
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.60795, ||x_it|| = 500.52
+alpha = 0.000742157
+eta = 0.0763589
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.942923, ||x_it|| = 548.127
+alpha = 0.00153254
+eta = 0.110783
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.06057, ||x_it|| = 583.807
+alpha = 0.00322115
+eta = 0.0741632
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.823742, ||x_it|| = 694.405
+alpha = 0.00286425
+eta = 0.0262748
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.454894, ||x_it|| = 763.716
+alpha = 0.00284317
+eta = 0.0244783
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.415606, ||x_it|| = 786.878
+alpha = 0.00275832
+eta = 0.0221554
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.380429, ||x_it|| = 807.451
+alpha = 0.00332277
+eta = 0.00598395
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.185147, ||x_it|| = 830.834
+alpha = 0.0052409
+eta = 0.00402853
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.144239, ||x_it|| = 840.679
+alpha = 0.005331
+eta = 0.00244752
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.108046, ||x_it|| = 847.492
+alpha = 0.00443171
+eta = 0.000881853
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0614856, ||x_it|| = 851.025
+alpha = 0.00831572
+eta = 0.000420793
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0409399, ||x_it|| = 853.425
+alpha = 0.00563775
+eta = 0.000257582
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0312784, ||x_it|| = 854.225
+alpha = 0.00602468
+eta = 9.35393e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.018766, ||x_it|| = 854.768
+alpha = 0.00631168
+eta = 5.7092e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0150908, ||x_it|| = 854.991
+alpha = 0.00501914
+eta = 3.0219e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0119192, ||x_it|| = 855.114
+alpha = 0.000889854
+eta = 2.11722e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0112857, ||x_it|| = 855.128
+alpha = 0.00414876
+eta = -1.94527e-06
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00539143, ||x_it|| = 855.19
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108352, <w, mu> / Mt = 0.00393453
+inner_prod(v, mu, 0) / Mt = 0.00393021
+correction = 1.13224
+ksis.back() = 0.183573, other part = 0.108408
+new_vars = 0.81612
+new_vars = 0.81612
+CG took 1713.56 seconds.
+onsager took 4.79995e-08 seconds.
+alpha2 = 0.924779
+gam1 = 1.22531
+true gam1 = 1.0811
+l2_norm2(temp) / N = 0.190351
+trace_correction / N = 0.132065
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.436293
+R2 = 0.809649
+prior variances = 0 0.0420485 0.839937 16.0826 
+prior probabilities = 0.968499 0.0102059 0.0181135 0.00318132 
+gamw = 3.10159
+lmmse step took 1844.91 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17045
+[old] it_revar = 2: gam1 = 1.166
+[old] it_revar = 3: gam1 = 1.16563
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.8239 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_29.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_29.bin
+time needed to save beta1 to an external file = 0.986813 seconds
+gam2 = 15.0698
+true gam2 = 23.6714
+time needed to calculate conditional expectation = 2.33005e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.669156
+R2 = 0.552231
+prior variances = 0 0.0420606 0.844549 16.2255 
+prior probabilities = 0.968452 0.0102066 0.0181847 0.00315715 
+gamw = 3.10159
+denoising step took 133.236 seconds.
+total iteration time = 1978.14
+total computation time so far = 59979.8
+
+
+
+********************
+iteration = 30
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2618.36
+l2_norm(mu_CG_last, 0) = 18.3092
+alpha = 0.0205111
+eta = 0.173664
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.60941, ||x_it|| = 500.846
+alpha = 0.000740747
+eta = 0.0762545
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.942102, ||x_it|| = 548.471
+alpha = 0.00153567
+eta = 0.110617
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05953, ||x_it|| = 584.178
+alpha = 0.0032258
+eta = 0.0739534
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.822352, ||x_it|| = 694.786
+alpha = 0.00286712
+eta = 0.026221
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.454321, ||x_it|| = 763.979
+alpha = 0.00283888
+eta = 0.024413
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.414941, ||x_it|| = 787.062
+alpha = 0.00276407
+eta = 0.0221071
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.379928, ||x_it|| = 807.626
+alpha = 0.00331982
+eta = 0.00596032
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.184734, ||x_it|| = 830.945
+alpha = 0.00523919
+eta = 0.00401748
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.14401, ||x_it|| = 840.749
+alpha = 0.00533077
+eta = 0.00243527
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.107748, ||x_it|| = 847.545
+alpha = 0.00443546
+eta = 0.000877541
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0613185, ||x_it|| = 851.064
+alpha = 0.00831749
+eta = 0.000419093
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0408473, ||x_it|| = 853.454
+alpha = 0.00562717
+eta = 0.000255868
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0311645, ||x_it|| = 854.248
+alpha = 0.00604139
+eta = 9.28631e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0186919, ||x_it|| = 854.79
+alpha = 0.00630569
+eta = 5.67091e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0150335, ||x_it|| = 855.011
+alpha = 0.005112
+eta = 2.01263e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0100947, ||x_it|| = 855.135
+alpha = 0.00141217
+eta = 3.12358e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0137328, ||x_it|| = 855.152
+alpha = 0.00258406
+eta = -1.96453e-06
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00536167, ||x_it|| = 855.209
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108409, <w, mu> / Mt = 0.00393154
+inner_prod(v, mu, 0) / Mt = 0.0039275
+correction = 1.1327
+ksis.back() = 0.183573, other part = 0.108464
+new_vars = 0.815841
+new_vars = 0.815841
+CG took 1709.71 seconds.
+onsager took 1.23e-07 seconds.
+alpha2 = 0.924836
+gam1 = 1.22573
+true gam1 = 1.08134
+l2_norm2(temp) / N = 0.190541
+trace_correction / N = 0.132027
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.436511
+R2 = 0.809458
+prior variances = 0 0.0420606 0.844549 16.2255 
+prior probabilities = 0.968452 0.0102066 0.0181847 0.00315715 
+gamw = 3.10012
+lmmse step took 1841.16 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17099
+[old] it_revar = 2: gam1 = 1.16654
+[old] it_revar = 3: gam1 = 1.16617
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.6938 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_30.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_30.bin
+time needed to save beta1 to an external file = 0.707524 seconds
+gam2 = 15.086
+true gam2 = 23.5805
+time needed to calculate conditional expectation = 5.06996e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.668721
+R2 = 0.552812
+prior variances = 0 0.0420726 0.848955 16.3598 
+prior probabilities = 0.968403 0.0102074 0.0182548 0.00313469 
+gamw = 3.10012
+denoising step took 132.942 seconds.
+total iteration time = 1974.1
+total computation time so far = 61953.9
+
+
+
+********************
+iteration = 31
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2618.67
+l2_norm(mu_CG_last, 0) = 18.297
+alpha = 0.020514
+eta = 0.173971
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.61067, ||x_it|| = 501.131
+alpha = 0.000739828
+eta = 0.0761592
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.941328, ||x_it|| = 548.79
+alpha = 0.00153729
+eta = 0.110446
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05844, ||x_it|| = 584.49
+alpha = 0.00323246
+eta = 0.0737575
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.821022, ||x_it|| = 695.16
+alpha = 0.00286855
+eta = 0.0261582
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.453632, ||x_it|| = 764.207
+alpha = 0.00283776
+eta = 0.0243661
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.414407, ||x_it|| = 787.225
+alpha = 0.00276804
+eta = 0.0220554
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.379363, ||x_it|| = 807.779
+alpha = 0.0033166
+eta = 0.00594556
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.184437, ||x_it|| = 831.022
+alpha = 0.00523633
+eta = 0.00400653
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.143743, ||x_it|| = 840.795
+alpha = 0.00532885
+eta = 0.00242632
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.107471, ||x_it|| = 847.568
+alpha = 0.00444607
+eta = 0.000876671
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0612142, ||x_it|| = 851.079
+alpha = 0.00827989
+eta = 0.000422607
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0409257, ||x_it|| = 853.451
+alpha = 0.00560922
+eta = 0.000256032
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0310378, ||x_it|| = 854.246
+alpha = 0.00606845
+eta = 9.47659e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0186927, ||x_it|| = 854.786
+alpha = 0.00628209
+eta = 5.88222e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0150089, ||x_it|| = 855.006
+alpha = 0.00502003
+eta = 3.40775e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0121145, ||x_it|| = 855.128
+alpha = 0.00085533
+eta = 2.33313e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0110008, ||x_it|| = 855.142
+alpha = 0.00433027
+eta = -8.90977e-08
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00535851, ||x_it|| = 855.204
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108468, <w, mu> / Mt = 0.00392882
+inner_prod(v, mu, 0) / Mt = 0.00392508
+correction = 1.13297
+ksis.back() = 0.183569, other part = 0.108514
+new_vars = 0.815807
+new_vars = 0.815807
+CG took 1711.82 seconds.
+onsager took 1.11999e-07 seconds.
+alpha2 = 0.924899
+gam1 = 1.22578
+true gam1 = 1.0813
+l2_norm2(temp) / N = 0.19072
+trace_correction / N = 0.13198
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.436715
+R2 = 0.80928
+prior variances = 0 0.0420726 0.848955 16.3598 
+prior probabilities = 0.968403 0.0102074 0.0182548 0.00313469 
+gamw = 3.09886
+lmmse step took 1843.34 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17118
+[old] it_revar = 2: gam1 = 1.16674
+[old] it_revar = 3: gam1 = 1.16637
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.6567 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_31.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_31.bin
+time needed to save beta1 to an external file = 0.8286 seconds
+gam2 = 15.0989
+true gam2 = 23.4982
+time needed to calculate conditional expectation = 2.07001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.668293
+R2 = 0.553384
+prior variances = 0 0.0420846 0.853137 16.4852 
+prior probabilities = 0.968354 0.0102081 0.0183236 0.00311378 
+gamw = 3.09886
+denoising step took 133.622 seconds.
+total iteration time = 1976.97
+total computation time so far = 63930.8
+
+
+
+********************
+iteration = 32
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2618.95
+l2_norm(mu_CG_last, 0) = 18.286
+alpha = 0.0205164
+eta = 0.17425
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.61182, ||x_it|| = 501.35
+alpha = 0.000739216
+eta = 0.0760829
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.940707, ||x_it|| = 549.052
+alpha = 0.0015379
+eta = 0.110285
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05742, ||x_it|| = 584.73
+alpha = 0.00323943
+eta = 0.0736047
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.81997, ||x_it|| = 695.473
+alpha = 0.00286881
+eta = 0.0261003
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.452998, ||x_it|| = 764.383
+alpha = 0.00283839
+eta = 0.0243355
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.414032, ||x_it|| = 787.352
+alpha = 0.00277032
+eta = 0.0220063
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.378835, ||x_it|| = 807.898
+alpha = 0.00331434
+eta = 0.00593599
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.184232, ||x_it|| = 831.072
+alpha = 0.00523331
+eta = 0.00399657
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.143504, ||x_it|| = 840.823
+alpha = 0.00532847
+eta = 0.0024203
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.10727, ||x_it|| = 847.576
+alpha = 0.00445376
+eta = 0.000875555
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0611101, ||x_it|| = 851.082
+alpha = 0.0082603
+eta = 0.000424296
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0409243, ||x_it|| = 853.441
+alpha = 0.0056062
+eta = 0.000256528
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0309503, ||x_it|| = 854.236
+alpha = 0.00607293
+eta = 9.62923e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0186821, ||x_it|| = 854.773
+alpha = 0.00627564
+eta = 6.05397e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0149721, ||x_it|| = 854.993
+alpha = 0.00498364
+eta = 4.06764e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.0128056, ||x_it|| = 855.114
+alpha = 0.000785968
+eta = 2.40002e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0105414, ||x_it|| = 855.128
+alpha = 0.00473585
+eta = 1.51838e-06
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00535838, ||x_it|| = 855.19
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108517, <w, mu> / Mt = 0.00392666
+inner_prod(v, mu, 0) / Mt = 0.00392325
+correction = 1.13317
+ksis.back() = 0.183566, other part = 0.108555
+new_vars = 0.815802
+new_vars = 0.815802
+CG took 1707.5 seconds.
+onsager took 1.11002e-07 seconds.
+alpha2 = 0.92495
+gam1 = 1.22579
+true gam1 = 1.08123
+l2_norm2(temp) / N = 0.190868
+trace_correction / N = 0.131944
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.436885
+R2 = 0.809131
+prior variances = 0 0.0420846 0.853137 16.4852 
+prior probabilities = 0.968354 0.0102081 0.0183236 0.00311378 
+gamw = 3.09778
+lmmse step took 1838.4 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17133
+[old] it_revar = 2: gam1 = 1.16689
+[old] it_revar = 3: gam1 = 1.16652
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3835 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_32.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_32.bin
+time needed to save beta1 to an external file = 0.689687 seconds
+gam2 = 15.1103
+true gam2 = 23.4231
+time needed to calculate conditional expectation = 2.08995e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.66787
+R2 = 0.55395
+prior variances = 0 0.0420965 0.857103 16.6025 
+prior probabilities = 0.968306 0.0102089 0.0183912 0.00309444 
+gamw = 3.09778
+denoising step took 132.759 seconds.
+total iteration time = 1971.16
+total computation time so far = 65902
+
+
+
+********************
+iteration = 33
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2619.21
+l2_norm(mu_CG_last, 0) = 18.2774
+alpha = 0.020518
+eta = 0.174539
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.61307, ||x_it|| = 501.536
+alpha = 0.000738702
+eta = 0.0760151
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.940179, ||x_it|| = 549.292
+alpha = 0.0015379
+eta = 0.110117
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05641, ||x_it|| = 584.939
+alpha = 0.00324669
+eta = 0.0734754
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.819084, ||x_it|| = 695.76
+alpha = 0.00286851
+eta = 0.0260419
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.452374, ||x_it|| = 764.545
+alpha = 0.00284027
+eta = 0.02431
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.413722, ||x_it|| = 787.476
+alpha = 0.00277168
+eta = 0.0219613
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.378363, ||x_it|| = 808.011
+alpha = 0.00331215
+eta = 0.0059272
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.184056, ||x_it|| = 831.124
+alpha = 0.0052294
+eta = 0.00398715
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.143293, ||x_it|| = 840.853
+alpha = 0.00532993
+eta = 0.00241474
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.107105, ||x_it|| = 847.59
+alpha = 0.00445832
+eta = 0.000873372
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0609949, ||x_it|| = 851.091
+alpha = 0.00825667
+eta = 0.000424087
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0408673, ||x_it|| = 853.441
+alpha = 0.00560777
+eta = 0.000256373
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0308783, ||x_it|| = 854.234
+alpha = 0.00607088
+eta = 9.68462e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0186527, ||x_it|| = 854.769
+alpha = 0.00627794
+eta = 6.09702e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0149026, ||x_it|| = 854.988
+alpha = 0.00518436
+eta = 1.87172e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.00889145, ||x_it|| = 855.113
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.10855, <w, mu> / Mt = 0.00392465
+inner_prod(v, mu, 0) / Mt = 0.00392154
+correction = 1.13344
+ksis.back() = 0.183561, other part = 0.108573
+new_vars = 0.815827
+new_vars = 0.815824
+CG took 1536.21 seconds.
+onsager took 1.05007e-07 seconds.
+alpha2 = 0.924989
+gam1 = 1.22575
+true gam1 = 1.08114
+l2_norm2(temp) / N = 0.191002
+trace_correction / N = 0.131921
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.437038
+R2 = 0.808998
+prior variances = 0 0.0420965 0.857103 16.6025 
+prior probabilities = 0.968306 0.0102089 0.0183912 0.00309444 
+gamw = 3.09672
+lmmse step took 1667.12 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17144
+[old] it_revar = 2: gam1 = 1.16701
+[old] it_revar = 3: gam1 = 1.16664
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3743 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_33.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_33.bin
+time needed to save beta1 to an external file = 0.65299 seconds
+gam2 = 15.122
+true gam2 = 23.3545
+time needed to calculate conditional expectation = 2.66009e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.667452
+R2 = 0.554508
+prior variances = 0 0.0421084 0.860938 16.7099 
+prior probabilities = 0.968255 0.0102096 0.018458 0.0030771 
+gamw = 3.09672
+denoising step took 132.821 seconds.
+total iteration time = 1799.95
+total computation time so far = 67701.9
+
+
+
+********************
+iteration = 34
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2619.71
+l2_norm(mu_CG_last, 0) = 18.2683
+alpha = 0.020543
+eta = 0.171824
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.59878, ||x_it|| = 502.299
+alpha = 0.000747286
+eta = 0.0761234
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.940252, ||x_it|| = 549.781
+alpha = 0.00152977
+eta = 0.110686
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05895, ||x_it|| = 585.265
+alpha = 0.00322674
+eta = 0.0734644
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.818925, ||x_it|| = 695.986
+alpha = 0.00286491
+eta = 0.0259728
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.451672, ||x_it|| = 764.682
+alpha = 0.00284841
+eta = 0.0242999
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.413582, ||x_it|| = 787.618
+alpha = 0.00276798
+eta = 0.0219023
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.377801, ||x_it|| = 808.122
+alpha = 0.00331299
+eta = 0.00592492
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.184023, ||x_it|| = 831.182
+alpha = 0.00522384
+eta = 0.00396947
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.142975, ||x_it|| = 840.901
+alpha = 0.00532069
+eta = 0.00240352
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.106846, ||x_it|| = 847.598
+alpha = 0.00449718
+eta = 0.00087639
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0611407, ||x_it|| = 851.114
+alpha = 0.00804592
+eta = 0.000442107
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.041808, ||x_it|| = 853.414
+alpha = 0.00552698
+eta = 0.000250983
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0306092, ||x_it|| = 854.231
+alpha = 0.00621108
+eta = 9.90773e-05
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0189414, ||x_it|| = 854.768
+alpha = 0.00615263
+eta = 6.01633e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.014909, ||x_it|| = 854.989
+alpha = 0.00525592
+eta = 1.74689e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.00878544, ||x_it|| = 855.115
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108585, <w, mu> / Mt = 0.00392275
+inner_prod(v, mu, 0) / Mt = 0.00391989
+correction = 1.1338
+ksis.back() = 0.183563, other part = 0.108611
+new_vars = 0.815556
+new_vars = 0.815555
+CG took 1533.98 seconds.
+onsager took 6.6997e-08 seconds.
+alpha2 = 0.925023
+gam1 = 1.22616
+true gam1 = 1.08139
+l2_norm2(temp) / N = 0.191132
+trace_correction / N = 0.131907
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.437187
+R2 = 0.808868
+prior variances = 0 0.0421084 0.860938 16.7099 
+prior probabilities = 0.968255 0.0102096 0.018458 0.0030771 
+gamw = 3.0956
+lmmse step took 1664.9 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17195
+[old] it_revar = 2: gam1 = 1.16752
+[old] it_revar = 3: gam1 = 1.16714
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3273 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_34.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_34.bin
+time needed to save beta1 to an external file = 0.634457 seconds
+gam2 = 15.1331
+true gam2 = 23.2901
+time needed to calculate conditional expectation = 2.36992e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.667029
+R2 = 0.555072
+prior variances = 0 0.0421202 0.864543 16.8121 
+prior probabilities = 0.968206 0.0102103 0.0185234 0.00306069 
+gamw = 3.0956
+denoising step took 132.16 seconds.
+total iteration time = 1797.05
+total computation time so far = 69499
+
+
+
+********************
+iteration = 35
+********************
+->LMMSE
+l2_norm(p_last, 0) = 2620.26
+l2_norm(mu_CG_last, 0) = 18.2606
+alpha = 0.0205313
+eta = 0.173561
+[CG] it = 0: ||r_it|| / ||RHS|| = 1.6075, ||x_it|| = 502.148
+alpha = 0.000743149
+eta = 0.0760179
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.939789, ||x_it|| = 549.892
+alpha = 0.00153053
+eta = 0.110053
+[CG] it = 2: ||r_it|| / ||RHS|| = 1.05567, ||x_it|| = 585.359
+alpha = 0.00324811
+eta = 0.073506
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.819021, ||x_it|| = 696.147
+alpha = 0.00286109
+eta = 0.0258923
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.450806, ||x_it|| = 764.791
+alpha = 0.00285739
+eta = 0.0242905
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.413362, ||x_it|| = 787.719
+alpha = 0.00276521
+eta = 0.0218689
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.377367, ||x_it|| = 808.191
+alpha = 0.00331329
+eta = 0.00591132
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.183697, ||x_it|| = 831.211
+alpha = 0.00522609
+eta = 0.00396672
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.142797, ||x_it|| = 840.905
+alpha = 0.00532283
+eta = 0.00240263
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.10668, ||x_it|| = 847.591
+alpha = 0.00449505
+eta = 0.000874914
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0609101, ||x_it|| = 851.096
+alpha = 0.0080974
+eta = 0.000441721
+[CG] it = 11: ||r_it|| / ||RHS|| = 0.0415463, ||x_it|| = 853.395
+alpha = 0.00553579
+eta = 0.000255087
+[CG] it = 12: ||r_it|| / ||RHS|| = 0.0305314, ||x_it|| = 854.204
+alpha = 0.00618914
+eta = 0.000103113
+[CG] it = 13: ||r_it|| / ||RHS|| = 0.0188778, ||x_it|| = 854.737
+alpha = 0.00615624
+eta = 6.51543e-05
+[CG] it = 14: ||r_it|| / ||RHS|| = 0.0148387, ||x_it|| = 854.957
+alpha = 0.00509818
+eta = 4.30167e-05
+[CG] it = 15: ||r_it|| / ||RHS|| = 0.012176, ||x_it|| = 855.078
+alpha = 0.000868379
+eta = 3.54315e-05
+[CG] it = 16: ||r_it|| / ||RHS|| = 0.0111759, ||x_it|| = 855.093
+alpha = 0.00410366
+eta = 6.46377e-06
+[CG] it = 17: ||r_it|| / ||RHS|| = 0.00543637, ||x_it|| = 855.153
+std(noise) = 0.999999
+inner_prod(alphas, etas, 0) = 0.108644, <w, mu> / Mt = 0.00392104
+inner_prod(v, mu, 0) / Mt = 0.00391831
+correction = 1.13368
+ksis.back() = 0.183558, other part = 0.10866
+new_vars = 0.815819
+new_vars = 0.815819
+CG took 1706.76 seconds.
+onsager took 1.10012e-07 seconds.
+alpha2 = 0.925086
+gam1 = 1.22576
+true gam1 = 1.08101
+l2_norm2(temp) / N = 0.191254
+trace_correction / N = 0.131843
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.437327
+R2 = 0.808745
+prior variances = 0 0.0421202 0.864543 16.8121 
+prior probabilities = 0.968206 0.0102103 0.0185234 0.00306069 
+gamw = 3.09504
+lmmse step took 1837.64 seconds.
+->DENOISING
+[old] it_revar = 1: gam1 = 1.17171
+[old] it_revar = 2: gam1 = 1.16728
+[old] it_revar = 3: gam1 = 1.16691
+A total of 2 variance and prior tuning iterations were performed
+time needed to calculate z1 = 65.3623 seconds
+rho = 0.5
+x1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_it_35.bin
+r1_hat filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_r1_it_35.bin
+time needed to save beta1 to an external file = 0.808329 seconds
+gam2 = 15.1379
+true gam2 = 23.2311
+time needed to calculate conditional expectation = 2.39001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.666621
+R2 = 0.555617
+prior variances = 0 0.042132 0.867869 16.9117 
+prior probabilities = 0.968157 0.0102111 0.0185871 0.00304477 
+gamw = 3.09504
+denoising step took 132.494 seconds.
+total iteration time = 1970.14
+total computation time so far = 71469.1
+
+
+so far worker 0 has calculated 0 pvals.
+so far worker 0 has calculated 1000 pvals.
+so far worker 0 has calculated 2000 pvals.
+so far worker 0 has calculated 3000 pvals.
+so far worker 0 has calculated 4000 pvals.
+so far worker 0 has calculated 5000 pvals.
+so far worker 0 has calculated 6000 pvals.
+so far worker 0 has calculated 7000 pvals.
+so far worker 0 has calculated 8000 pvals.
+so far worker 0 has calculated 9000 pvals.
+so far worker 0 has calculated 10000 pvals.
+so far worker 0 has calculated 11000 pvals.
+so far worker 0 has calculated 12000 pvals.
+so far worker 0 has calculated 13000 pvals.
+so far worker 0 has calculated 14000 pvals.
+so far worker 0 has calculated 15000 pvals.
+so far worker 0 has calculated 16000 pvals.
+so far worker 0 has calculated 17000 pvals.
+so far worker 0 has calculated 18000 pvals.
+so far worker 0 has calculated 19000 pvals.
+so far worker 0 has calculated 20000 pvals.
+so far worker 0 has calculated 21000 pvals.
+so far worker 0 has calculated 22000 pvals.
+so far worker 0 has calculated 23000 pvals.
+so far worker 0 has calculated 24000 pvals.
+so far worker 0 has calculated 25000 pvals.
+so far worker 0 has calculated 26000 pvals.
+so far worker 0 has calculated 27000 pvals.
+so far worker 0 has calculated 28000 pvals.
+so far worker 0 has calculated 29000 pvals.
+so far worker 0 has calculated 30000 pvals.
+so far worker 0 has calculated 31000 pvals.
+so far worker 0 has calculated 32000 pvals.
+so far worker 0 has calculated 33000 pvals.
+so far worker 0 has calculated 34000 pvals.
+so far worker 0 has calculated 35000 pvals.
+so far worker 0 has calculated 36000 pvals.
+so far worker 0 has calculated 37000 pvals.
+so far worker 0 has calculated 38000 pvals.
+so far worker 0 has calculated 39000 pvals.
+so far worker 0 has calculated 40000 pvals.
+so far worker 0 has calculated 41000 pvals.
+so far worker 0 has calculated 42000 pvals.
+so far worker 0 has calculated 43000 pvals.
+so far worker 0 has calculated 44000 pvals.
+so far worker 0 has calculated 45000 pvals.
+so far worker 0 has calculated 46000 pvals.
+so far worker 0 has calculated 47000 pvals.
+so far worker 0 has calculated 48000 pvals.
+so far worker 0 has calculated 49000 pvals.
+so far worker 0 has calculated 50000 pvals.
+so far worker 0 has calculated 51000 pvals.
+so far worker 0 has calculated 52000 pvals.
+so far worker 0 has calculated 53000 pvals.
+so far worker 0 has calculated 54000 pvals.
+so far worker 0 has calculated 55000 pvals.
+so far worker 0 has calculated 56000 pvals.
+so far worker 0 has calculated 57000 pvals.
+so far worker 0 has calculated 58000 pvals.
+so far worker 0 has calculated 59000 pvals.
+so far worker 0 has calculated 60000 pvals.
+so far worker 0 has calculated 61000 pvals.
+so far worker 0 has calculated 62000 pvals.
+so far worker 0 has calculated 63000 pvals.
+so far worker 0 has calculated 64000 pvals.
+so far worker 0 has calculated 65000 pvals.
+so far worker 0 has calculated 66000 pvals.
+so far worker 0 has calculated 67000 pvals.
+so far worker 0 has calculated 68000 pvals.
+so far worker 0 has calculated 69000 pvals.
+so far worker 0 has calculated 70000 pvals.
+so far worker 0 has calculated 71000 pvals.
+so far worker 0 has calculated 72000 pvals.
+filepath_out_pvals = /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_pvals.bin
+gam1s filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_gam1s.csv
+gam2s filepath_out is /nfs/scistore13/robingrp/human_data/adepope_preprocessing/output_testVAMP/estimates/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_train_after8novars_gam2s.csv
+
+real	1217m4.388s
+user	7129m26.316s
+sys	4m26.673s

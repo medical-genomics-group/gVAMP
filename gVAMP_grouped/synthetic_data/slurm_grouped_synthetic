@@ -1,0 +1,72 @@
+#!/bin/bash
+
+#SBATCH --job-name=gVAMP_grouped_test
+
+#SBATCH --time=00-00:05:00
+
+#SBATCH --mem-per-cpu=5gb
+
+#SBATCH --ntasks=2
+
+#SBATCH --cpus-per-task=2
+
+#SBATCH --output=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/results_grouped.log
+
+module purge
+
+ml gcc boost openmpi
+
+module list
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+# printing out the details of the job
+
+out_dir=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/output_test/
+
+phen_file_loc=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data
+
+bed_file_loc=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data
+
+bed_name='gen_matrix'
+
+phen_name='phen_vector'
+
+true_signal_loc=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/true_signal.txt
+
+group_file_loc=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/signal_groups.txt
+
+
+
+echo "true_signal_loc = " $true_signal_loc
+
+echo "bed_name = " $bed_name
+
+echo "phen_name = " $phen_name
+
+# Specifying the total number of markers in the model (Mt)
+
+Mt=8000
+
+vloc=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/gVAMP_grouped_code
+
+time mpirun -np 2 $vloc/main_real_grouped.exe \
+			        --bed-file $bed_file_loc/$bed_name.bed \
+                                --K 3 \
+                                --group-file $group_file_loc \
+                                --phen-files $phen_file_loc/$phen_name.phen \
+                                --true-signal-files $true_signal_loc \
+                                --N 4800  \
+                                --Mt $Mt \
+                                --out-dir $out_dir \
+                                --out-name x1_hat_EOSI_${bed_name}_G1 \
+                                --iterations 10 \
+                                --num-mix-comp 23 \
+                                --CG-max-iter 100 \
+                                --probs "9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09"   \
+                                --vars "0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773" \
+                                --model linear \
+                                --run-mode infere \
+                                --store-pvals 0 \
+                                --learn-vars 1 \
+                                --rho 0.1

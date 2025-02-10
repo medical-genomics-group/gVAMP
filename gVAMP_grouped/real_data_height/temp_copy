@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#SBATCH --reservation=mondegrp_55
+#SBATCH --job-name=HT2
+#SBATCH --time=4-00:00:00
+#SBATCH --mem-per-cpu=5gb
+#SBATCH --ntasks 30
+#SBATCH --cpus-per-task 2
+#SBATCH --output=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/logfiles/VAMP_217_HT_G3.log
+
+module purge
+ml gcc/10.3 boost/1.83.0 openmpi/4.1.4
+module list 
+
+# printing out the details of the job
+bed_name=ukb22828_UKB_EST_v3_ldp08_fd_train
+bed_name=ukb22828_UKB_EST_v3_ldp08_fd_HT_train
+phen_name=ukb_ldp08_fd_R050_HT_train
+phen_name=ukb22828_UKB_EST_v3_ldp08_fd_HT_train
+Mt=2174071
+
+echo "bed_name = " ${bed_name} 
+echo "phen_name = " ${phen_name} 
+
+export OMP_NUM_THREADS=2
+
+vloc=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/VAMPBirtyhday/gVAMP/cpp_vamp
+vloc=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/VAMPmain/gVAMP
+bed_file_loc=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/geno_testVAMP
+bed_file_loc=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/data
+
+mpic++ $vloc/main_real.cpp $vloc/vamp.cpp $vloc/utilities.cpp $vloc/data.cpp $vloc/options.cpp -march=native -Ofast -g -fopenmp -lstdc++fs -D_GLIBCXX_DEBUG -o  $vloc/main_real.exe
+
+time mpirun -np 30 $vloc/main_real.exe --bed-file  ${bed_file_loc}/${bed_name}.bed \
+                                --bim-file ${bed_file_loc}/${bed_name}.bim \
+                                --phen-files ${bed_file_loc}/${phen_name}.phen \
+                                --N 414055 \
+                                --Mt ${Mt} \
+                                --out-dir /nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/estimates/ \
+                                --out-name x1_hat_HT_${bed_name}_G3  \
+                                --iterations 50 \
+                                --num-mix-comp 23 \
+                                --CG-max-iter 200 \
+                                --probs 9.400000000000e-01,3.000000715315e-02,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.1718752>
+                                --vars 0,0.000001,0.000002238,0.000005,0.0000112,0.0000251,0.0000561,0.00012565,0.0002812,0.000629,0.001408448,0.003152106,0.007054413,0.01578778,0.01578778,0.03533305,0.07907536,0.1769706>
+                                --model linear \
+                                --run-mode infere \
+                                --use-lmmse-damp 0 \
+                                --alpha-scale 1 \
+                                --store-pvals 0 \
+                                --learn-vars 1 \
+                                --rho 0.1

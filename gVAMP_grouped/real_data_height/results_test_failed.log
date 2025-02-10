@@ -1,0 +1,135 @@
+
+Currently Loaded Modules:
+  1) gcc/14.2    (T)   3) ucx/1.15.0      5) boost/1.83.0
+  2) cuda/12.0.0       4) openmpi/4.1.6
+
+  Where:
+   T:  Testing
+
+ 
+
+bed_name =  gen_matrix
+phen_name =  phen_vector_noheader
+[1738941122.674509] [eta316:1052408:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.686598] [eta312:232465:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.737722] [eta318:3376477:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.746310] [eta318:3376474:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.746575] [eta318:3376485:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.748855] [eta318:3376490:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.748987] [eta318:3376481:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.749035] [eta318:3376475:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.749076] [eta318:3376473:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.755338] [eta318:3376469:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.758103] [eta318:3376476:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.774946] [eta318:3376478:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.777339] [eta318:3376471:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.777761] [eta318:3376470:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.777726] [eta318:3376472:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826426] [eta317:1945191:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826487] [eta317:1945190:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826748] [eta317:1945197:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826788] [eta317:1945189:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826909] [eta317:1945193:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826903] [eta317:1945199:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.826955] [eta317:1945196:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.827691] [eta317:1945218:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.827912] [eta317:1945210:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.828160] [eta317:1945192:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.830938] [eta317:1945195:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.830951] [eta317:1945211:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.848452] [eta317:1945188:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.918457] [eta317:1945194:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.918450] [eta317:1945209:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.948098] [eta312:232465:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.960733] [eta318:3376474:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.961379] [eta318:3376481:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.962571] [eta318:3376473:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.962982] [eta318:3376475:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.963091] [eta318:3376490:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.966987] [eta318:3376469:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.969433] [eta318:3376470:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.969570] [eta318:3376478:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.976878] [eta317:1945199:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.977121] [eta317:1945192:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.977329] [eta317:1945195:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.977341] [eta317:1945189:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.977378] [eta317:1945210:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.977639] [eta317:1945191:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978305] [eta317:1945209:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978415] [eta317:1945188:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978469] [eta317:1945196:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978590] [eta317:1945194:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978634] [eta317:1945193:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978853] [eta317:1945197:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978949] [eta317:1945190:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.978991] [eta317:1945211:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.979177] [eta317:1945218:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.982370] [eta318:3376476:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.982928] [eta318:3376485:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.983023] [eta318:3376471:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.983188] [eta318:3376472:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.983576] [eta318:3376477:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1738941122.994799] [eta316:1052408:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+INFO   : rank   11 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 2937
+INFO   : rank    8 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 2136
+INFO   : rank   10 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 2670
+INFO   : rank   15 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 4005
+INFO   : rank    6 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 1602
+INFO   : rank    2 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 534
+INFO   : rank   16 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 4272
+INFO   : rank    1 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 267
+INFO   : rank    4 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 1068
+INFO   : rank   14 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 3738
+INFO   : rank    3 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 801
+INFO   : rank   12 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 3204
+INFO   : rank    5 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 1335
+INFO   : rank    7 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 1869
+INFO   : rank    9 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 2403
+INFO   : rank   13 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 3471
+INFO   : rank   21 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 5606
+INFO   : rank   20 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 5340
+INFO   : rank   29 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 7734
+INFO   : rank   23 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 6138
+INFO   : rank   19 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 5073
+INFO   : rank   24 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 6404
+INFO   : rank   25 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 6670
+INFO   : rank   27 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 7202
+INFO   : rank   28 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 7468
+INFO   : rank   22 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 5872
+INFO   : rank   26 has 266 markers over tot Mt = 8000, max Mm = 267, starting at S = 6936
+INFO   : rank   18 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 4806
+INFO   : rank   17 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 4539
+
+ardyh command line options:
+--bed-file /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/gen_matrix.bed
+--num-groups 3
+--group-file /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/signal_groups123.txt
+--phen-files /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/phen_vector_noheader.phen
+--N 4800
+--Mt 8000
+--out-dir /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/
+--out-name x1_hat_SYN_gen_matrix_G1
+--iterations 50
+--num-mix-comp 23
+--CG-max-iter 100
+--probs 9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09
+--vars 0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773
+--model linear
+--run-mode infere
+--store-pvals 0
+--learn-vars 1
+--rho 0.1
+
+INFO   : rank    0 has 267 markers over tot Mt = 8000, max Mm = 267, starting at S = 0
+--------------------------------------------------------------------------
+WARNING: Open MPI failed to TCP connect to a peer MPI process.  This
+should not happen.
+
+Your Open MPI job may now hang or fail.
+
+  Local host: eta317
+  PID:        1945188
+  Message:    connect() to 10.36.194.64:1054 failed
+  Error:      Operation now in progress (115)
+--------------------------------------------------------------------------
+slurmstepd-eta312: error: *** JOB 27811016 ON eta312 CANCELLED AT 2025-02-07T16:31:08 ***

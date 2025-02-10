@@ -1,0 +1,2176 @@
+
+Currently Loaded Modules:
+  1) gcc/14.2    (T)   3) ucx/1.15.0      5) boost/1.83.0
+  2) cuda/12.0.0       4) openmpi/4.1.6
+
+  Where:
+   T:  Testing
+
+ 
+
+bed_name =  gen_matrix
+phen_name =  phen_vector_noheader
+[1739176624.592275] [eta300:4137554:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.592409] [eta297:1931241:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.600102] [eta301:920929:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.600219] [eta301:920928:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.607590] [eta299:3034497:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.607712] [eta299:3034496:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.619119] [eta295:2505129:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.622812] [eta295:2505128:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.622918] [eta295:2505127:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.624713] [eta299:3034498:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.643727] [eta300:4137554:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.643838] [eta297:1931241:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.644381] [eta301:920929:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.644345] [eta301:920928:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.646096] [eta295:2505127:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.645848] [eta299:3034497:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.646065] [eta299:3034496:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.646176] [eta299:3034498:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.648559] [eta295:2505129:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+[1739176624.648680] [eta295:2505128:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'ens22f0'(tcp), 'ibp66s0:1'(ib), 'ibs3'(tcp), 'lo'(tcp)
+INFO   : rank    2 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 1600
+
+ardyh command line options:
+--bed-file /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/data/gen_matrix.bed
+--num-groups 3
+--group-file /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/data/signal_groups123.txt
+--phen-files /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/synthetic_data/data/phen_vector_noheader.phen
+--N 4800
+--Mt 8000
+--out-dir /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/
+--out-name x1_hat_SYN_gen_matrix_G1
+--iterations 50
+--num-mix-comp 23
+--CG-max-iter 100
+--probs 9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09
+--vars 0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773
+--model linear
+--run-mode infere
+--store-pvals 0
+--learn-vars 1
+--rho 0.1
+
+INFO   : rank    0 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 0
+INFO   : rank    1 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 800
+INFO   : rank    5 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 4000
+INFO   : rank    4 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 3200
+INFO   : rank    6 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 4800
+INFO   : rank    8 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 6400
+INFO   : rank    7 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 5600
+INFO   : rank    9 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 7200
+INFO   : rank    3 has 800 markers over tot Mt = 8000, max Mm = 800, starting at S = 2400
+INFO   : rank 2 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 0 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 1 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 4 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 9 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 3 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 6 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 7 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 8 has allocated 960000 bytes (0.001 GB) for raw data.
+INFO   : rank 5 has allocated 960000 bytes (0.001 GB) for raw data.
+reading genotype data took 0.276879 seconds.
+rank = 0: statistics took 0.0204953 seconds to run.
+
+********************
+iteration = 1
+********************
+->DENOISING
+A total of 1 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.022697 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_1.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_1.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_1.bin
+time needed to save beta1 to an external file = 0.00385494 seconds
+eta1 = 2474.18
+gam2 = 2474.18
+true gam2 = inf
+it = 0: dist_probs = 2.07644e-10 & dist_vars = 0.00435221
+Final number of prior EM iterations = 1 / 2
+it = 0: dist_probs = 2.07644e-10 & dist_vars = 0.00435221
+Final number of prior EM iterations = 1 / 2
+it = 0: dist_probs = 2.07644e-10 & dist_vars = 0.00435221
+Final number of prior EM iterations = 1 / 2
+time needed to calculate conditional expectation = 0.0370116 seconds
+correlation x1_hat = -nan
+l2 signal error = -nan
+l2 prediction error = 1
+R2 = 0
+prior variances = 0 0.00048 0.00107424 0.0024 0.005376 0.012048 0.026928 0.060312 0.134976 0.30192 0.676055 1.51301 3.38611 7.57808 16.9596 37.9547 84.9387 190.073 425.283 951.282 2126.47 4746.53 ;0 0.00048 0.00107424 0.0024 0.005376 0.012048 0.026928 0.060312 0.134976 0.30192 0.676055 1.51301 3.38611 7.57808 16.9596 37.9547 84.9387 190.073 425.283 951.282 2126.47 4746.53 ;0 0.00048 0.00107424 0.0024 0.005376 0.012048 0.026928 0.060312 0.134976 0.30192 0.676055 1.51301 3.38611 7.57808 16.9596 37.9547 84.9387 190.073 425.283 951.282 2126.47 4746.53 ;
+prior probabilities= 0.97 0.015 0.0075 0.00375 0.001875 0.0009375 0.00046875 0.000234375 0.000117188 5.85938e-05 2.92969e-05 1.46484e-05 7.32421e-06 5.49315e-06 9.1552e-07 4.57755e-07 2.28872e-07 1.1443e-07 5.72083e-08 2.85966e-08 1.42899e-08 7.13556e-09 ;0.97 0.015 0.0075 0.00375 0.001875 0.0009375 0.00046875 0.000234375 0.000117188 5.85938e-05 2.92969e-05 1.46484e-05 7.32421e-06 5.49315e-06 9.1552e-07 4.57755e-07 2.28872e-07 1.1443e-07 5.72083e-08 2.85966e-08 1.42899e-08 7.13556e-09 ;0.97 0.015 0.0075 0.00375 0.001875 0.0009375 0.00046875 0.000234375 0.000117188 5.85938e-05 2.92969e-05 1.46484e-05 7.32421e-06 5.49315e-06 9.1552e-07 4.57755e-07 2.28872e-07 1.1443e-07 5.72083e-08 2.85966e-08 1.42899e-08 7.13556e-09 ;
+gamw = 2
+denoising step took 0.178942 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_1.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.0009308857006, ||x_it|| = 0.08982898743, ||z|| / ||RHS|| = 3.759368518e-07
+[CG] it = 1: ||r_it|| / ||RHS|| = 9.418615549e-07, ||x_it|| = 0.08982910423, ||z|| / ||RHS|| = 3.803694348e-10
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_1_x2_hat.bin
+CG took 0.262517497 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.001051864378, ||x_it|| = 0.0004038426287, ||z|| / ||RHS|| = 4.247939169e-07
+[CG onsager] it = 1: relative error for onsager is 1.104905622e-06
+[CG] it = 1: ||r_it|| / ||RHS|| = 1.124907518e-06, ||x_it|| = 0.0004038432977, ||z|| / ||RHS|| = 4.542922839e-10
+onsager took 0.223634829 seconds.
+alpha2 = 0.9991788945
+eta2= 2476.209355
+gam2 re-est = 2474.176126
+gam1 = 2.033229071
+true gam1 = 0.6684266398
+l2_norm2(temp) / N = 0.9959807268
+trace_correction / N = 0.0006842545666
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.997915738
+R2 = 0.004164179875
+prior variances = 0 0.0004799999998 0.001074239999 0.002399999994 0.005375999971 0.01204799985 0.02692799927 0.06031199636 0.1349759818 0.3019199088 0.6760545829 1.513008591 3.386106774 7.578076972 16.95957637 37.95473218 84.93867281 190.0728095 425.2828975 951.2822005 2126.465469 4746.534007 ;0 0.0004799999998 0.001074239999 0.002399999994 0.005375999971 0.01204799985 0.02692799927 0.06031199636 0.1349759818 0.3019199088 0.6760545829 1.513008591 3.386106774 7.578076972 16.95957637 37.95473218 84.93867281 190.0728095 425.2828975 951.2822005 2126.465469 4746.534007 ;0 0.0004799999998 0.001074239999 0.002399999994 0.005375999971 0.01204799985 0.02692799927 0.06031199636 0.1349759818 0.3019199088 0.6760545829 1.513008591 3.386106774 7.578076972 16.95957637 37.95473218 84.93867281 190.0728095 425.2828975 951.2822005 2126.465469 4746.534007 ;
+prior probabilities= 0.9700000002 0.01500000358 0.007500001786 0.00375000089 0.001875000442 0.0009375002181 0.0004687501056 0.0002343750489 0.0001171875201 5.859375514e-05 2.929687209e-05 1.464842991e-05 7.324206848e-06 5.493145247e-06 9.15519705e-07 4.57755172e-07 2.28872159e-07 1.144300757e-07 5.720829492e-08 2.859662039e-08 1.428990065e-08 7.135564083e-09 ;0.9700000002 0.01500000358 0.007500001786 0.00375000089 0.001875000442 0.0009375002181 0.0004687501056 0.0002343750489 0.0001171875201 5.859375514e-05 2.929687209e-05 1.464842991e-05 7.324206848e-06 5.493145247e-06 9.15519705e-07 4.57755172e-07 2.28872159e-07 1.144300757e-07 5.720829492e-08 2.859662039e-08 1.428990065e-08 7.135564083e-09 ;0.9700000002 0.01500000358 0.007500001786 0.00375000089 0.001875000442 0.0009375002181 0.0004687501056 0.0002343750489 0.0001171875201 5.859375514e-05 2.929687209e-05 1.464842991e-05 7.324206848e-06 5.493145247e-06 9.15519705e-07 4.57755172e-07 2.28872159e-07 1.144300757e-07 5.720829492e-08 2.859662039e-08 1.428990065e-08 7.135564083e-09 ;
+gamw = 1.003346178
+lmmse step took 0.658658712 seconds.
+total iteration time = 0.837600701
+total computation time so far = 0.837600701
+
+
+
+********************
+iteration = 2
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 0.843216265
+[old] it_revar = 2: gam1 = 0.8122872057
+[old] it_revar = 3: gam1 = 0.8312481096
+[old] it_revar = 4: gam1 = 0.8494087697
+[old] it_revar = 5: gam1 = 0.868185114
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.028077078 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_2.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_2.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_2.bin
+time needed to save beta1 to an external file = 0.036046991 seconds
+eta1 = 10.79970631
+gam2 = 9.931521197
+true gam2 = 127.1215599
+time needed to calculate conditional expectation = 3.999999976e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.9425707344
+R2 = 0.1115604107
+prior variances = 0 0.0004801667182 0.001075076964 0.002404199162 0.005397314178 0.01215784133 0.02750890348 0.06361993979 0.1570711987 0.5430366068 6.851393842 ;0 0.0004796856503 0.001072667632 0.002392175031 0.005336998354 0.01185501817 0.02599537015 0.05596645474 0.1165292626 0.2406087878 0.9297742736 12.28220659 20.91891968 46.17051827 ;0 0.0004800974256 0.00107472966 0.002402462932 0.005388571464 0.01211356992 0.02728337518 0.06242971773 0.1501163423 0.4752657075 7.361628761 ;
+prior probabilities= 0.9333051498 0.01443506161 0.007219084515 0.003611282525 0.001807612446 0.000906061703 0.0004556643779 0.0002311111334 0.0001202446886 7.064032735e-05 0.0378380869 ;0.9567250179 0.01478987399 0.007391941836 0.00369263915 0.001842603443 0.0009171938525 0.00045415512 0.0002224172591 0.0001066751715 4.941319374e-05 2.14130853e-05 9.712327707e-05 0.0003461755867 0.01334335713 ;0.9296445484 0.01437740703 0.007189608314 0.00359581932 0.001799063846 0.0009008633497 0.0004520126573 0.0002280386569 0.0001170723822 6.559422616e-05 0.0416299718 ;
+gamw = 1.003346178
+denoising step took 0.472137348 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_2.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1325329536, ||x_it|| = 5.069884304, ||z|| / ||RHS|| = 0.01212044761
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.0148462098, ||x_it|| = 5.191581612, ||z|| / ||RHS|| = 0.001357720501
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0015365593, ||x_it|| = 5.193917803, ||z|| / ||RHS|| = 0.0001405219305
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0001601215805, ||x_it|| = 5.19395169, ||z|| / ||RHS|| = 1.464349186e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 1.64941913e-05, ||x_it|| = 5.193952101, ||z|| / ||RHS|| = 1.508432251e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 1.745316671e-06, ||x_it|| = 5.19395211, ||z|| / ||RHS|| = 1.596132788e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_2_x2_hat.bin
+CG took 0.343500334 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1192995679, ||x_it|| = 0.09129993703, ||z|| / ||RHS|| = 0.01091022364
+[CG onsager] it = 1: relative error for onsager is 0.01231909838
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01269852904, ||x_it|| = 0.09293022933, ||z|| / ||RHS|| = 0.001161310087
+[CG onsager] it = 2: relative error for onsager is 0.0001399139978
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001319499803, ||x_it|| = 0.09295987563, ||z|| / ||RHS|| = 0.0001206713334
+[CG onsager] it = 3: relative error for onsager is 1.507995583e-06
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0001357609692, ||x_it|| = 0.09296031666, ||z|| / ||RHS|| = 1.241565716e-05
+[CG onsager] it = 4: relative error for onsager is 1.605842593e-08
+[CG] it = 4: ||r_it|| / ||RHS|| = 1.40742716e-05, ||x_it|| = 0.09296032265, ||z|| / ||RHS|| = 1.287124952e-06
+onsager took 0.064926457 seconds.
+alpha2 = 0.9181867596
+onsager approx = -0.1236994324
+u1 = -0.4959361165, u2 = 0.1926742471, u3 = -0.01458153306
+polyest1 = 3.502208554, polyest2 = 9.711370998
+extremum = 6.606789776
+polyest = 9.711370998
+eta2= 10.81645002
+gam2 re-est = 9.931521197
+gam1 = 0.8849288263
+true gam1 = 0.5676681538
+l2_norm2(temp) / N = 0.8486384474
+trace_correction / N = 0.1359006529
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.9211487273
+R2 = 0.1514850222
+prior variances = 0 0.0004801667182 0.001075076964 0.002404199162 0.005397314178 0.01215784133 0.02750890348 0.06361993979 0.1570711987 0.5430366068 6.851393842 ;0 0.0004796856503 0.001072667632 0.002392175031 0.005336998354 0.01185501817 0.02599537015 0.05596645474 0.1165292626 0.2406087878 0.9297742736 12.28220659 20.91891968 46.17051827 ;0 0.0004800974256 0.00107472966 0.002402462932 0.005388571464 0.01211356992 0.02728337518 0.06242971773 0.1501163423 0.4752657075 7.361628761 ;
+prior probabilities= 0.9333051498 0.01443506161 0.007219084515 0.003611282525 0.001807612446 0.000906061703 0.0004556643779 0.0002311111334 0.0001202446886 7.064032735e-05 0.0378380869 ;0.9567250179 0.01478987399 0.007391941836 0.00369263915 0.001842603443 0.0009171938525 0.00045415512 0.0002224172591 0.0001066751715 4.941319374e-05 2.14130853e-05 9.712327707e-05 0.0003461755867 0.01334335713 ;0.9296445484 0.01437740703 0.007189608314 0.00359581932 0.001799063846 0.0009008633497 0.0004520126573 0.0002280386569 0.0001170723822 6.559422616e-05 0.0416299718 ;
+gamw = 1.015703693
+lmmse step took 0.454131474 seconds.
+total iteration time = 0.926268822
+total computation time so far = 1.763869523
+
+
+
+********************
+iteration = 3
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 0.805329702
+[old] it_revar = 2: gam1 = 0.8008492279
+[old] it_revar = 3: gam1 = 0.8081168844
+[old] it_revar = 4: gam1 = 0.8174431236
+[old] it_revar = 5: gam1 = 0.8267060448
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.006728095 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_3.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_3.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_3.bin
+time needed to save beta1 to an external file = 0.069674461 seconds
+eta1 = 5.856069358
+gam2 = 5.029363313
+true gam2 = 34.94601834
+time needed to calculate conditional expectation = 3.999999976e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.8669193871
+R2 = 0.2484507762
+prior variances = 0 0.0004802631969 0.001075561241 0.002406628136 0.005409636011 0.01222128263 0.0278443723 0.06554845902 0.1709541433 0.8117981211 5.274881107 ;0 0.0004795584552 0.001072031943 0.002389017399 0.005321324859 0.0117781567 0.0256307032 0.05432353534 0.1098067722 0.2151723971 0.7466655064 12.31568732 52.37696295 ;0 0.0004801339417 0.001074913125 0.002403385031 0.005393270384 0.0121379984 0.02741507072 0.06321272115 0.1559691549 0.5812008474 6.176947042 ;
+prior probabilities= 0.8832106028 0.01366164077 0.006833141882 0.003419171504 0.001712532265 0.0008596402499 0.0004337689397 0.0002218414061 0.0001182667716 8.028916604e-05 0.08944910424 ;0.9547620939 0.01475757227 0.007374589092 0.003682628872 0.001836118055 0.0009123330558 0.000450016385 0.000218639868 0.0001032562222 4.645942076e-05 1.795850752e-05 0.0006136784206 0.01522465591 ;0.8895286565 0.0137575178 0.006879949166 0.003441309932 0.001722172956 0.0008628371316 0.0004334970623 0.0002194252779 0.0001137971994 6.773325187e-05 0.08297310372 ;
+gamw = 1.015703693
+denoising step took 0.278359886 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_3.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1106901297, ||x_it|| = 9.609427304, ||z|| / ||RHS|| = 0.01831146031
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.02145631261, ||x_it|| = 9.960110677, ||z|| / ||RHS|| = 0.003549516272
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.003748278676, ||x_it|| = 9.976906983, ||z|| / ||RHS|| = 0.0006200774754
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0006573770532, ||x_it|| = 9.977480519, ||z|| / ||RHS|| = 0.0001087498393
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0001138471693, ||x_it|| = 9.977501388, ||z|| / ||RHS|| = 1.883372914e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 2.018251027e-05, ||x_it|| = 9.977501736, ||z|| / ||RHS|| = 3.338791242e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 3.529438136e-06, ||x_it|| = 9.977501528, ||z|| / ||RHS|| = 5.838747004e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_3_x2_hat.bin
+CG took 0.193471061 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.2181590733, ||x_it|| = 0.1649258217, ||z|| / ||RHS|| = 0.03609004001
+[CG onsager] it = 1: relative error for onsager is 0.03706616379
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.03918973637, ||x_it|| = 0.1737288429, ||z|| / ||RHS|| = 0.006483155307
+[CG onsager] it = 2: relative error for onsager is 0.001194728054
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.006855060998, ||x_it|| = 0.174168875, ||z|| / ||RHS|| = 0.001134032254
+[CG onsager] it = 3: relative error for onsager is 3.641806128e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0011849987, ||x_it|| = 0.1741872012, ||z|| / ||RHS|| = 0.0001960342509
+[CG onsager] it = 4: relative error for onsager is 1.098845968e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0002071788842, ||x_it|| = 0.1741879031, ||z|| / ||RHS|| = 3.427358812e-05
+[CG onsager] it = 5: relative error for onsager is 3.304331978e-08
+[CG] it = 5: ||r_it|| / ||RHS|| = 3.637574718e-05, ||x_it|| = 0.1741879287, ||z|| / ||RHS|| = 6.017637275e-06
+onsager took 0.077897254 seconds.
+alpha2 = 0.8624634535
+onsager approx = -0.03038477284
+u1 = -0.3958937955, u2 = 0.3638560653, u3 = -0.05034264891
+polyest1 = 1.33442422, polyest2 = 5.893166565
+extremum = 3.613795393
+polyest = 5.893166565
+eta2= 5.831392963
+gam2 re-est = 4.620011916
+gam1 = 1.211381047
+true gam1 = 1.288209139
+l2_norm2(temp) / N = 0.7348447109
+trace_correction / N = 0.225683513
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.8571684766
+R2 = 0.2652622027
+prior variances = 0 0.0004802631969 0.001075561241 0.002406628136 0.005409636011 0.01222128263 0.0278443723 0.06554845902 0.1709541433 0.8117981211 5.274881107 ;0 0.0004795584552 0.001072031943 0.002389017399 0.005321324859 0.0117781567 0.0256307032 0.05432353534 0.1098067722 0.2151723971 0.7466655064 12.31568732 52.37696295 ;0 0.0004801339417 0.001074913125 0.002403385031 0.005393270384 0.0121379984 0.02741507072 0.06321272115 0.1559691549 0.5812008474 6.176947042 ;
+prior probabilities= 0.8832106028 0.01366164077 0.006833141882 0.003419171504 0.001712532265 0.0008596402499 0.0004337689397 0.0002218414061 0.0001182667716 8.028916604e-05 0.08944910424 ;0.9547620939 0.01475757227 0.007374589092 0.003682628872 0.001836118055 0.0009123330558 0.000450016385 0.000218639868 0.0001032562222 4.645942076e-05 1.795850752e-05 0.0006136784206 0.01522465591 ;0.8895286565 0.0137575178 0.006879949166 0.003441309932 0.001722172956 0.0008628371316 0.0004334970623 0.0002194252779 0.0001137971994 6.773325187e-05 0.08297310372 ;
+gamw = 1.041093822
+lmmse step took 0.317767464 seconds.
+total iteration time = 0.59612735
+total computation time so far = 2.359996873
+
+
+
+********************
+iteration = 4
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.779442899
+[old] it_revar = 2: gam1 = 1.953630844
+[old] it_revar = 3: gam1 = 2.029734989
+[old] it_revar = 4: gam1 = 2.073885873
+[old] it_revar = 5: gam1 = 2.105196762
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.006359469 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_4.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_4.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_4.bin
+time needed to save beta1 to an external file = 0.207990819 seconds
+eta1 = 12.73026368
+gam2 = 10.62506692
+true gam2 = 54.004537
+time needed to calculate conditional expectation = 7.999999996e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.8177170118
+R2 = 0.3313388886
+prior variances = 0 0.0004803148061 0.001075822805 0.002407968008 0.005416748319 0.0122614675 0.02809721321 0.06748679821 0.1921753177 1.187473623 2.369090142 ;0 0.000478959197 0.001069043267 0.002374240712 0.00524872935 0.01143005042 0.0240549302 0.04785124339 0.08726578232 0.1488205199 0.570061966 6.265229341 26.56678387 ;0 0.0004800882404 0.001074686382 0.002402277295 0.005387982436 0.01211447794 0.02733148522 0.0631880439 0.1613827884 0.7918489501 2.927230296 ;
+prior probabilities= 0.8631242196 0.01335165575 0.00667854381 0.003342322376 0.001674637842 0.0008413521526 0.000425531281 0.0002192440353 0.000120698618 0.0001050862393 0.1101167083 ;0.9536965513 0.01473188754 0.007356079237 0.003667114485 0.001821489301 0.0008976829741 0.0004353270467 0.0002046463752 9.133317034e-05 3.760678237e-05 1.110004093e-05 0.001204004814 0.01584517698 ;0.8777006733 0.01357393665 0.006787744539 0.00339475223 0.001698399284 0.0008504365403 0.0004268261492 0.0002158284499 0.0001125513196 7.507228532e-05 0.0951637793 ;
+gamw = 1.041093822
+denoising step took 0.449351632 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_4.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.04306638146, ||x_it|| = 10.64496854, ||z|| / ||RHS|| = 0.003691632844
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.004982496218, ||x_it|| = 10.90916498, ||z|| / ||RHS|| = 0.0004270975656
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0004984522275, ||x_it|| = 10.92736527, ||z|| / ||RHS|| = 4.272712384e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 4.828925658e-05, ||x_it|| = 10.92808336, ||z|| / ||RHS|| = 4.139335592e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 4.849570691e-06, ||x_it|| = 10.92807757, ||z|| / ||RHS|| = 4.157032431e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_4_x2_hat.bin
+CG took 0.242995492 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1160334277, ||x_it|| = 0.08558066565, ||z|| / ||RHS|| = 0.009946338605
+[CG onsager] it = 1: relative error for onsager is 0.0116968458
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01204951959, ||x_it|| = 0.08703239856, ||z|| / ||RHS|| = 0.001032879958
+[CG onsager] it = 2: relative error for onsager is 0.0001264449233
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001221513076, ||x_it|| = 0.08705755285, ||z|| / ||RHS|| = 0.000104707608
+[CG onsager] it = 3: relative error for onsager is 1.297209052e-06
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0001226198622, ||x_it|| = 0.08705790915, ||z|| / ||RHS|| = 1.051092512e-05
+[CG onsager] it = 4: relative error for onsager is 1.314760203e-08
+[CG] it = 4: ||r_it|| / ||RHS|| = 1.240076242e-05, ||x_it|| = 0.08705791376, ||z|| / ||RHS|| = 1.062988352e-06
+onsager took 0.061408643 seconds.
+alpha2 = 0.9201796821
+onsager approx = -3.873032871
+u1 = -0.4849796568, u2 = 0.1784613645, u3 = -0.0122082088
+polyest1 = 3.60814844, polyest2 = 11.0099964
+extremum = 7.309072422
+polyest = 11.0099964
+eta2= 11.54673063
+gam2 re-est = 10.10698512
+gam1 = 1.439745511
+true gam1 = 1.461348168
+l2_norm2(temp) / N = 0.8289613404
+trace_correction / N = 0.1277827802
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.9104069055
+R2 = 0.1711592664
+prior variances = 0 0.0004803148061 0.001075822805 0.002407968008 0.005416748319 0.0122614675 0.02809721321 0.06748679821 0.1921753177 1.187473623 2.369090142 ;0 0.000478959197 0.001069043267 0.002374240712 0.00524872935 0.01143005042 0.0240549302 0.04785124339 0.08726578232 0.1488205199 0.570061966 6.265229341 26.56678387 ;0 0.0004800882404 0.001074686382 0.002402277295 0.005387982436 0.01211447794 0.02733148522 0.0631880439 0.1613827884 0.7918489501 2.927230296 ;
+prior probabilities= 0.8631242196 0.01335165575 0.00667854381 0.003342322376 0.001674637842 0.0008413521526 0.000425531281 0.0002192440353 0.000120698618 0.0001050862393 0.1101167083 ;0.9536965513 0.01473188754 0.007356079237 0.003667114485 0.001821489301 0.0008976829741 0.0004353270467 0.0002046463752 9.133317034e-05 3.760678237e-05 1.110004093e-05 0.001204004814 0.01584517698 ;0.8777006733 0.01357393665 0.006787744539 0.00339475223 0.001698399284 0.0008504365403 0.0004268261492 0.0002158284499 0.0001125513196 7.507228532e-05 0.0951637793 ;
+gamw = 1.045211545
+lmmse step took 0.34728578 seconds.
+total iteration time = 0.796637412
+total computation time so far = 3.156634285
+
+
+
+********************
+iteration = 5
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.085522587
+[old] it_revar = 2: gam1 = 2.324088549
+[old] it_revar = 3: gam1 = 2.428287922
+[old] it_revar = 4: gam1 = 2.482544506
+[old] it_revar = 5: gam1 = 2.516586664
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005936803 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_5.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_5.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_5.bin
+time needed to save beta1 to an external file = 0.125392271 seconds
+eta1 = 13.71530896
+gam2 = 11.1987223
+true gam2 = 42.58677765
+time needed to calculate conditional expectation = 1.410000001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.7740666924
+R2 = 0.4008207557
+prior variances = 0 0.0004802987494 0.001075745453 0.002407616163 0.005415370073 0.01225895416 0.02813569489 0.06834573218 0.2097841715 1.31799813 ;0 0.0004783553897 0.001066041157 0.002359498127 0.005177373217 0.01109858979 0.02264692111 0.04269096667 0.07205812523 0.1116782962 0.3872271073 5.458413635 24.36946851 ;0 0.0004800233658 0.001074363553 0.002400689293 0.005380275577 0.01207866705 0.02718408515 0.06280138898 0.164532346 0.9627807344 2.470613942 ;
+prior probabilities= 0.8441892021 0.01305852847 0.006531787872 0.003268738575 0.001637636869 0.0008226733717 0.0004161397253 0.0002149265757 0.0001210274045 0.129739339 ;0.9531415576 0.0147140293 0.007341464318 0.00365357388 0.001807987635 0.0008839968838 0.0004220166879 0.0001929305901 8.256161885e-05 3.21043784e-05 7.404966623e-06 0.00196348006 0.01575689212 ;0.8659077857 0.01339064835 0.006695531546 0.003348017357 0.00167434197 0.000837672561 0.0004197158876 0.0002116815451 0.0001105230356 8.181194545e-05 0.1073222701 ;
+gamw = 1.045211545
+denoising step took 0.353650899 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_5.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.02212070309, ||x_it|| = 13.33765986, ||z|| / ||RHS|| = 0.001806698467
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.002291819567, ||x_it|| = 13.40663779, ||z|| / ||RHS|| = 0.0001871833315
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0002249065971, ||x_it|| = 13.4092919, ||z|| / ||RHS|| = 1.836914507e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 2.191695609e-05, ||x_it|| = 13.40943769, ||z|| / ||RHS|| = 1.790057522e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 2.084332838e-06, ||x_it|| = 13.40944224, ||z|| / ||RHS|| = 1.702369463e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_5_x2_hat.bin
+CG took 0.136476791 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1110029819, ||x_it|| = 0.08154791389, ||z|| / ||RHS|| = 0.009066118579
+[CG onsager] it = 1: relative error for onsager is 0.01076588591
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01108005299, ||x_it|| = 0.08282221281, ||z|| / ||RHS|| = 0.0009049583398
+[CG onsager] it = 2: relative error for onsager is 0.0001075296435
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.00107966054, ||x_it|| = 0.08284264746, ||z|| / ||RHS|| = 8.818078856e-05
+[CG onsager] it = 3: relative error for onsager is 1.019315189e-06
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.000104184839, ||x_it|| = 0.08284291505, ||z|| / ||RHS|| = 8.509249821e-06
+onsager took 0.067737937 seconds.
+alpha2 = 0.9232714263
+onsager approx = 1.576499103
+u1 = -0.4637188832, u2 = 0.1378659419, u3 = -0.008169253905
+polyest1 = 4.638415964, polyest2 = 12.23778148
+extremum = 8.438098723
+polyest = 12.23778148
+eta2= 12.12939335
+gam2 re-est = 10.7286296
+gam1 = 1.400763747
+true gam1 = 1.37235049
+l2_norm2(temp) / N = 0.7909061202
+trace_correction / N = 0.122349353
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.8892643308
+R2 = 0.2092089499
+prior variances = 0 0.0004802987494 0.001075745453 0.002407616163 0.005415370073 0.01225895416 0.02813569489 0.06834573218 0.2097841715 1.31799813 ;0 0.0004783553897 0.001066041157 0.002359498127 0.005177373217 0.01109858979 0.02264692111 0.04269096667 0.07205812523 0.1116782962 0.3872271073 5.458413635 24.36946851 ;0 0.0004800233658 0.001074363553 0.002400689293 0.005380275577 0.01207866705 0.02718408515 0.06280138898 0.164532346 0.9627807344 2.470613942 ;
+prior probabilities= 0.8441892021 0.01305852847 0.006531787872 0.003268738575 0.001637636869 0.0008226733717 0.0004161397253 0.0002149265757 0.0001210274045 0.129739339 ;0.9531415576 0.0147140293 0.007341464318 0.00365357388 0.001807987635 0.0008839968838 0.0004220166879 0.0001929305901 8.256161885e-05 3.21043784e-05 7.404966623e-06 0.00196348006 0.01575689212 ;0.8659077857 0.01339064835 0.006695531546 0.003348017357 0.00167434197 0.000837672561 0.0004197158876 0.0002116815451 0.0001105230356 8.181194545e-05 0.1073222701 ;
+gamw = 1.094983857
+lmmse step took 0.247384356 seconds.
+total iteration time = 0.601035255
+total computation time so far = 3.75766954
+
+
+
+********************
+iteration = 6
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.977418603
+[old] it_revar = 2: gam1 = 2.243045794
+[old] it_revar = 3: gam1 = 2.368695033
+[old] it_revar = 4: gam1 = 2.430742406
+[old] it_revar = 5: gam1 = 2.462965862
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.006055632 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_6.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_6.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_6.bin
+time needed to save beta1 to an external file = 0.07841306 seconds
+eta1 = 12.36246615
+gam2 = 9.899500292
+true gam2 = 32.07275318
+time needed to calculate conditional expectation = 1.4e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.7306066622
+R2 = 0.4662139052
+prior variances = 0 0.0004802054204 0.001075279811 0.002405311997 0.005404031448 0.0122044555 0.02788986068 0.06742465667 0.2126242254 1.946165257 ;0 0.0004777822056 0.001063199569 0.002345632562 0.005111184196 0.01079985501 0.0214456688 0.03866890911 0.06152793303 0.243453623 5.76059232 26.76684806 ;0 0.0004799527534 0.001074011542 0.002398950646 0.005371755465 0.01203809608 0.02700468513 0.06214506223 0.1646803723 1.081394127 2.551668241 ;
+prior probabilities= 0.8275524547 0.01279993285 0.006401671049 0.003202770384 0.00160364104 0.0008045635797 0.0004058943594 0.0002085771335 0.000117055132 0.1469034398 ;0.9524155238 0.01469400868 0.007326085646 0.003640041052 0.00179500803 0.0008713146777 0.0004102757844 0.0001833340208 0.0001048906703 5.406877391e-06 0.003065051618 0.01548905919 ;0.8567264368 0.013247689 0.006623447906 0.003311306692 0.001655247976 0.0008273265595 0.0004137182987 0.0002079031953 0.0001081608713 8.61287362e-05 0.116792634 ;
+gamw = 1.094983857
+denoising step took 0.288361426 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_6.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.02545594044, ||x_it|| = 15.81126712, ||z|| / ||RHS|| = 0.002315385451
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.003103686596, ||x_it|| = 15.96215001, ||z|| / ||RHS|| = 0.0002823007385
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.000347389461, ||x_it|| = 15.96734294, ||z|| / ||RHS|| = 3.159735958e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 3.906062536e-05, ||x_it|| = 15.96744058, ||z|| / ||RHS|| = 3.552821152e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 4.303294352e-06, ||x_it|| = 15.96744199, ||z|| / ||RHS|| = 3.914129652e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_6_x2_hat.bin
+CG took 0.153085172 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1294712517, ||x_it|| = 0.0907920952, ||z|| / ||RHS|| = 0.01177626311
+[CG onsager] it = 1: relative error for onsager is 0.01434492712
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01481714509, ||x_it|| = 0.09267711488, ||z|| / ||RHS|| = 0.00134771694
+[CG onsager] it = 2: relative error for onsager is 0.000188320474
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001655319312, ||x_it|| = 0.09271660409, ||z|| / ||RHS|| = 0.0001505621943
+[CG onsager] it = 3: relative error for onsager is 2.345745597e-06
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0001830757738, ||x_it|| = 0.09271728228, ||z|| / ||RHS|| = 1.665194747e-05
+[CG onsager] it = 4: relative error for onsager is 2.887595721e-08
+[CG] it = 4: ||r_it|| / ||RHS|| = 2.041037431e-05, ||x_it|| = 0.09271729293, ||z|| / ||RHS|| = 1.856457978e-06
+onsager took 0.063972902 seconds.
+alpha2 = 0.9120511082
+onsager approx = 1.088234358
+u1 = -0.4231155352, u2 = 0.1317813449, u3 = -0.008267705601
+polyest1 = 4.457048278, polyest2 = 11.48224024
+extremum = 7.969644258
+polyest = 11.48224024
+eta2= 10.85410697
+gam2 re-est = 9.438732058
+gam1 = 1.415374913
+true gam1 = 1.34588932
+l2_norm2(temp) / N = 0.728311352
+trace_correction / N = 0.1338663446
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.8533495116
+R2 = 0.2717946111
+prior variances = 0 0.0004802054204 0.001075279811 0.002405311997 0.005404031448 0.0122044555 0.02788986068 0.06742465667 0.2126242254 1.946165257 ;0 0.0004777822056 0.001063199569 0.002345632562 0.005111184196 0.01079985501 0.0214456688 0.03866890911 0.06152793303 0.243453623 5.76059232 26.76684806 ;0 0.0004799527534 0.001074011542 0.002398950646 0.005371755465 0.01203809608 0.02700468513 0.06214506223 0.1646803723 1.081394127 2.551668241 ;
+prior probabilities= 0.8275524547 0.01279993285 0.006401671049 0.003202770384 0.00160364104 0.0008045635797 0.0004058943594 0.0002085771335 0.000117055132 0.1469034398 ;0.9524155238 0.01469400868 0.007326085646 0.003640041052 0.00179500803 0.0008713146777 0.0004102757844 0.0001833340208 0.0001048906703 5.406877391e-06 0.003065051618 0.01548905919 ;0.8567264368 0.013247689 0.006623447906 0.003311306692 0.001655247976 0.0008273265595 0.0004137182987 0.0002079031953 0.0001081608713 8.61287362e-05 0.116792634 ;
+gamw = 1.15985371
+lmmse step took 0.260214312 seconds.
+total iteration time = 0.548575738
+total computation time so far = 4.306245278
+
+
+
+********************
+iteration = 7
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.030195124
+[old] it_revar = 2: gam1 = 2.294188674
+[old] it_revar = 3: gam1 = 2.414440281
+[old] it_revar = 4: gam1 = 2.473878046
+[old] it_revar = 5: gam1 = 2.503554689
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005989392 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_7.csv
+rho = 0.1289696035
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_7.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_7.bin
+time needed to save beta1 to an external file = 0.093385169 seconds
+eta1 = 12.20351416
+gam2 = 9.699959473
+true gam2 = 24.21358314
+time needed to calculate conditional expectation = 2.999999982e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.6781581453
+R2 = 0.54010153
+prior variances = 0 0.0004801105101 0.001074806293 0.002402968924 0.005392499528 0.01214894489 0.02763704791 0.06641018249 0.212898341 2.023523734 ;0 0.0004772439791 0.001060538623 0.002332726434 0.005050367866 0.01053253219 0.02042180175 0.03549179553 0.05395883421 0.1665084397 6.202609011 29.40160781 ;0 0.0004798746981 0.001073622152 0.00239702426 0.005362278903 0.01199252694 0.02679741956 0.0612991711 0.1627925383 1.141374716 2.634387341 ;
+prior probabilities= 0.8237709225 0.01274018145 0.006371009085 0.003186566987 0.001594571504 0.000798970242 0.0004019726471 0.0002054551964 0.0001145583859 0.150815792 ;0.9520714365 0.01468042346 0.007314266785 0.003628696999 0.001783641085 0.0008601271186 0.0004001666222 0.0001754967743 9.806506075e-05 4.352635324e-06 0.004332959348 0.01465036765 ;0.853095997 0.0131904767 0.006594180994 0.003295941024 0.001646755237 0.000822200453 0.0004102355461 0.0002052474838 0.0001060335735 8.807188408e-05 0.1205448601 ;
+gamw = 1.15985371
+denoising step took 0.287226978 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_7.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.03082871381, ||x_it|| = 19.14314373, ||z|| / ||RHS|| = 0.002838851761
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.004017183759, ||x_it|| = 19.38357134, ||z|| / ||RHS|| = 0.0003699210177
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0004799392017, ||x_it|| = 19.39151191, ||z|| / ||RHS|| = 4.419504026e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 5.730494893e-05, ||x_it|| = 19.39166329, ||z|| / ||RHS|| = 5.276906983e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 6.733345287e-06, ||x_it|| = 19.39167233, ||z|| / ||RHS|| = 6.200378402e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_7_x2_hat.bin
+CG took 0.234996946 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1388241931, ||x_it|| = 0.09190610267, ||z|| / ||RHS|| = 0.01278357922
+[CG onsager] it = 1: relative error for onsager is 0.01632225235
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01689345152, ||x_it|| = 0.09407468234, ||z|| / ||RHS|| = 0.001555627812
+[CG onsager] it = 2: relative error for onsager is 0.0002422405124
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.002006617111, ||x_it|| = 0.09412588223, ||z|| / ||RHS|| = 0.000184778663
+[CG onsager] it = 3: relative error for onsager is 3.410470548e-06
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0002359224953, ||x_it|| = 0.09412687513, ||z|| / ||RHS|| = 2.172484377e-05
+[CG onsager] it = 4: relative error for onsager is 4.746222687e-08
+[CG] it = 4: ||r_it|| / ||RHS|| = 2.797126019e-05, ||x_it|| = 0.09412689275, ||z|| / ||RHS|| = 2.575724104e-06
+onsager took 0.085741668 seconds.
+alpha2 = 0.9065006945
+onsager approx = 1.479638418
+u1 = -0.3707712362, u2 = 0.07729490929, u3 = -0.002092158387
+polyest1 = 5.665701497, polyest2 = 31.27935475
+extremum = 18.47252812
+polyest = 31.27935475
+eta2= 10.70044351
+gam2 re-est = 9.309700971
+gam1 = 1.390742538
+true gam1 = 1.243413358
+l2_norm2(temp) / N = 0.641306297
+trace_correction / N = 0.1343550264
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.8007577614
+R2 = 0.3587870076
+prior variances = 0 0.0004801105101 0.001074806293 0.002402968924 0.005392499528 0.01214894489 0.02763704791 0.06641018249 0.212898341 2.023523734 ;0 0.0004772439791 0.001060538623 0.002332726434 0.005050367866 0.01053253219 0.02042180175 0.03549179553 0.05395883421 0.1665084397 6.202609011 29.40160781 ;0 0.0004798746981 0.001073622152 0.00239702426 0.005362278903 0.01199252694 0.02679741956 0.0612991711 0.1627925383 1.141374716 2.634387341 ;
+prior probabilities= 0.8237709225 0.01274018145 0.006371009085 0.003186566987 0.001594571504 0.000798970242 0.0004019726471 0.0002054551964 0.0001145583859 0.150815792 ;0.9520714365 0.01468042346 0.007314266785 0.003628696999 0.001783641085 0.0008601271186 0.0004001666222 0.0001754967743 9.806506075e-05 4.352635324e-06 0.004332959348 0.01465036765 ;0.853095997 0.0131904767 0.006594180994 0.003295941024 0.001646755237 0.000822200453 0.0004102355461 0.0002052474838 0.0001060335735 8.807188408e-05 0.1205448601 ;
+gamw = 1.289222461
+lmmse step took 0.363622193 seconds.
+total iteration time = 0.650849171
+total computation time so far = 4.957094449
+
+
+
+********************
+iteration = 8
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.941544218
+[old] it_revar = 2: gam1 = 2.191405652
+[old] it_revar = 3: gam1 = 2.306081109
+[old] it_revar = 4: gam1 = 2.362672053
+[old] it_revar = 5: gam1 = 2.390942139
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005906718 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_8.csv
+rho = 0.1646254932
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_8.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_8.bin
+time needed to save beta1 to an external file = 0.125575547 seconds
+eta1 = 11.20445363
+gam2 = 8.813511491
+true gam2 = 16.95027419
+time needed to calculate conditional expectation = 3.999999976e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.6149733865
+R2 = 0.6218077338
+prior variances = 0 0.0004800613983 0.00107456185 0.002401765807 0.005386650111 0.01212158894 0.02752143249 0.06606509575 0.217104156 2.160859701 ;0 0.0004767273687 0.001057991181 0.00232044063 0.004993169164 0.01028712088 0.01952147374 0.03287097419 0.1236343642 7.037299679 34.33007636 ;0 0.0004798094327 0.001073296665 0.002395415066 0.005354373798 0.0119546205 0.02662580471 0.0606010395 0.1612101867 1.210100207 2.847540644 ;
+prior probabilities= 0.8153105821 0.0126086898 0.006304855705 0.003153039568 0.001577311439 0.0007898063517 0.0003968453613 0.0002023899547 0.000113028392 0.1595434513 ;0.9517463973 0.014667466 0.007302981824 0.003617890604 0.001772900318 0.0008497436448 0.0003910864602 0.00026239152 3.719600945e-06 0.005744554371 0.01364086834 ;0.8482772558 0.01311507664 0.006555936385 0.003276215675 0.001636226532 0.0008162148468 0.0004064926948 0.0002026339842 0.0001040650569 9.041824203e-05 0.1255194642 ;
+gamw = 1.289222461
+denoising step took 0.312192435 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_8.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.03795000652, ||x_it|| = 23.43782151, ||z|| / ||RHS|| = 0.003756509442
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.005896659672, ||x_it|| = 23.82813304, ||z|| / ||RHS|| = 0.0005836852154
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0008276987107, ||x_it|| = 23.84556916, ||z|| / ||RHS|| = 8.193036857e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.000115081912, ||x_it|| = 23.84607443, ||z|| / ||RHS|| = 1.13914681e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 1.581808619e-05, ||x_it|| = 23.84610973, ||z|| / ||RHS|| = 1.565764951e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 2.222571534e-06, ||x_it|| = 23.84611089, ||z|| / ||RHS|| = 2.200028858e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_8_x2_hat.bin
+CG took 0.222660874 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1658101353, ||x_it|| = 0.09875648376, ||z|| / ||RHS|| = 0.01641283878
+[CG onsager] it = 1: relative error for onsager is 0.02261196458
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.02355387832, ||x_it|| = 0.101976453, ||z|| / ||RHS|| = 0.002331498052
+[CG onsager] it = 2: relative error for onsager is 0.0004569899178
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.003264414945, ||x_it|| = 0.1020790711, ||z|| / ||RHS|| = 0.0003231305259
+[CG onsager] it = 3: relative error for onsager is 8.754786104e-06
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0004475969367, ||x_it|| = 0.1020817715, ||z|| / ||RHS|| = 4.430571356e-05
+[CG onsager] it = 4: relative error for onsager is 1.658804137e-07
+[CG] it = 4: ||r_it|| / ||RHS|| = 6.195390595e-05, ||x_it|| = 0.1020818367, ||z|| / ||RHS|| = 6.132553166e-06
+onsager took 0.063962707 seconds.
+alpha2 = 0.8909430908
+onsager approx = 1.285766132
+u1 = -0.3027786542, u2 = 0.03706805733, u3 = 0.001400927323
+polyest1 = 6.547827283, polyest2 = -33.00748491
+extremum = -13.22982881
+polyest = -33.00748491
+eta2= 9.892339457
+gam2 re-est = 8.481609504
+gam1 = 1.410729952
+true gam1 = 1.17290871
+l2_norm2(temp) / N = 0.5327274569
+trace_correction / N = 0.1409853775
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.7298287125
+R2 = 0.4673500504
+prior variances = 0 0.0004800613983 0.00107456185 0.002401765807 0.005386650111 0.01212158894 0.02752143249 0.06606509575 0.217104156 2.160859701 ;0 0.0004767273687 0.001057991181 0.00232044063 0.004993169164 0.01028712088 0.01952147374 0.03287097419 0.1236343642 7.037299679 34.33007636 ;0 0.0004798094327 0.001073296665 0.002395415066 0.005354373798 0.0119546205 0.02662580471 0.0606010395 0.1612101867 1.210100207 2.847540644 ;
+prior probabilities= 0.8153105821 0.0126086898 0.006304855705 0.003153039568 0.001577311439 0.0007898063517 0.0003968453613 0.0002023899547 0.000113028392 0.1595434513 ;0.9517463973 0.014667466 0.007302981824 0.003617890604 0.001772900318 0.0008497436448 0.0003910864602 0.00026239152 3.719600945e-06 0.005744554371 0.01364086834 ;0.8482772558 0.01311507664 0.006555936385 0.003276215675 0.001636226532 0.0008162148468 0.0004064926948 0.0002026339842 0.0001040650569 9.041824203e-05 0.1255194642 ;
+gamw = 1.484311934
+lmmse step took 0.329672618 seconds.
+total iteration time = 0.641865053
+total computation time so far = 5.598959502
+
+
+
+********************
+iteration = 9
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.923020596
+[old] it_revar = 2: gam1 = 2.158747508
+[old] it_revar = 3: gam1 = 2.267424564
+[old] it_revar = 4: gam1 = 2.320272485
+[old] it_revar = 5: gam1 = 2.347210497
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005786236 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_9.csv
+rho = 0.2069527699
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_9.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_9.bin
+time needed to save beta1 to an external file = 0.123286392 seconds
+eta1 = 10.60575782
+gam2 = 8.258547321
+true gam2 = 11.53150793
+time needed to calculate conditional expectation = 2.999999982e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.5446573157
+R2 = 0.7033484084
+prior variances = 0 0.0004800190033 0.001074350998 0.002400729757 0.005381631971 0.01209832238 0.02742516937 0.06580329353 0.221774002 2.282903525 ;0 0.0004762666186 0.00105572481 0.002309568976 0.004943126007 0.01007716896 0.01878052954 0.03082999282 0.09964560091 8.123379385 39.84894478 ;0 0.0004797553784 0.00107302713 0.00239408295 0.005347834305 0.01192329954 0.02648413906 0.06002087255 0.1597336544 1.262217905 3.062434076 ;
+prior probabilities= 0.8075566256 0.01248822262 0.006244277034 0.003122369083 0.001561557655 0.0007814820779 0.0003922323275 0.0001996828858 0.0001117995293 0.1675417512 ;0.9517612662 0.01466060506 0.007295268805 0.003609459969 0.00176401688 0.0008410315585 0.0003835823644 0.0002540851744 3.330592025e-06 0.006816028135 0.0126113253 ;0.8448255067 0.01306097294 0.006528437055 0.003261970748 0.00162855769 0.0008117900545 0.0004036685739 0.0002006176825 0.0001024981031 9.242979165e-05 0.1290835506 ;
+gamw = 1.484311934
+denoising step took 0.295743744 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_9.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.04244093445, ||x_it|| = 28.61280558, ||z|| / ||RHS|| = 0.004356244962
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.007767031915, ||x_it|| = 29.15954057, ||z|| / ||RHS|| = 0.0007972278199
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001274087577, ||x_it|| = 29.19008519, ||z|| / ||RHS|| = 0.0001307755746
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0002057667743, ||x_it|| = 29.19123525, ||z|| / ||RHS|| = 2.112042267e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 3.293362506e-05, ||x_it|| = 29.19132983, ||z|| / ||RHS|| = 3.380390655e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 5.371789796e-06, ||x_it|| = 29.19133369, ||z|| / ||RHS|| = 5.513741046e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_9_x2_hat.bin
+CG took 0.269543209 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.1978646312, ||x_it|| = 0.1023588502, ||z|| / ||RHS|| = 0.02030932668
+[CG onsager] it = 1: relative error for onsager is 0.03113127347
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.03271320518, ||x_it|| = 0.1069474459, ||z|| / ||RHS|| = 0.003357766201
+[CG onsager] it = 2: relative error for onsager is 0.0008510452536
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.005271341434, ||x_it|| = 0.1071432285, ||z|| / ||RHS|| = 0.0005410638304
+[CG onsager] it = 3: relative error for onsager is 2.202497216e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.000839802827, ||x_it|| = 0.1071501657, ||z|| / ||RHS|| = 8.619948833e-05
+[CG onsager] it = 4: relative error for onsager is 5.64062989e-07
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0001352219893, ||x_it|| = 0.1071503915, ||z|| / ||RHS|| = 1.387952733e-05
+[CG onsager] it = 5: relative error for onsager is 1.440445382e-08
+[CG] it = 5: ||r_it|| / ||RHS|| = 2.189241712e-05, ||x_it|| = 0.1071503985, ||z|| / ||RHS|| = 2.247093119e-06
+onsager took 0.071417153 seconds.
+alpha2 = 0.873260268
+onsager approx = 1.264370804
+u1 = -0.2330311676, u2 = -0.00445177168, u3 = 0.002436482394
+polyest1 = 10.73583903, polyest2 = -8.908708374
+extremum = 0.9135653291
+polyest = -8.908708374
+eta2= 9.457143104
+gam2 re-est = 8.008985043
+gam1 = 1.448158061
+true gam1 = 1.103095032
+l2_norm2(temp) / N = 0.4203102466
+trace_correction / N = 0.1423103068
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.6482662224
+R2 = 0.5797509049
+prior variances = 0 0.0004800190033 0.001074350998 0.002400729757 0.005381631971 0.01209832238 0.02742516937 0.06580329353 0.221774002 2.282903525 ;0 0.0004762666186 0.00105572481 0.002309568976 0.004943126007 0.01007716896 0.01878052954 0.03082999282 0.09964560091 8.123379385 39.84894478 ;0 0.0004797553784 0.00107302713 0.00239408295 0.005347834305 0.01192329954 0.02648413906 0.06002087255 0.1597336544 1.262217905 3.062434076 ;
+prior probabilities= 0.8075566256 0.01248822262 0.006244277034 0.003122369083 0.001561557655 0.0007814820779 0.0003922323275 0.0001996828858 0.0001117995293 0.1675417512 ;0.9517612662 0.01466060506 0.007295268805 0.003609459969 0.00176401688 0.0008410315585 0.0003835823644 0.0002540851744 3.330592025e-06 0.006816028135 0.0126113253 ;0.8448255067 0.01306097294 0.006528437055 0.003261970748 0.00162855769 0.0008117900545 0.0004036685739 0.0002006176825 0.0001024981031 9.242979165e-05 0.1290835506 ;
+gamw = 1.777396851
+lmmse step took 0.383484259 seconds.
+total iteration time = 0.679228003
+total computation time so far = 6.278187505
+
+
+
+********************
+iteration = 10
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.902641488
+[old] it_revar = 2: gam1 = 2.112388388
+[old] it_revar = 3: gam1 = 2.210388891
+[old] it_revar = 4: gam1 = 2.258994007
+[old] it_revar = 5: gam1 = 2.28425751
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005772356 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_10.csv
+rho = 0.2546754203
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_10.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_10.bin
+time needed to save beta1 to an external file = 0.193891725 seconds
+eta1 = 9.941616044
+gam2 = 7.657358534
+true gam2 = 7.858875059
+time needed to calculate conditional expectation = 6.099999972e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.4726000131
+R2 = 0.7766492276
+prior variances = 0 0.0004799906467 0.001074210378 0.002400043399 0.005378359115 0.01208372842 0.02737152598 0.06575751589 0.2283377776 2.397401221 ;0 0.0004758836754 0.001053845303 0.002300595895 0.004902232466 0.009908901456 0.01820581444 0.02931639883 0.08569099401 9.177934453 45.31424898 ;0 0.0004797240602 0.001072871212 0.002393315079 0.005344094936 0.01190572067 0.02640818055 0.05975081642 0.159905369 1.310560046 3.25617546 ;
+prior probabilities= 0.7992774437 0.01235982508 0.006179851687 0.003089907183 0.001545055594 0.0007729476281 0.0003876954675 0.0001972236591 0.0001110728374 0.1760789771 ;0.9517121056 0.01465395261 0.007288394634 0.003602253207 0.0017566094 0.0008339273374 0.000377632178 0.0002477276062 3.084201038e-06 0.007659346165 0.01186496707 ;0.8404227341 0.01299248133 0.006493940506 0.003244445684 0.001619491601 0.0008069333868 0.0004009152094 0.0001989452033 0.0001014910104 9.603895446e-05 0.133622583 ;
+gamw = 1.777396851
+denoising step took 0.361091074 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_10.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.04634016702, ||x_it|| = 34.38830278, ||z|| / ||RHS|| = 0.004911837556
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01029462, ||x_it|| = 35.12787536, ||z|| / ||RHS|| = 0.001091180814
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.002035815458, ||x_it|| = 35.18491472, ||z|| / ||RHS|| = 0.000215786767
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0003918741885, ||x_it|| = 35.18805063, ||z|| / ||RHS|| = 4.15368023e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 7.490518711e-05, ||x_it|| = 35.18835869, ||z|| / ||RHS|| = 7.939593982e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 1.455944094e-05, ||x_it|| = 35.1883739, ||z|| / ||RHS|| = 1.543231572e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 2.818076677e-06, ||x_it|| = 35.18837303, ||z|| / ||RHS|| = 2.987027399e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_10_x2_hat.bin
+CG took 0.177227459 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.2445133537, ||x_it|| = 0.1056332359, ||z|| / ||RHS|| = 0.02591725389
+[CG onsager] it = 1: relative error for onsager is 0.04535070085
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.04836501134, ||x_it|| = 0.1125384826, ||z|| / ||RHS|| = 0.005126461434
+[CG onsager] it = 2: relative error for onsager is 0.001768574868
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.009301184074, ||x_it|| = 0.1129527106, ||z|| / ||RHS|| = 0.0009858813247
+[CG onsager] it = 3: relative error for onsager is 6.512228321e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.001766638544, ||x_it|| = 0.112973493, ||z|| / ||RHS|| = 0.0001872552929
+[CG onsager] it = 4: relative error for onsager is 2.374292009e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.000339670222, ||x_it|| = 0.1129744535, ||z|| / ||RHS|| = 3.600342986e-05
+[CG onsager] it = 5: relative error for onsager is 8.621340355e-08
+[CG] it = 5: ||r_it|| / ||RHS|| = 6.548405687e-05, ||x_it|| = 0.1129744957, ||z|| / ||RHS|| = 6.940998933e-06
+onsager took 0.077484984 seconds.
+alpha2 = 0.8488556108
+onsager approx = 1.204207176
+u1 = -0.1657542295, u2 = -0.02759118483, u3 = -0.002369087
+polyest1 = -nan, polyest2 = -nan
+extremum = -5.823168342
+polyest = -nan
+eta2= 9.020802167
+gam2 re-est = 7.508067995
+gam1 = 1.512734172
+true gam1 = 1.049884768
+l2_norm2(temp) / N = 0.3135254531
+trace_correction / N = 0.1417282332
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.5598927021
+R2 = 0.6865201621
+prior variances = 0 0.0004799906467 0.001074210378 0.002400043399 0.005378359115 0.01208372842 0.02737152598 0.06575751589 0.2283377776 2.397401221 ;0 0.0004758836754 0.001053845303 0.002300595895 0.004902232466 0.009908901456 0.01820581444 0.02931639883 0.08569099401 9.177934453 45.31424898 ;0 0.0004797240602 0.001072871212 0.002393315079 0.005344094936 0.01190572067 0.02640818055 0.05975081642 0.159905369 1.310560046 3.25617546 ;
+prior probabilities= 0.7992774437 0.01235982508 0.006179851687 0.003089907183 0.001545055594 0.0007729476281 0.0003876954675 0.0001972236591 0.0001110728374 0.1760789771 ;0.9517121056 0.01465395261 0.007288394634 0.003602253207 0.0017566094 0.0008339273374 0.000377632178 0.0002477276062 3.084201038e-06 0.007659346165 0.01186496707 ;0.8404227341 0.01299248133 0.006493940506 0.003244445684 0.001619491601 0.0008069333868 0.0004009152094 0.0001989452033 0.0001014910104 9.603895446e-05 0.133622583 ;
+gamw = 2.196577491
+lmmse step took 0.297348228 seconds.
+total iteration time = 0.658439302
+total computation time so far = 6.936626807
+
+
+
+********************
+iteration = 11
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.902009451
+[old] it_revar = 2: gam1 = 2.081946383
+[old] it_revar = 3: gam1 = 2.168054652
+[old] it_revar = 4: gam1 = 2.210311989
+[old] it_revar = 5: gam1 = 2.233470909
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005763512 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_11.csv
+rho = 0.3055536231
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_11.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_11.bin
+time needed to save beta1 to an external file = 0.159361846 seconds
+eta1 = 9.381786829
+gam2 = 7.14831592
+true gam2 = 5.576461513
+time needed to calculate conditional expectation = 3.100000079e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.4051154303
+R2 = 0.8358814881
+prior variances = 0 0.0004799782675 0.001074149556 0.002399752845 0.005377045337 0.01207869869 0.02736322151 0.06592529391 0.2364535258 2.47814894 ;0 0.0004755050628 0.001051990678 0.002291778818 0.004862400834 0.009747737134 0.01767039247 0.02795710453 0.07520982742 9.91669808 49.84624048 ;0 0.0004797261208 0.001072882062 0.002393375077 0.005344460723 0.01190826403 0.02642841847 0.05993987326 0.1627404459 1.334993637 3.37449217 ;
+prior probabilities= 0.7912115277 0.0122349368 0.006117311432 0.003058532675 0.001529258172 0.0007649423311 0.0003836140904 0.0001952040161 0.0001109202698 0.1843937526 ;0.9512928147 0.01464166827 0.007278769368 0.003593757466 0.001748682615 0.0008267434582 0.0003718585072 0.0002417833274 2.885296514e-06 0.008726571726 0.01127446527 ;0.835254817 0.01291261526 0.006454039202 0.003224531729 0.001609579042 0.00080203483 0.0003985495558 0.0001979081435 0.0001013950908 0.000102028025 0.1389425021 ;
+gamw = 2.196577491
+denoising step took 0.3168416 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_11.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.04774349595, ||x_it|| = 40.25144983, ||z|| / ||RHS|| = 0.005109296807
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.012888658, ||x_it|| = 41.14024005, ||z|| / ||RHS|| = 0.001379286913
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.003085082085, ||x_it|| = 41.23408119, ||z|| / ||RHS|| = 0.0003301517774
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0007093931839, ||x_it|| = 41.24126284, ||z|| / ||RHS|| = 7.591610664e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0001621929782, ||x_it|| = 41.24209961, ||z|| / ||RHS|| = 1.735717189e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 3.775401693e-05, ||x_it|| = 41.24214686, ||z|| / ||RHS|| = 4.040267147e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 8.787544599e-06, ||x_it|| = 41.24214725, ||z|| / ||RHS|| = 9.404039791e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_11_x2_hat.bin
+CG took 0.162725327 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.3048301463, ||x_it|| = 0.1065598974, ||z|| / ||RHS|| = 0.03262156787
+[CG onsager] it = 1: relative error for onsager is 0.06652236849
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.07255292686, ||x_it|| = 0.1168402438, ||z|| / ||RHS|| = 0.007764291872
+[CG onsager] it = 2: relative error for onsager is 0.003730764418
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.01670855011, ||x_it|| = 0.1177113882, ||z|| / ||RHS|| = 0.001788074795
+[CG onsager] it = 3: relative error for onsager is 0.0001966531209
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.003794244583, ||x_it|| = 0.1177735487, ||z|| / ||RHS|| = 0.0004060431971
+[CG onsager] it = 4: relative error for onsager is 1.026702386e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0008737770735, ||x_it|| = 0.1177776497, ||z|| / ||RHS|| = 9.350774012e-05
+[CG onsager] it = 5: relative error for onsager is 5.330718752e-07
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0002011008616, ||x_it|| = 0.1177779069, ||z|| / ||RHS|| = 2.15209207e-05
+[CG onsager] it = 6: relative error for onsager is 2.84689867e-08
+[CG] it = 6: ||r_it|| / ||RHS|| = 4.618453187e-05, ||x_it|| = 0.1177779229, ||z|| / ||RHS|| = 4.942463398e-06
+onsager took 0.085094765 seconds.
+alpha2 = 0.819232199
+onsager approx = 1.167576333
+u1 = -0.1086136728, u2 = -0.03125939411, u3 = -0.01297958531
+polyest1 = -nan, polyest2 = -nan
+extremum = -1.204175378
+polyest = -nan
+eta2= 8.725628617
+gam2 re-est = 7.11509005
+gam1 = 1.610538567
+true gam1 = 1.019793627
+l2_norm2(temp) / N = 0.2242862761
+trace_correction / N = 0.1371586796
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.4735542676
+R2 = 0.7757463556
+prior variances = 0 0.0004799782675 0.001074149556 0.002399752845 0.005377045337 0.01207869869 0.02736322151 0.06592529391 0.2364535258 2.47814894 ;0 0.0004755050628 0.001051990678 0.002291778818 0.004862400834 0.009747737134 0.01767039247 0.02795710453 0.07520982742 9.91669808 49.84624048 ;0 0.0004797261208 0.001072882062 0.002393375077 0.005344460723 0.01190826403 0.02642841847 0.05993987326 0.1627404459 1.334993637 3.37449217 ;
+prior probabilities= 0.7912115277 0.0122349368 0.006117311432 0.003058532675 0.001529258172 0.0007649423311 0.0003836140904 0.0001952040161 0.0001109202698 0.1843937526 ;0.9512928147 0.01464166827 0.007278769368 0.003593757466 0.001748682615 0.0008267434582 0.0003718585072 0.0002417833274 2.885296514e-06 0.008726571726 0.01127446527 ;0.835254817 0.01291261526 0.006454039202 0.003224531729 0.001609579042 0.00080203483 0.0003985495558 0.0001979081435 0.0001013950908 0.000102028025 0.1389425021 ;
+gamw = 2.766673
+lmmse step took 0.290217428 seconds.
+total iteration time = 0.607059028
+total computation time so far = 7.543685835
+
+
+
+********************
+iteration = 12
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 1.93389594
+[old] it_revar = 2: gam1 = 2.084476569
+[old] it_revar = 3: gam1 = 2.158689872
+[old] it_revar = 4: gam1 = 2.196474817
+[old] it_revar = 5: gam1 = 2.21802559
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005750533 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_12.csv
+rho = 0.3561650644
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_12.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_12.bin
+time needed to save beta1 to an external file = 0.199468336 seconds
+eta1 = 8.929866152
+gam2 = 6.711840562
+true gam2 = 4.239230575
+time needed to calculate conditional expectation = 8.09999996e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.3455820355
+R2 = 0.8805730567
+prior variances = 0 0.0004799796929 0.001074157963 0.002399808843 0.005377482701 0.01208262861 0.02740226954 0.06638801058 0.249565312 2.482170448 ;0 0.0004751336433 0.001050174711 0.002283180378 0.004823880802 0.00959433133 0.01717360028 0.02673663999 0.06707692599 10.42132851 53.25244221 ;0 0.0004797680114 0.001073091863 0.002394422187 0.005349715527 0.01193471075 0.02656231661 0.06066502761 0.1685355833 1.325477196 3.391544524 ;
+prior probabilities= 0.7805389814 0.01206991801 0.006034816233 0.003017303748 0.001508671748 0.0007546982171 0.0003785918521 0.0001929483469 0.0001113880298 0.1953926824 ;0.9508815447 0.01462962096 0.0072693394 0.003585456891 0.00174098526 0.0008198498873 0.0003664240116 0.000236325977 2.722052167e-06 0.009821312586 0.01064641825 ;0.8296425791 0.01282641261 0.006411299353 0.003203564338 0.00159954559 0.0007975200021 0.0003968507202 0.0001977165789 0.0001024103132 0.0001096835576 0.1447124178 ;
+gamw = 2.766673
+denoising step took 0.346934212 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_12.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.04596555934, ||x_it|| = 45.57864476, ||z|| / ||RHS|| = 0.004849742988
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01493032105, ||x_it|| = 46.50330552, ||z|| / ||RHS|| = 0.001575271156
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.004303188846, ||x_it|| = 46.6362722, ||z|| / ||RHS|| = 0.0004540216682
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.001172743594, ||x_it|| = 46.65029901, ||z|| / ||RHS|| = 0.0001237340544
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0003172699081, ||x_it|| = 46.65219499, ||z|| / ||RHS|| = 3.347457388e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 8.799882743e-05, ||x_it|| = 46.65233521, ||z|| / ||RHS|| = 9.284597042e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 2.439459416e-05, ||x_it|| = 46.65234966, ||z|| / ||RHS|| = 2.573829486e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 6.683750914e-06, ||x_it|| = 46.65235263, ||z|| / ||RHS|| = 7.051904641e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_12_x2_hat.bin
+CG took 0.153810033 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.3781478031, ||x_it|| = 0.1049508977, ||z|| / ||RHS|| = 0.03989769041
+[CG onsager] it = 1: relative error for onsager is 0.09582280177
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.107896278, ||x_it|| = 0.1197420347, ||z|| / ||RHS|| = 0.01138394104
+[CG onsager] it = 2: relative error for onsager is 0.007629957591
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0295439557, ||x_it|| = 0.1214864016, ||z|| / ||RHS|| = 0.003117129304
+[CG onsager] it = 3: relative error for onsager is 0.0005669395853
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.007957000119, ||x_it|| = 0.121660375, ||z|| / ||RHS|| = 0.0008395286838
+[CG onsager] it = 4: relative error for onsager is 4.171272437e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.002177369955, ||x_it|| = 0.1216764841, ||z|| / ||RHS|| = 0.0002297303639
+[CG onsager] it = 5: relative error for onsager is 3.046830256e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0005933044015, ||x_it|| = 0.1216779016, ||z|| / ||RHS|| = 6.259847377e-05
+[CG onsager] it = 6: relative error for onsager is 2.284234454e-07
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.0001615602047, ||x_it|| = 0.1216780259, ||z|| / ||RHS|| = 1.704592485e-05
+[CG onsager] it = 7: relative error for onsager is 1.705578257e-08
+[CG] it = 7: ||r_it|| / ||RHS|| = 4.378779431e-05, ||x_it|| = 0.1216780365, ||z|| / ||RHS|| = 4.619970941e-06
+onsager took 0.093303927 seconds.
+alpha2 = 0.785536606
+onsager approx = 1.139772769
+u1 = -0.06434478655, u2 = -0.02037561151, u3 = -0.02475238989
+polyest1 = -nan, polyest2 = -nan
+extremum = -0.4115887718
+polyest = -nan
+eta2= 8.544274717
+gam2 re-est = 6.791010373
+gam1 = 1.753264345
+true gam1 = 1.017818505
+l2_norm2(temp) / N = 0.1576155483
+trace_correction / N = 0.1291945199
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.3969793655
+R2 = 0.8424073834
+prior variances = 0 0.0004799796929 0.001074157963 0.002399808843 0.005377482701 0.01208262861 0.02740226954 0.06638801058 0.249565312 2.482170448 ;0 0.0004751336433 0.001050174711 0.002283180378 0.004823880802 0.00959433133 0.01717360028 0.02673663999 0.06707692599 10.42132851 53.25244221 ;0 0.0004797680114 0.001073091863 0.002394422187 0.005349715527 0.01193471075 0.02656231661 0.06066502761 0.1685355833 1.325477196 3.391544524 ;
+prior probabilities= 0.7805389814 0.01206991801 0.006034816233 0.003017303748 0.001508671748 0.0007546982171 0.0003785918521 0.0001929483469 0.0001113880298 0.1953926824 ;0.9508815447 0.01462962096 0.0072693394 0.003585456891 0.00174098526 0.0008198498873 0.0003664240116 0.000236325977 2.722052167e-06 0.009821312586 0.01064641825 ;0.8296425791 0.01282641261 0.006411299353 0.003203564338 0.00159954559 0.0007975200021 0.0003968507202 0.0001977165789 0.0001024103132 0.0001096835576 0.1447124178 ;
+gamw = 3.48662795
+lmmse step took 0.289691647 seconds.
+total iteration time = 0.636625859
+total computation time so far = 8.180311694
+
+
+
+********************
+iteration = 13
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.023665164
+[old] it_revar = 2: gam1 = 2.149665488
+[old] it_revar = 3: gam1 = 2.215586464
+[old] it_revar = 4: gam1 = 2.251436713
+[old] it_revar = 5: gam1 = 2.273257017
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005820919 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_13.csv
+rho = 0.4045230053
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_13.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_13.bin
+time needed to save beta1 to an external file = 0.202882063 seconds
+eta1 = 8.743270219
+gam2 = 6.470013202
+true gam2 = 3.475662578
+time needed to calculate conditional expectation = 5.999999964e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2952613255
+R2 = 0.9128207497
+prior variances = 0 0.0004799692183 0.001074107335 0.00239957643 0.005376541758 0.01208037889 0.02741834659 0.06683919701 0.2687044032 2.424853994 ;0 0.000474767718 0.001048388937 0.002274758603 0.004786461258 0.009447589382 0.01670986908 0.02563189596 0.06060033104 10.44847839 55.22296273 ;0 0.0004798520238 0.001073512553 0.002396521052 0.005360239869 0.01198758625 0.02682908027 0.06210002179 0.1798211645 1.2975635 3.277574133 ;
+prior probabilities= 0.7683121881 0.01188071668 0.005940138972 0.002969883851 0.001484880938 0.0007427375647 0.0003726013545 0.0001901316686 0.0001120968773 0.207994624 ;0.9503436243 0.01461571319 0.007259046675 0.00357681191 0.001733234973 0.0008130890707 0.000361228471 0.0002312449197 2.584559366e-06 0.01100806769 0.01005535429 ;0.8206711492 0.01268882331 0.006343212279 0.003170308839 0.001583799521 0.0007906304552 0.0003945024272 0.0001978402491 0.000104695951 0.0001229284048 0.1539321094 ;
+gamw = 3.48662795
+denoising step took 0.360999246 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_13.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.04139994563, ||x_it|| = 49.96867065, ||z|| / ||RHS|| = 0.004158326641
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01565815593, ||x_it|| = 50.80424801, ||z|| / ||RHS|| = 0.001572749093
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.005273239557, ||x_it|| = 50.95750594, ||z|| / ||RHS|| = 0.0005296589694
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.001657829013, ||x_it|| = 50.97850682, ||z|| / ||RHS|| = 0.0001665169953
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0005135675144, ||x_it|| = 50.98154436, ||z|| / ||RHS|| = 5.15841614e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0001651857609, ||x_it|| = 50.98189207, ||z|| / ||RHS|| = 1.659172107e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 5.255402174e-05, ||x_it|| = 50.98194855, ||z|| / ||RHS|| = 5.278673326e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 1.656407662e-05, ||x_it|| = 50.98195554, ||z|| / ||RHS|| = 1.663742308e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 5.217295772e-06, ||x_it|| = 50.98196563, ||z|| / ||RHS|| = 5.240398188e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_13_x2_hat.bin
+CG took 0.279456406 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.4531939519, ||x_it|| = 0.09980697801, ||z|| / ||RHS|| = 0.04552007147
+[CG onsager] it = 1: relative error for onsager is 0.1291733813
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.1510193098, ||x_it|| = 0.1191764817, ||z|| / ||RHS|| = 0.015168803
+[CG onsager] it = 2: relative error for onsager is 0.01379180558
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.04777393839, ||x_it|| = 0.1221852086, ||z|| / ||RHS|| = 0.00479854835
+[CG onsager] it = 3: relative error for onsager is 0.001362102179
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.01481477139, ||x_it|| = 0.1225803078, ||z|| / ||RHS|| = 0.001488037185
+[CG onsager] it = 4: relative error for onsager is 0.000133047215
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.004674752512, ||x_it|| = 0.1226286518, ||z|| / ||RHS|| = 0.0004695452523
+[CG onsager] it = 5: relative error for onsager is 1.287876505e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.001463916003, ||x_it|| = 0.1226342733, ||z|| / ||RHS|| = 0.0001470398287
+[CG onsager] it = 6: relative error for onsager is 1.276934042e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.0004587362651, ||x_it|| = 0.1226349234, ||z|| / ||RHS|| = 4.607675695e-05
+[CG onsager] it = 7: relative error for onsager is 1.263955592e-07
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.0001432267308, ||x_it|| = 0.122634997, ||z|| / ||RHS|| = 1.43860945e-05
+[CG onsager] it = 8: relative error for onsager is 1.224587247e-08
+[CG] it = 8: ||r_it|| / ||RHS|| = 4.50831837e-05, ||x_it|| = 0.122635005, ||z|| / ||RHS|| = 4.528281402e-06
+onsager took 0.102689539 seconds.
+alpha2 = 0.7530463731
+onsager approx = 1.138403371
+u1 = -0.03330611468, u2 = -0.009556732449, u3 = -0.03077177637
+polyest1 = -nan, polyest2 = -nan
+extremum = -0.1552840554
+polyest = -nan
+eta2= 8.591785889
+gam2 re-est = 6.656734019
+gam1 = 1.935051869
+true gam1 = 1.031374502
+l2_norm2(temp) / N = 0.1119031435
+trace_correction / N = 0.1180479776
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.3344949365
+R2 = 0.8881131375
+prior variances = 0 0.0004799692183 0.001074107335 0.00239957643 0.005376541758 0.01208037889 0.02741834659 0.06683919701 0.2687044032 2.424853994 ;0 0.000474767718 0.001048388937 0.002274758603 0.004786461258 0.009447589382 0.01670986908 0.02563189596 0.06060033104 10.44847839 55.22296273 ;0 0.0004798520238 0.001073512553 0.002396521052 0.005360239869 0.01198758625 0.02682908027 0.06210002179 0.1798211645 1.2975635 3.277574133 ;
+prior probabilities= 0.7683121881 0.01188071668 0.005940138972 0.002969883851 0.001484880938 0.0007427375647 0.0003726013545 0.0001901316686 0.0001120968773 0.207994624 ;0.9503436243 0.01461571319 0.007259046675 0.00357681191 0.001733234973 0.0008130890707 0.000361228471 0.0002312449197 2.584559366e-06 0.01100806769 0.01005535429 ;0.8206711492 0.01268882331 0.006343212279 0.003170308839 0.001583799521 0.0007906304552 0.0003945024272 0.0001978402491 0.000104695951 0.0001229284048 0.1539321094 ;
+gamw = 4.348750271
+lmmse step took 0.424562 seconds.
+total iteration time = 0.785561246
+total computation time so far = 8.96587294
+
+
+
+********************
+iteration = 14
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.164753716
+[old] it_revar = 2: gam1 = 2.274713775
+[old] it_revar = 3: gam1 = 2.33270534
+[old] it_revar = 4: gam1 = 2.366006658
+[old] it_revar = 5: gam1 = 2.387154553
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005915832 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_14.csv
+rho = 0.4492176211
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_14.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_14.bin
+time needed to save beta1 to an external file = 0.144334494 seconds
+eta1 = 8.783510898
+gam2 = 6.396356345
+true gam2 = 3.033624169
+time needed to calculate conditional expectation = 3.000000071e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2553248643
+R2 = 0.9348092137
+prior variances = 0 0.0004799635559 0.001074080742 0.002399463257 0.005376191555 0.01208102748 0.02744859787 0.06737622237 0.2921453188 2.349650052 ;0 0.0004744166754 0.001046678655 0.002266721655 0.004751012373 0.009310455122 0.01628560282 0.02464719477 0.05538620871 10.43151956 56.99302538 ;0 0.0004799577392 0.001074042102 0.002399165082 0.005373520919 0.01205457292 0.02717000973 0.06397138201 0.1952674896 1.24536163 3.136288207 ;
+prior probabilities= 0.7562663577 0.0116943765 0.005846930957 0.002923241394 0.001461526136 0.0007310462389 0.0003667999848 0.0001874742414 0.0001133694557 0.2204088774 ;0.9500358615 0.01460557738 0.007250774547 0.003569331776 0.00172624624 0.0008069058065 0.0003564980401 0.0002266853824 2.469771707e-06 0.0119382742 0.009481375352 ;0.8109190016 0.012539421 0.006269379942 0.00313436126 0.001566911866 0.0007834043743 0.0003922628546 0.0001983906967 0.0001080366507 0.0001393523461 0.1639494774 ;
+gamw = 4.348750271
+denoising step took 0.296652611 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_14.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.03550651368, ||x_it|| = 53.33462157, ||z|| / ||RHS|| = 0.003304714321
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01520044704, ||x_it|| = 54.05329083, ||z|| / ||RHS|| = 0.001414758302
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.005824226148, ||x_it|| = 54.21275828, ||z|| / ||RHS|| = 0.0005420809189
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.002064202891, ||x_it|| = 54.24079187, ||z|| / ||RHS|| = 0.0001921225192
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0007131385631, ||x_it|| = 54.24512871, ||z|| / ||RHS|| = 6.637427836e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0002576167808, ||x_it|| = 54.24581515, ||z|| / ||RHS|| = 2.397728689e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 9.045432112e-05, ||x_it|| = 54.245938, ||z|| / ||RHS|| = 8.418897251e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 3.165900674e-05, ||x_it|| = 54.24595118, ||z|| / ||RHS|| = 2.946613512e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 1.117768912e-05, ||x_it|| = 54.24595297, ||z|| / ||RHS|| = 1.040346277e-06
+[CG] it = 9: ||r_it|| / ||RHS|| = 3.940024506e-06, ||x_it|| = 54.24595568, ||z|| / ||RHS|| = 3.667117399e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_14_x2_hat.bin
+CG took 0.177895495 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.5232654235, ||x_it|| = 0.09239319329, ||z|| / ||RHS|| = 0.04870212701
+[CG onsager] it = 1: relative error for onsager is 0.1628623187
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.1980682534, ||x_it|| = 0.1155901993, ||z|| / ||RHS|| = 0.018434899
+[CG onsager] it = 2: relative error for onsager is 0.02198445186
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.07032322115, ||x_it|| = 0.1200832247, ||z|| / ||RHS|| = 0.006545225987
+[CG onsager] it = 3: relative error for onsager is 0.002719898794
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.02437343704, ||x_it|| = 0.1208154292, ||z|| / ||RHS|| = 0.002268520283
+[CG onsager] it = 4: relative error for onsager is 0.0003321363178
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.008604394994, ||x_it|| = 0.1209268813, ||z|| / ||RHS|| = 0.0008008408716
+[CG onsager] it = 5: relative error for onsager is 4.012136228e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.003005665757, ||x_it|| = 0.1209430055, ||z|| / ||RHS|| = 0.000279747732
+[CG onsager] it = 6: relative error for onsager is 4.95524405e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.001051771795, ||x_it|| = 0.1209453233, ||z|| / ||RHS|| = 9.789204721e-05
+[CG onsager] it = 7: relative error for onsager is 6.12219213e-07
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.0003670518115, ||x_it|| = 0.1209456504, ||z|| / ||RHS|| = 3.416278458e-05
+[CG onsager] it = 8: relative error for onsager is 7.404693605e-08
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.000129037299, ||x_it|| = 0.1209456949, ||z|| / ||RHS|| = 1.200994876e-05
+onsager took 0.102515628 seconds.
+alpha2 = 0.7240640285
+onsager approx = 1.147432824
+u1 = -0.01256256664, u2 = -0.004233894503, u3 = -0.02823301888
+polyest1 = -nan, polyest2 = -nan
+extremum = -0.07498125723
+polyest = -nan
+eta2= 8.833965082
+gam2 re-est = 6.681135111
+gam1 = 2.152829971
+true gam1 = 1.051690513
+l2_norm2(temp) / N = 0.08172664047
+trace_correction / N = 0.1057529766
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2858579192
+R2 = 0.9182852501
+prior variances = 0 0.0004799635559 0.001074080742 0.002399463257 0.005376191555 0.01208102748 0.02744859787 0.06737622237 0.2921453188 2.349650052 ;0 0.0004744166754 0.001046678655 0.002266721655 0.004751012373 0.009310455122 0.01628560282 0.02464719477 0.05538620871 10.43151956 56.99302538 ;0 0.0004799577392 0.001074042102 0.002399165082 0.005373520919 0.01205457292 0.02717000973 0.06397138201 0.1952674896 1.24536163 3.136288207 ;
+prior probabilities= 0.7562663577 0.0116943765 0.005846930957 0.002923241394 0.001461526136 0.0007310462389 0.0003667999848 0.0001874742414 0.0001133694557 0.2204088774 ;0.9500358615 0.01460557738 0.007250774547 0.003569331776 0.00172624624 0.0008069058065 0.0003564980401 0.0002266853824 2.469771707e-06 0.0119382742 0.009481375352 ;0.8109190016 0.012539421 0.006269379942 0.00313436126 0.001566911866 0.0007834043743 0.0003922628546 0.0001983906967 0.0001080366507 0.0001393523461 0.1639494774 ;
+gamw = 5.333913176
+lmmse step took 0.322657201 seconds.
+total iteration time = 0.619309812
+total computation time so far = 9.585182752
+
+
+
+********************
+iteration = 15
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.34653004
+[old] it_revar = 2: gam1 = 2.439530313
+[old] it_revar = 3: gam1 = 2.488960729
+[old] it_revar = 4: gam1 = 2.517497598
+[old] it_revar = 5: gam1 = 2.535643364
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.00578878 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_15.csv
+rho = 0.4894318664
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_15.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_15.bin
+time needed to save beta1 to an external file = 0.045678904 seconds
+eta1 = 9.024698459
+gam2 = 6.489055095
+true gam2 = 2.764362068
+time needed to calculate conditional expectation = 3.000000071e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2263044634
+R2 = 0.9487862898
+prior variances = 0 0.0004799636908 0.001074083194 0.002399495182 0.005376571504 0.01208538686 0.02749847329 0.06805042405 0.3221779749 2.274011821 ;0 0.0004740913394 0.001045095993 0.002259308192 0.004718526449 0.009186286394 0.01590849391 0.05121377685 10.81644237 59.18131311 ;0 0.0004800483845 0.001074496367 0.002401435477 0.005384950745 0.01211251206 0.02746820237 0.06565000227 0.2098651642 1.17435047 3.063158982 ;
+prior probabilities= 0.7457579437 0.01153188159 0.005765689403 0.002882631061 0.001441242354 0.000720952535 0.00036186986 0.0001853581409 0.0001157575444 0.2312366738 ;0.9503432039 0.01460529246 0.007247635747 0.003564645801 0.00172089683 0.0008017765983 0.0005756027553 2.37636983e-06 0.01214930591 0.008989263656 ;0.8054807923 0.01245650462 0.006228652202 0.003114812781 0.001558054636 0.0007800106434 0.0003917505402 0.0001996242465 0.0001116082338 0.000153165904 0.1695250239 ;
+gamw = 5.333913176
+denoising step took 0.191844473 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_15.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.02850987937, ||x_it|| = 55.86079164, ||z|| / ||RHS|| = 0.002411624441
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01341631695, ||x_it|| = 56.44907627, ||z|| / ||RHS|| = 0.001134873896
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.005705909188, ||x_it|| = 56.60338699, ||z|| / ||RHS|| = 0.0004826576035
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.00222559658, ||x_it|| = 56.63661856, ||z|| / ||RHS|| = 0.0001882611651
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.000837112349, ||x_it|| = 56.6427201, ||z|| / ||RHS|| = 7.081056269e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0003276570652, ||x_it|| = 56.64373731, ||z|| / ||RHS|| = 2.77162094e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.0001232764178, ||x_it|| = 56.6439057, ||z|| / ||RHS|| = 1.042783866e-05
+[CG] it = 7: ||r_it|| / ||RHS|| = 4.65258215e-05, ||x_it|| = 56.64392014, ||z|| / ||RHS|| = 3.935576394e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 1.775842791e-05, ||x_it|| = 56.64390157, ||z|| / ||RHS|| = 1.502169063e-06
+[CG] it = 9: ||r_it|| / ||RHS|| = 6.882659658e-06, ||x_it|| = 56.64390294, ||z|| / ||RHS|| = 5.821978422e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_15_x2_hat.bin
+CG took 0.340166738 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.5828111963, ||x_it|| = 0.08390046199, ||z|| / ||RHS|| = 0.04929946238
+[CG onsager] it = 1: relative error for onsager is 0.193132417
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.2436935627, ||x_it|| = 0.1095436051, ||z|| / ||RHS|| = 0.02061381405
+[CG onsager] it = 2: relative error for onsager is 0.031157517
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.09449521676, ||x_it|| = 0.1154256436, ||z|| / ||RHS|| = 0.007993263364
+[CG onsager] it = 3: relative error for onsager is 0.004568853026
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.03560894718, ||x_it|| = 0.1165524224, ||z|| / ||RHS|| = 0.003012128049
+[CG onsager] it = 4: relative error for onsager is 0.0006595910528
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.01367343523, ||x_it|| = 0.1167542234, ||z|| / ||RHS|| = 0.001156623294
+[CG onsager] it = 5: relative error for onsager is 9.403688847e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.00518287397, ||x_it|| = 0.1167885805, ||z|| / ||RHS|| = 0.0004384145362
+[CG onsager] it = 6: relative error for onsager is 1.36860523e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.001969577968, ||x_it|| = 0.1167943883, ||z|| / ||RHS|| = 0.0001666047865
+[CG onsager] it = 7: relative error for onsager is 1.99575038e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.0007470403445, ||x_it|| = 0.1167953542, ||z|| / ||RHS|| = 6.319145478e-05
+[CG onsager] it = 8: relative error for onsager is 2.849403222e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.000285242716, ||x_it|| = 0.1167955091, ||z|| / ||RHS|| = 2.412841866e-05
+[CG onsager] it = 9: relative error for onsager is 4.154197756e-08
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0001073234935, ||x_it|| = 0.1167955342, ||z|| / ||RHS|| = 9.078395481e-06
+onsager took 0.2454061 seconds.
+alpha2 = 0.7001861153
+onsager approx = 1.168418027
+u1 = 0.000556558209, u2 = -0.00311628391, u3 = -0.0212924676
+polyest1 = -0.2506429207, polyest2 = 0.1042867553
+extremum = -0.07317808271
+polyest = 0.1042867553
+eta2= 9.267614642
+gam2 re-est = 6.857955411
+gam1 = 2.409659231
+true gam1 = 1.0776247
+l2_norm2(temp) / N = 0.0622527723
+trace_correction / N = 0.09368165384
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2494869036
+R2 = 0.9377562849
+prior variances = 0 0.0004799636908 0.001074083194 0.002399495182 0.005376571504 0.01208538686 0.02749847329 0.06805042405 0.3221779749 2.274011821 ;0 0.0004740913394 0.001045095993 0.002259308192 0.004718526449 0.009186286394 0.01590849391 0.05121377685 10.81644237 59.18131311 ;0 0.0004800483845 0.001074496367 0.002401435477 0.005384950745 0.01211251206 0.02746820237 0.06565000227 0.2098651642 1.17435047 3.063158982 ;
+prior probabilities= 0.7457579437 0.01153188159 0.005765689403 0.002882631061 0.001441242354 0.000720952535 0.00036186986 0.0001853581409 0.0001157575444 0.2312366738 ;0.9503432039 0.01460529246 0.007247635747 0.003564645801 0.00172089683 0.0008017765983 0.0005756027553 2.37636983e-06 0.01214930591 0.008989263656 ;0.8054807923 0.01245650462 0.006228652202 0.003114812781 0.001558054636 0.0007800106434 0.0003917505402 0.0001996242465 0.0001116082338 0.000153165904 0.1695250239 ;
+gamw = 6.412952064
+lmmse step took 0.62747555 seconds.
+total iteration time = 0.819320023
+total computation time so far = 10.40450278
+
+
+
+********************
+iteration = 16
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.56642277
+[old] it_revar = 2: gam1 = 2.639353144
+[old] it_revar = 3: gam1 = 2.677224669
+[old] it_revar = 4: gam1 = 2.698491077
+[old] it_revar = 5: gam1 = 2.711609712
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005800739 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_16.csv
+rho = 0.5229486397
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_16.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_16.bin
+time needed to save beta1 to an external file = 0.132330842 seconds
+eta1 = 9.496743799
+gam2 = 6.785134087
+true gam2 = 2.590855089
+time needed to calculate conditional expectation = 6.000000141e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2072935187
+R2 = 0.9570293971
+prior variances = 0 0.000479971619 0.001074124547 0.002399719847 0.005377903649 0.01209439036 0.02757074105 0.06885233691 0.3570705789 2.217515405 ;0 0.0004737947053 0.001043654939 0.00225257778 0.004689208629 0.009075439086 0.01557735905 0.04786323851 11.40675846 61.0323097 ;0 0.0004801538947 0.001075024978 0.00240407583 0.00539822516 0.01217960844 0.02781147746 0.06755668536 0.2252935859 1.078561091 3.041652213 ;
+prior probabilities= 0.7391510868 0.01142981057 0.005714715756 0.002857217009 0.001428626481 0.0007147709571 0.0003589852926 0.0001843890839 0.0001195944467 0.2380408036 ;0.9508554609 0.01460859355 0.007246543279 0.003561255689 0.001716476886 0.0007973712666 0.000569923384 2.299823391e-06 0.01194034671 0.008701728549 ;0.8044412518 0.01244179567 0.006222143937 0.003112503484 0.001557963159 0.0007811663022 0.0003937078155 0.0002023495694 0.0001164228255 0.0001659163998 0.1705647791 ;
+gamw = 6.412952064
+denoising step took 0.278212654 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_16.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.02153885014, ||x_it|| = 57.75672047, ||z|| / ||RHS|| = 0.001632132907
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.01076071595, ||x_it|| = 58.1939534, ||z|| / ||RHS|| = 0.0008154065092
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.004915336075, ||x_it|| = 58.32502417, ||z|| / ||RHS|| = 0.0003724656473
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.00204561953, ||x_it|| = 58.35628553, ||z|| / ||RHS|| = 0.0001550093403
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.000817024152, ||x_it|| = 58.363008, ||z|| / ||RHS|| = 6.191101177e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0003352645747, ||x_it|| = 58.36412828, ||z|| / ||RHS|| = 2.540508622e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.0001330816742, ||x_it|| = 58.3642205, ||z|| / ||RHS|| = 1.008442783e-05
+[CG] it = 7: ||r_it|| / ||RHS|| = 5.304403908e-05, ||x_it|| = 58.36423407, ||z|| / ||RHS|| = 4.019477416e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 2.139157089e-05, ||x_it|| = 58.36421372, ||z|| / ||RHS|| = 1.620972641e-06
+[CG] it = 9: ||r_it|| / ||RHS|| = 8.828096814e-06, ||x_it|| = 58.36421865, ||z|| / ||RHS|| = 6.689599132e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_16_x2_hat.bin
+CG took 0.209408252 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.627316007, ||x_it|| = 0.07511225211, ||z|| / ||RHS|| = 0.04753564334
+[CG onsager] it = 1: relative error for onsager is 0.2166185264
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.2815227197, ||x_it|| = 0.1014375874, ||z|| / ||RHS|| = 0.02133273095
+[CG onsager] it = 2: relative error for onsager is 0.03954793493
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1161091209, ||x_it|| = 0.1082372566, ||z|| / ||RHS|| = 0.008798311692
+[CG onsager] it = 3: relative error for onsager is 0.006521391067
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.04635038194, ||x_it|| = 0.1096929512, ||z|| / ||RHS|| = 0.0035122573
+[CG onsager] it = 4: relative error for onsager is 0.001056123864
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.01885443628, ||x_it|| = 0.1099842538, ||z|| / ||RHS|| = 0.00142871814
+[CG onsager] it = 5: relative error for onsager is 0.0001686626542
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.007557494256, ||x_it|| = 0.110039672, ||z|| / ||RHS|| = 0.0005726784388
+[CG onsager] it = 6: relative error for onsager is 2.746402278e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.003038647702, ||x_it|| = 0.1100501355, ||z|| / ||RHS|| = 0.0002302572736
+[CG onsager] it = 7: relative error for onsager is 4.485849693e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001220126493, ||x_it|| = 0.1100520823, ||z|| / ||RHS|| = 9.245658836e-05
+[CG onsager] it = 8: relative error for onsager is 7.174565936e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0004929752873, ||x_it|| = 0.1100524317, ||z|| / ||RHS|| = 3.735580979e-05
+[CG onsager] it = 9: relative error for onsager is 1.171321522e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0001962921199, ||x_it|| = 0.110052495, ||z|| / ||RHS|| = 1.487427724e-05
+[CG onsager] it = 10: relative error for onsager is 1.884742171e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 7.920408079e-05, ||x_it|| = 0.1100525062, ||z|| / ||RHS|| = 6.001786809e-06
+onsager took 0.142759404 seconds.
+alpha2 = 0.6826657601
+onsager approx = 1.208547882
+u1 = 0.007900561653, u2 = -0.003946614595, u3 = -0.0150932125
+polyest1 = -0.8659587557, polyest2 = 0.6044760134
+extremum = -0.1307413711
+polyest = 0.6044760134
+eta2= 9.939174459
+gam2 re-est = 7.219222275
+gam1 = 2.719952184
+true gam1 = 1.112157589
+l2_norm2(temp) / N = 0.04999968191
+trace_correction / N = 0.08247222099
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2235898195
+R2 = 0.9500075926
+prior variances = 0 0.000479971619 0.001074124547 0.002399719847 0.005377903649 0.01209439036 0.02757074105 0.06885233691 0.3570705789 2.217515405 ;0 0.0004737947053 0.001043654939 0.00225257778 0.004689208629 0.009075439086 0.01557735905 0.04786323851 11.40675846 61.0323097 ;0 0.0004801538947 0.001075024978 0.00240407583 0.00539822516 0.01217960844 0.02781147746 0.06755668536 0.2252935859 1.078561091 3.041652213 ;
+prior probabilities= 0.7391510868 0.01142981057 0.005714715756 0.002857217009 0.001428626481 0.0007147709571 0.0003589852926 0.0001843890839 0.0001195944467 0.2380408036 ;0.9508554609 0.01460859355 0.007246543279 0.003561255689 0.001716476886 0.0007973712666 0.000569923384 2.299823391e-06 0.01194034671 0.008701728549 ;0.8044412518 0.01244179567 0.006222143937 0.003112503484 0.001557963159 0.0007811663022 0.0003937078155 0.0002023495694 0.0001164228255 0.0001659163998 0.1705647791 ;
+gamw = 7.548770555
+lmmse step took 0.39477598 seconds.
+total iteration time = 0.672988634
+total computation time so far = 11.07749141
+
+
+
+********************
+iteration = 17
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 2.839738689
+[old] it_revar = 2: gam1 = 2.893887542
+[old] it_revar = 3: gam1 = 2.920844666
+[old] it_revar = 4: gam1 = 2.935238382
+[old] it_revar = 5: gam1 = 2.943626855
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005822191 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_17.csv
+rho = 0.5466641167
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_17.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_17.bin
+time needed to save beta1 to an external file = 0.098789452 seconds
+eta1 = 10.21850054
+gam2 = 7.274873681
+true gam2 = 2.471489298
+time needed to calculate conditional expectation = 1.300000001e-07 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1964819489
+R2 = 0.9613948438
+prior variances = 0 0.0004799838587 0.001074187437 0.002400051387 0.005379765808 0.01210600501 0.02765601601 0.06974087937 0.3955351945 2.182788263 ;0 0.0004735208751 0.001042326445 0.002246390688 0.004662412083 0.008975175657 0.01528249123 0.04511170053 11.70887381 62.01834935 ;0 0.0004802726261 0.001075619636 0.002407043948 0.005413123381 0.01225463974 0.02819212003 0.06962067282 0.2396019768 0.9895640521 3.052298919 ;
+prior probabilities= 0.7361093603 0.01138291866 0.005691361574 0.002845646193 0.001422970227 0.0007121130518 0.0003579163617 0.000184416529 0.0001248238275 0.2411684733 ;0.9510664209 0.01460761259 0.007243538779 0.003557156035 0.001711956557 0.0007931499357 0.0005646691644 2.234612112e-06 0.01185452945 0.008598731999 ;0.8061532569 0.01246981639 0.00623711201 0.00312105694 0.001563443456 0.0007852669852 0.0003973211074 0.0002061316347 0.0001220346612 0.0001770376568 0.1687675222 ;
+gamw = 7.548770555
+denoising step took 0.23701915 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_17.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.01578620336, ||x_it|| = 59.14545636, ||z|| / ||RHS|| = 0.001065047034
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.008146021293, ||x_it|| = 59.46131221, ||z|| / ||RHS|| = 0.0005495872322
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.003838412828, ||x_it|| = 59.56340287, ||z|| / ||RHS|| = 0.0002589660162
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.001660468003, ||x_it|| = 59.58778709, ||z|| / ||RHS|| = 0.000112026716
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0006924753533, ||x_it|| = 59.5935347, ||z|| / ||RHS|| = 4.671920182e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0002917448253, ||x_it|| = 59.59441548, ||z|| / ||RHS|| = 1.968313429e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.0001207184956, ||x_it|| = 59.59448488, ||z|| / ||RHS|| = 8.144509016e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 5.00554768e-05, ||x_it|| = 59.59450586, ||z|| / ||RHS|| = 3.37709048e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 2.101618691e-05, ||x_it|| = 59.59450623, ||z|| / ||RHS|| = 1.417898086e-06
+[CG] it = 9: ||r_it|| / ||RHS|| = 8.959797644e-06, ||x_it|| = 59.59452133, ||z|| / ||RHS|| = 6.044902427e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_17_x2_hat.bin
+CG took 0.165738812 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.657173325, ||x_it|| = 0.06684764465, ||z|| / ||RHS|| = 0.04433748155
+[CG onsager] it = 1: relative error for onsager is 0.2327493522
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.308846274, ||x_it|| = 0.09242915101, ||z|| / ||RHS|| = 0.02083691692
+[CG onsager] it = 2: relative error for onsager is 0.04599913754
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1325622344, ||x_it|| = 0.09956514045, ||z|| / ||RHS|| = 0.008943569983
+[CG onsager] it = 3: relative error for onsager is 0.008176362737
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.05490353761, ||x_it|| = 0.1012051255, ||z|| / ||RHS|| = 0.003704174368
+[CG onsager] it = 4: relative error for onsager is 0.001424582732
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0231675529, ||x_it|| = 0.1015571976, ||z|| / ||RHS|| = 0.001563044192
+[CG onsager] it = 5: relative error for onsager is 0.0002444991939
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.009621514981, ||x_it|| = 0.1016290499, ||z|| / ||RHS|| = 0.0006491342949
+[CG onsager] it = 6: relative error for onsager is 4.275144951e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.004009422234, ||x_it|| = 0.1016435995, ||z|| / ||RHS|| = 0.0002705034997
+[CG onsager] it = 7: relative error for onsager is 7.503611293e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001669209008, ||x_it|| = 0.1016465058, ||z|| / ||RHS|| = 0.000112616445
+[CG onsager] it = 8: relative error for onsager is 1.289722607e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0006990398119, ||x_it|| = 0.101647066, ||z|| / ||RHS|| = 4.716208584e-05
+[CG onsager] it = 9: relative error for onsager is 2.262306374e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0002885249612, ||x_it|| = 0.1016471749, ||z|| / ||RHS|| = 1.946589987e-05
+[CG onsager] it = 10: relative error for onsager is 3.912897548e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0001207245385, ||x_it|| = 0.1016471956, ||z|| / ||RHS|| = 8.144916716e-06
+onsager took 0.149329751 seconds.
+alpha2 = 0.6710253271
+onsager approx = 1.23566382
+u1 = 0.01149014389, u2 = -0.004550100213, u3 = -0.01107659397
+polyest1 = -1.244392852, polyest2 = 0.8336077113
+extremum = -0.2053925704
+polyest = 0.8336077113
+eta2= 10.84142936
+gam2 re-est = 7.737200893
+gam1 = 3.104228463
+true gam1 = 1.157281971
+l2_norm2(temp) / N = 0.04251592693
+trace_correction / N = 0.0726331682
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.2061789059
+R2 = 0.9574902588
+prior variances = 0 0.0004799838587 0.001074187437 0.002400051387 0.005379765808 0.01210600501 0.02765601601 0.06974087937 0.3955351945 2.182788263 ;0 0.0004735208751 0.001042326445 0.002246390688 0.004662412083 0.008975175657 0.01528249123 0.04511170053 11.70887381 62.01834935 ;0 0.0004802726261 0.001075619636 0.002407043948 0.005413123381 0.01225463974 0.02819212003 0.06962067282 0.2396019768 0.9895640521 3.052298919 ;
+prior probabilities= 0.7361093603 0.01138291866 0.005691361574 0.002845646193 0.001422970227 0.0007121130518 0.0003579163617 0.000184416529 0.0001248238275 0.2411684733 ;0.9510664209 0.01460761259 0.007243538779 0.003557156035 0.001711956557 0.0007931499357 0.0005646691644 2.234612112e-06 0.01185452945 0.008598731999 ;0.8061532569 0.01246981639 0.00623711201 0.00312105694 0.001563443456 0.0007852669852 0.0003973211074 0.0002061316347 0.0001220346612 0.0001770376568 0.1687675222 ;
+gamw = 8.684393037
+lmmse step took 0.357610797 seconds.
+total iteration time = 0.594629947
+total computation time so far = 11.67212136
+
+
+
+********************
+iteration = 18
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 3.195574494
+[old] it_revar = 2: gam1 = 3.236429534
+[old] it_revar = 3: gam1 = 3.256139391
+[old] it_revar = 4: gam1 = 3.266361652
+[old] it_revar = 5: gam1 = 3.272150264
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005795831 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_18.csv
+rho = 0.5618782244
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_18.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_18.bin
+time needed to save beta1 to an external file = 0.07679856 seconds
+eta1 = 11.25503739
+gam2 = 7.982887125
+true gam2 = 2.379823658
+time needed to calculate conditional expectation = 3.000000071e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1907709077
+R2 = 0.9636064608
+prior variances = 0 0.0004799985955 0.001074262611 0.0024004418 0.00538189645 0.01211867874 0.02774358555 0.07060934574 0.4316000199 2.160246963 ;0 0.0004732462636 0.001040995969 0.002240212191 0.004635807613 0.008876664594 0.01499722102 0.04264568973 11.81586015 62.62919502 ;0 0.0004804267666 0.001076391909 0.002410901584 0.005432519673 0.01235268517 0.02869317104 0.07236454384 0.2572802401 0.9151700976 3.061751543 ;
+prior probabilities= 0.7346906597 0.01136115351 0.00568058814 0.002840384691 0.001420488834 0.0007110627676 0.0003576684757 0.0001848644997 0.0001304346812 0.2426226947 ;0.951183361 0.01460517288 0.007239806928 0.003552703441 0.001707287153 0.0007889026826 0.0005594849367 2.174287778e-06 0.01182197334 0.008539133395 ;0.807544958 0.01249334921 0.006250125038 0.003128957003 0.001568965657 0.0007898147553 0.0004016704917 0.0002109841793 0.0001295060598 0.0001913459905 0.1672903236 ;
+gamw = 8.684393037
+denoising step took 0.21815238 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_18.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.0118272921, ||x_it|| = 60.18453634, ||z|| / ||RHS|| = 0.0007096884427
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.00614581565, ||x_it|| = 60.42828356, ||z|| / ||RHS|| = 0.0003687753968
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.00287784855, ||x_it|| = 60.50296698, ||z|| / ||RHS|| = 0.0001726833022
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0012568781, ||x_it|| = 60.51964607, ||z|| / ||RHS|| = 7.541809688e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0005360140955, ||x_it|| = 60.52349563, ||z|| / ||RHS|| = 3.216315328e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0002286158458, ||x_it|| = 60.52403949, ||z|| / ||RHS|| = 1.371793494e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 9.651575399e-05, ||x_it|| = 60.52415524, ||z|| / ||RHS|| = 5.791360742e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 4.072393834e-05, ||x_it|| = 60.52416671, ||z|| / ||RHS|| = 2.443611618e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 1.748381048e-05, ||x_it|| = 60.52418096, ||z|| / ||RHS|| = 1.049103897e-06
+[CG] it = 9: ||r_it|| / ||RHS|| = 7.557200144e-06, ||x_it|| = 60.52419563, ||z|| / ||RHS|| = 4.534645425e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_18_x2_hat.bin
+CG took 0.16058055 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.6722674217, ||x_it|| = 0.05944084891, ||z|| / ||RHS|| = 0.04033893943
+[CG onsager] it = 1: relative error for onsager is 0.2410114837
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.3232910489, ||x_it|| = 0.08319660469, ||z|| / ||RHS|| = 0.01939885471
+[CG onsager] it = 2: relative error for onsager is 0.04953127717
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1415381367, ||x_it|| = 0.09008163992, ||z|| / ||RHS|| = 0.008492897529
+[CG onsager] it = 3: relative error for onsager is 0.009135863611
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.05969412717, ||x_it|| = 0.09172019071, ||z|| / ||RHS|| = 0.003581904615
+[CG onsager] it = 4: relative error for onsager is 0.001649948458
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.02564632209, ||x_it|| = 0.09208426916, ||z|| / ||RHS|| = 0.001538889734
+[CG onsager] it = 5: relative error for onsager is 0.0002933594066
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.01083766815, ||x_it|| = 0.09216116872, ||z|| / ||RHS|| = 0.0006503067457
+[CG onsager] it = 6: relative error for onsager is 5.311625998e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.004596055682, ||x_it|| = 0.09217728244, ||z|| / ||RHS|| = 0.000275783127
+[CG onsager] it = 7: relative error for onsager is 9.657237609e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001947645845, ||x_it|| = 0.09218061504, ||z|| / ||RHS|| = 0.0001168671354
+[CG onsager] it = 8: relative error for onsager is 1.719506021e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0008300999439, ||x_it|| = 0.09218128028, ||z|| / ||RHS|| = 4.980957023e-05
+[CG onsager] it = 9: relative error for onsager is 3.124165562e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0003487048034, ||x_it|| = 0.09218141416, ||z|| / ||RHS|| = 2.092378939e-05
+[CG onsager] it = 10: relative error for onsager is 5.598270752e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0001485240696, ||x_it|| = 0.0921814405, ||z|| / ||RHS|| = 8.912083576e-06
+[CG onsager] it = 11: relative error for onsager is 1.007134993e-08
+[CG] it = 11: ||r_it|| / ||RHS|| = 6.363641579e-05, ||x_it|| = 0.09218144566, ||z|| / ||RHS|| = 3.818458903e-06
+onsager took 0.134043269 seconds.
+alpha2 = 0.6651668547
+onsager approx = 1.253215789
+u1 = 0.01235641906, u2 = -0.004747519623, u3 = -0.008407086781
+polyest1 = -1.527135386, polyest2 = 0.9624308992
+extremum = -0.2823522432
+polyest = 0.9624308992
+eta2= 12.0013303
+gam2 re-est = 8.435365397
+gam1 = 3.565964899
+true gam1 = 1.208456443
+l2_norm2(temp) / N = 0.0381016209
+trace_correction / N = 0.06425955617
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1951821648
+R2 = 0.9619039226
+prior variances = 0 0.0004799985955 0.001074262611 0.0024004418 0.00538189645 0.01211867874 0.02774358555 0.07060934574 0.4316000199 2.160246963 ;0 0.0004732462636 0.001040995969 0.002240212191 0.004635807613 0.008876664594 0.01499722102 0.04264568973 11.81586015 62.62919502 ;0 0.0004804267666 0.001076391909 0.002410901584 0.005432519673 0.01235268517 0.02869317104 0.07236454384 0.2572802401 0.9151700976 3.061751543 ;
+prior probabilities= 0.7346906597 0.01136115351 0.00568058814 0.002840384691 0.001420488834 0.0007110627676 0.0003576684757 0.0001848644997 0.0001304346812 0.2426226947 ;0.951183361 0.01460517288 0.007239806928 0.003552703441 0.001707287153 0.0007889026826 0.0005594849367 2.174287778e-06 0.01182197334 0.008539133395 ;0.807544958 0.01249334921 0.006250125038 0.003128957003 0.001568965657 0.0007898147553 0.0004016704917 0.0002109841793 0.0001295060598 0.0001913459905 0.1672903236 ;
+gamw = 9.769328847
+lmmse step took 0.337050649 seconds.
+total iteration time = 0.555203029
+total computation time so far = 12.22732439
+
+
+
+********************
+iteration = 19
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 3.638665544
+[old] it_revar = 2: gam1 = 3.671043337
+[old] it_revar = 3: gam1 = 3.686778785
+[old] it_revar = 4: gam1 = 3.695078849
+[old] it_revar = 5: gam1 = 3.69990105
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005704353 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_19.csv
+rho = 0.5723001638
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_19.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_19.bin
+time needed to save beta1 to an external file = 0.111605045 seconds
+eta1 = 12.59016148
+gam2 = 8.890260425
+true gam2 = 2.303966926
+time needed to calculate conditional expectation = 2.999999893e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1875677669
+R2 = 0.9648183328
+prior variances = 0 0.0004800183951 0.001074363258 0.002400960653 0.00538468683 0.0121348568 0.02785145528 0.07164732425 0.4714082853 2.141090469 ;0 0.0004729436569 0.001039531976 0.002233434452 0.004606801574 0.008770432861 0.01469449373 0.04022045156 12.0924763 63.15618355 ;0 0.0004806204231 0.001077362995 0.002415761554 0.005457059437 0.01247789303 0.02934589632 0.07607727337 0.2807604343 0.8573867841 3.04890928 ;
+prior probabilities= 0.7336223522 0.01134486592 0.005672590252 0.00283655232 0.001418769356 0.0007104492045 0.0003577102368 0.0001855856056 0.000137476499 0.2437136484 ;0.9514987269 0.01460534468 0.007237115907 0.003548507749 0.001702515405 0.0007844507899 0.0005540391482 2.113621501e-06 0.01159404606 0.008473139766 ;0.8073616548 0.01249303211 0.006251528362 0.003131408201 0.001572174054 0.0007936950628 0.0004063126243 0.0002169464644 0.0001396389736 0.0002111199389 0.1674224894 ;
+gamw = 9.769328847
+denoising step took 0.246520236 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_19.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.009314086011, ||x_it|| = 61.01167823, ||z|| / ||RHS|| = 0.0004992125984
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.004760826476, ||x_it|| = 61.20425377, ||z|| / ||RHS|| = 0.0002551688435
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.002194019699, ||x_it|| = 61.25619778, ||z|| / ||RHS|| = 0.0001175941766
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0009505033895, ||x_it|| = 61.26677227, ||z|| / ||RHS|| = 5.094469456e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0004071648883, ||x_it|| = 61.26903628, ||z|| / ||RHS|| = 2.182305828e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.000174229147, ||x_it|| = 61.26944703, ||z|| / ||RHS|| = 9.338263043e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 7.381566743e-05, ||x_it|| = 61.26953815, ||z|| / ||RHS|| = 3.956342158e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 3.11682298e-05, ||x_it|| = 61.26954927, ||z|| / ||RHS|| = 1.670542119e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 1.342193279e-05, ||x_it|| = 61.26956176, ||z|| / ||RHS|| = 7.193833014e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 5.798747341e-06, ||x_it|| = 61.26957105, ||z|| / ||RHS|| = 3.107989044e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_19_x2_hat.bin
+CG took 0.164007126 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.6754769782, ||x_it|| = 0.05309189552, ||z|| / ||RHS|| = 0.03620394068
+[CG onsager] it = 1: relative error for onsager is 0.2427772983
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.3264191259, ||x_it|| = 0.07450513064, ||z|| / ||RHS|| = 0.01749527971
+[CG onsager] it = 2: relative error for onsager is 0.05030675674
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1435069377, ||x_it|| = 0.08076161147, ||z|| / ||RHS|| = 0.007691626552
+[CG onsager] it = 3: relative error for onsager is 0.009351432616
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0607560829, ||x_it|| = 0.08226156433, ||z|| / ||RHS|| = 0.003256379851
+[CG onsager] it = 4: relative error for onsager is 0.001701679695
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.02620148567, ||x_it|| = 0.08259726423, ||z|| / ||RHS|| = 0.001404336585
+[CG onsager] it = 5: relative error for onsager is 0.000304811151
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0111127713, ||x_it|| = 0.08266868293, ||z|| / ||RHS|| = 0.0005956178018
+[CG onsager] it = 6: relative error for onsager is 5.559576087e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.004730102387, ||x_it|| = 0.08268375608, ||z|| / ||RHS|| = 0.0002535221063
+[CG onsager] it = 7: relative error for onsager is 1.018315363e-05
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.002011925676, ||x_it|| = 0.0826868963, ||z|| / ||RHS|| = 0.0001078343751
+[CG onsager] it = 8: relative error for onsager is 1.8266373e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0008606665672, ||x_it|| = 0.08268752775, ||z|| / ||RHS|| = 4.612965705e-05
+[CG onsager] it = 9: relative error for onsager is 3.343424072e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.000362884725, ||x_it|| = 0.08268765577, ||z|| / ||RHS|| = 1.944974808e-05
+[CG onsager] it = 10: relative error for onsager is 6.035881757e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0001551425024, ||x_it|| = 0.08268768114, ||z|| / ||RHS|| = 8.31526482e-06
+[CG onsager] it = 11: relative error for onsager is 1.093991507e-08
+[CG] it = 11: ||r_it|| / ||RHS|| = 6.671998026e-05, ||x_it|| = 0.08268768615, ||z|| / ||RHS|| = 3.576030399e-06
+onsager took 0.133036765 seconds.
+alpha2 = 0.66392301
+onsager approx = 1.263266324
+u1 = 0.01146881431, u2 = -0.004622168002, u3 = -0.006595962069
+polyest1 = -1.714756888, polyest2 = 1.013999675
+extremum = -0.3503786069
+polyest = 1.013999675
+eta2= 13.39049904
+gam2 re-est = 9.30484673
+gam1 = 4.085652306
+true gam1 = 1.259136328
+l2_norm2(temp) / N = 0.03552643271
+trace_correction / N = 0.05733539381
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.188470857
+R2 = 0.9644787361
+prior variances = 0 0.0004800183951 0.001074363258 0.002400960653 0.00538468683 0.0121348568 0.02785145528 0.07164732425 0.4714082853 2.141090469 ;0 0.0004729436569 0.001039531976 0.002233434452 0.004606801574 0.008770432861 0.01469449373 0.04022045156 12.0924763 63.15618355 ;0 0.0004806204231 0.001077362995 0.002415761554 0.005457059437 0.01247789303 0.02934589632 0.07607727337 0.2807604343 0.8573867841 3.04890928 ;
+prior probabilities= 0.7336223522 0.01134486592 0.005672590252 0.00283655232 0.001418769356 0.0007104492045 0.0003577102368 0.0001855856056 0.000137476499 0.2437136484 ;0.9514987269 0.01460534468 0.007237115907 0.003548507749 0.001702515405 0.0007844507899 0.0005540391482 2.113621501e-06 0.01159404606 0.008473139766 ;0.8073616548 0.01249303211 0.006251528362 0.003131408201 0.001572174054 0.0007936950628 0.0004063126243 0.0002169464644 0.0001396389736 0.0002111199389 0.1674224894 ;
+gamw = 10.7686876
+lmmse step took 0.339406214 seconds.
+total iteration time = 0.58592645
+total computation time so far = 12.81325084
+
+
+
+********************
+iteration = 20
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 4.143339557
+[old] it_revar = 2: gam1 = 4.168950909
+[old] it_revar = 3: gam1 = 4.181437688
+[old] it_revar = 4: gam1 = 4.18811068
+[old] it_revar = 5: gam1 = 4.192064732
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005818296 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_20.csv
+rho = 0.5807007416
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_20.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_20.bin
+time needed to save beta1 to an external file = 0.038343836 seconds
+eta1 = 14.12648772
+gam2 = 9.934422992
+true gam2 = 2.241553333
+time needed to calculate conditional expectation = 3.099999901e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1858614683
+R2 = 0.9654555146
+prior variances = 0 0.0004800510666 0.001074528471 0.002401802906 0.005389114365 0.01215946776 0.02800518258 0.07301768253 0.5129312121 2.12025039 ;0 0.0004726589839 0.001038156906 0.002227089465 0.004579826931 0.008672794643 0.0144209407 0.03819099361 12.45665351 63.45458242 ;0 0.0004808529674 0.001078530397 0.002421618707 0.00548680031 0.01263152354 0.0301681409 0.08098279943 0.3090549742 0.8020369972 3.032655916 ;
+prior probabilities= 0.7325753617 0.01132905914 0.005664926468 0.002832991832 0.00141730439 0.0007100989462 0.0003580484626 0.0001867197563 0.0001465551139 0.2447789342 ;0.9518447674 0.01460625947 0.0072349604 0.003544757733 0.001698151977 0.0007803740698 0.0005490936122 2.061323469e-06 0.01129810432 0.008441469674 ;0.8070932665 0.01249190191 0.006252839825 0.003134171656 0.001575958945 0.0007983831573 0.0004120721493 0.0002246982418 0.0001533711432 0.0002363674162 0.167626969 ;
+gamw = 10.7686876
+denoising step took 0.165295485 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_20.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.007695990943, ||x_it|| = 61.67910702, ||z|| / ||RHS|| = 0.0003717714287
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.003841671257, ||x_it|| = 61.82875265, ||z|| / ||RHS|| = 0.0001855802095
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001734796666, ||x_it|| = 61.86525552, ||z|| / ||RHS|| = 8.380309172e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0007433437307, ||x_it|| = 61.87221219, ||z|| / ||RHS|| = 3.590882094e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0003150926427, ||x_it|| = 61.8734897, ||z|| / ||RHS|| = 1.522122918e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0001340982501, ||x_it|| = 61.87380722, ||z|| / ||RHS|| = 6.477904975e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 5.643326975e-05, ||x_it|| = 61.87385513, ||z|| / ||RHS|| = 2.726130719e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 2.371329285e-05, ||x_it|| = 61.87386433, ||z|| / ||RHS|| = 1.145521717e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 1.016745192e-05, ||x_it|| = 61.87387298, ||z|| / ||RHS|| = 4.911606776e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 4.33144366e-06, ||x_it|| = 61.87387878, ||z|| / ||RHS|| = 2.09239721e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_20_x2_hat.bin
+CG took 0.113903694 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.6711219458, ||x_it|| = 0.04785431127, ||z|| / ||RHS|| = 0.03241999197
+[CG onsager] it = 1: relative error for onsager is 0.240382028
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.322179507, ||x_it|| = 0.06691703358, ||z|| / ||RHS|| = 0.01556357544
+[CG onsager] it = 2: relative error for onsager is 0.04925661023
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1408406758, ||x_it|| = 0.07242596831, ||z|| / ||RHS|| = 0.006803612381
+[CG onsager] it = 3: relative error for onsager is 0.009059931888
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.05931887283, ||x_it|| = 0.07373358042, ||z|| / ||RHS|| = 0.002865525994
+[CG onsager] it = 4: relative error for onsager is 0.001631820652
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.02545063103, ||x_it|| = 0.07402337526, ||z|| / ||RHS|| = 0.001229447582
+[CG onsager] it = 5: relative error for onsager is 0.0002893666357
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.01074092755, ||x_it|| = 0.07408442704, ||z|| / ||RHS|| = 0.0005188636537
+[CG onsager] it = 6: relative error for onsager is 5.225604722e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.004549032103, ||x_it|| = 0.07409718713, ||z|| / ||RHS|| = 0.0002197507997
+[CG onsager] it = 7: relative error for onsager is 9.475698103e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.00192515224, ||x_it|| = 0.07409981925, ||z|| / ||RHS|| = 9.299862797e-05
+[CG onsager] it = 8: relative error for onsager is 1.682711983e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0008194300314, ||x_it|| = 0.07410034329, ||z|| / ||RHS|| = 3.958433368e-05
+[CG onsager] it = 9: relative error for onsager is 3.049240284e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0003437672804, ||x_it|| = 0.07410044848, ||z|| / ||RHS|| = 1.660641936e-05
+[CG onsager] it = 10: relative error for onsager is 5.449487519e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0001462252895, ||x_it|| = 0.07410046912, ||z|| / ||RHS|| = 7.063727749e-06
+onsager took 0.121519704 seconds.
+alpha2 = 0.6656109261
+onsager approx = 1.26835917
+u1 = 0.009748405836, u2 = -0.004351771204, u3 = -0.005481222234
+polyest1 = -1.788407323, polyest2 = 0.9944655676
+extremum = -0.3969708779
+polyest = 0.9944655676
+eta2= 14.92527031
+gam2 re-est = 10.29179393
+gam1 = 4.633476377
+true gam1 = 1.304808395
+l2_norm2(temp) / N = 0.03401717514
+trace_correction / N = 0.05175330029
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1844240384
+R2 = 0.9659877741
+prior variances = 0 0.0004800510666 0.001074528471 0.002401802906 0.005389114365 0.01215946776 0.02800518258 0.07301768253 0.5129312121 2.12025039 ;0 0.0004726589839 0.001038156906 0.002227089465 0.004579826931 0.008672794643 0.0144209407 0.03819099361 12.45665351 63.45458242 ;0 0.0004808529674 0.001078530397 0.002421618707 0.00548680031 0.01263152354 0.0301681409 0.08098279943 0.3090549742 0.8020369972 3.032655916 ;
+prior probabilities= 0.7325753617 0.01132905914 0.005664926468 0.002832991832 0.00141730439 0.0007100989462 0.0003580484626 0.0001867197563 0.0001465551139 0.2447789342 ;0.9518447674 0.01460625947 0.0072349604 0.003544757733 0.001698151977 0.0007803740698 0.0005490936122 2.061323469e-06 0.01129810432 0.008441469674 ;0.8070932665 0.01249190191 0.006252839825 0.003134171656 0.001575958945 0.0007983831573 0.0004120721493 0.0002246982418 0.0001533711432 0.0002363674162 0.167626969 ;
+gamw = 11.65902363
+lmmse step took 0.277730038 seconds.
+total iteration time = 0.443025523
+total computation time so far = 13.25627636
+
+
+
+********************
+iteration = 21
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 4.676612
+[old] it_revar = 2: gam1 = 4.695570138
+[old] it_revar = 3: gam1 = 4.704790242
+[old] it_revar = 4: gam1 = 4.709725992
+[old] it_revar = 5: gam1 = 4.712662428
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005746938 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_21.csv
+rho = 0.5878106256
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_21.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_21.bin
+time needed to save beta1 to an external file = 0.016058604 seconds
+eta1 = 15.76869327
+gam2 = 11.05603084
+true gam2 = 2.190871646
+time needed to calculate conditional expectation = 3.099999901e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.185080156
+R2 = 0.9657453358
+prior variances = 0 0.000480099832 0.001074774459 0.002403050287 0.005395598798 0.01219474014 0.02821761113 0.0748215034 0.5513315607 2.100831597 ;0 0.0004723278185 0.001036559943 0.002219746604 0.004548828594 0.008561966677 0.01411583132 0.03609159311 12.730913 63.36326158 ;0 0.0004811280227 0.001079913108 0.002428577344 0.005522376201 0.01281809093 0.03119924033 0.08747177009 0.339323794 0.7451119431 3.026865355 ;
+prior probabilities= 0.7316010182 0.0113145643 0.005658035622 0.002829948853 0.00141624686 0.0007101242162 0.0003587859126 0.0001884052743 0.0001579603188 0.2457649105 ;0.9520528645 0.01460433477 0.007230976296 0.003539687827 0.001692775146 0.0007755575692 0.0005434035834 2.005034558e-06 0.01108696953 0.008471425699 ;0.8074330984 0.01250073758 0.006259486505 0.003140006586 0.001581760993 0.00080469458 0.0004195427909 0.0002350182382 0.0001718008564 0.0002676941833 0.1671861593 ;
+gamw = 11.65902363
+denoising step took 0.141736635 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_21.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.006648871451, ||x_it|| = 62.21587753, ||z|| / ||RHS|| = 0.0002927390076
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.003211322368, ||x_it|| = 62.33375886, ||z|| / ||RHS|| = 0.0001413893064
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001409136975, ||x_it|| = 62.36040271, ||z|| / ||RHS|| = 6.204201158e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0005963135559, ||x_it|| = 62.36545975, ||z|| / ||RHS|| = 2.625471704e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0002488550893, ||x_it|| = 62.36620633, ||z|| / ||RHS|| = 1.095668527e-05
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.0001046914318, ||x_it|| = 62.36639563, ||z|| / ||RHS|| = 4.60939365e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 4.34474843e-05, ||x_it|| = 62.36642061, ||z|| / ||RHS|| = 1.912922145e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 1.816132968e-05, ||x_it|| = 62.36642074, ||z|| / ||RHS|| = 7.996138392e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 7.754225425e-06, ||x_it|| = 62.36642849, ||z|| / ||RHS|| = 3.414059472e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_21_x2_hat.bin
+CG took 0.123043047 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.6623321924, ||x_it|| = 0.04362104742, ||z|| / ||RHS|| = 0.02916141034
+[CG onsager] it = 1: relative error for onsager is 0.2355652774
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.3137343121, ||x_it|| = 0.06056478443, ||z|| / ||RHS|| = 0.01381321204
+[CG onsager] it = 2: relative error for onsager is 0.04718528763
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1355783017, ||x_it|| = 0.06535365687, ||z|| / ||RHS|| = 0.00596929235
+[CG onsager] it = 3: relative error for onsager is 0.008494455303
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0565038129, ||x_it|| = 0.06646751896, ||z|| / ||RHS|| = 0.002487771081
+[CG onsager] it = 4: relative error for onsager is 0.001498391548
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.02399080896, ||x_it|| = 0.066709491, ||z|| / ||RHS|| = 0.001056276341
+[CG onsager] it = 5: relative error for onsager is 0.0002603107585
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.01002316323, ||x_it|| = 0.06675946103, ||z|| / ||RHS|| = 0.0004413035924
+[CG onsager] it = 6: relative error for onsager is 4.606589359e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.004202056937, ||x_it|| = 0.06676969949, ||z|| / ||RHS|| = 0.0001850097399
+[CG onsager] it = 7: relative error for onsager is 8.18399337e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001760105267, ||x_it|| = 0.06677176926, ||z|| / ||RHS|| = 7.749457529e-05
+[CG onsager] it = 8: relative error for onsager is 1.423849023e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.000741574514, ||x_it|| = 0.06677217306, ||z|| / ||RHS|| = 3.265032102e-05
+[CG onsager] it = 9: relative error for onsager is 2.527986246e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0003079406225, ||x_it|| = 0.06677225249, ||z|| / ||RHS|| = 1.35581253e-05
+[CG onsager] it = 10: relative error for onsager is 4.425994765e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0001296395696, ||x_it|| = 0.06677226776, ||z|| / ||RHS|| = 5.707819627e-06
+onsager took 0.123586814 seconds.
+alpha2 = 0.6690212814
+onsager approx = 1.268956023
+u1 = 0.007754407717, u2 = -0.00410034904, u3 = -0.004716739565
+polyest1 = -1.788523099, polyest2 = 0.919204583
+extremum = -0.4346592581
+polyest = 0.919204583
+eta2= 16.52567884
+gam2 re-est = 11.3424355
+gam1 = 5.183243348
+true gam1 = 1.343647284
+l2_norm2(temp) / N = 0.03315553179
+trace_correction / N = 0.04731367008
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1820733587
+R2 = 0.9668492921
+prior variances = 0 0.000480099832 0.001074774459 0.002403050287 0.005395598798 0.01219474014 0.02821761113 0.0748215034 0.5513315607 2.100831597 ;0 0.0004723278185 0.001036559943 0.002219746604 0.004548828594 0.008561966677 0.01411583132 0.03609159311 12.730913 63.36326158 ;0 0.0004811280227 0.001079913108 0.002428577344 0.005522376201 0.01281809093 0.03119924033 0.08747177009 0.339323794 0.7451119431 3.026865355 ;
+prior probabilities= 0.7316010182 0.0113145643 0.005658035622 0.002829948853 0.00141624686 0.0007101242162 0.0003587859126 0.0001884052743 0.0001579603188 0.2457649105 ;0.9520528645 0.01460433477 0.007230976296 0.003539687827 0.001692775146 0.0007755575692 0.0005434035834 2.005034558e-06 0.01108696953 0.008471425699 ;0.8074330984 0.01250073758 0.006259486505 0.003140006586 0.001581760993 0.00080469458 0.0004195427909 0.0002350182382 0.0001718008564 0.0002676941833 0.1671861593 ;
+gamw = 12.42711468
+lmmse step took 0.288861979 seconds.
+total iteration time = 0.430598614
+total computation time so far = 13.68687497
+
+
+
+********************
+iteration = 22
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 5.2142258
+[old] it_revar = 2: gam1 = 5.227982073
+[old] it_revar = 3: gam1 = 5.23476843
+[old] it_revar = 4: gam1 = 5.238472061
+[old] it_revar = 5: gam1 = 5.240722168
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005759306 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_22.csv
+rho = 0.5934188309
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_22.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_22.bin
+time needed to save beta1 to an external file = 0.020806568 seconds
+eta1 = 17.44439137
+gam2 = 12.2036692
+true gam2 = 2.149172908
+time needed to calculate conditional expectation = 2.999999893e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1846395463
+R2 = 0.9659082379
+prior variances = 0 0.0004801632111 0.001075094027 0.002404669266 0.005403998309 0.01224025088 0.02848985973 0.07711417217 0.5826305606 2.086626256 ;0 0.0004719491976 0.001034737548 0.002211400006 0.004513864523 0.008438622596 0.01378254157 0.0339647953 12.92648134 63.15126304 ;0 0.0004814469177 0.001081518844 0.002436688154 0.0055641866 0.01304144883 0.03248434191 0.09610604604 0.3694594261 0.6931472893 3.024383487 ;
+prior probabilities= 0.7306830414 0.01130111141 0.005651771758 0.002827338811 0.001415543051 0.0007104893281 0.0003599054259 0.0001906756684 0.0001717414109 0.2466883818 ;0.9522087796 0.01460087174 0.007225802244 0.003533609868 0.001686542362 0.0007700920932 0.0005370664456 1.945995876e-06 0.01091537867 0.008519911022 ;0.8076384385 0.01250806207 0.006265737154 0.003146060045 0.001588180153 0.0008119940454 0.0004285943329 0.0002484999378 0.0001961768109 0.0003073925694 0.1668608644 ;
+gamw = 12.42711468
+denoising step took 0.149646427 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_22.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.005913464264, ||x_it|| = 62.65331468, ||z|| / ||RHS|| = 0.0002401095284
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.002765901939, ||x_it|| = 62.75074844, ||z|| / ||RHS|| = 0.0001123063201
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.001177272889, ||x_it|| = 62.77187191, ||z|| / ||RHS|| = 4.78018342e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0004931197138, ||x_it|| = 62.77581931, ||z|| / ||RHS|| = 2.002256827e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0002025827155, ||x_it|| = 62.77630638, ||z|| / ||RHS|| = 8.225642046e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 8.358672786e-05, ||x_it|| = 62.77640595, ||z|| / ||RHS|| = 3.39394455e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 3.415713548e-05, ||x_it|| = 62.77642113, ||z|| / ||RHS|| = 1.386911855e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 1.416148403e-05, ||x_it|| = 62.77641675, ||z|| / ||RHS|| = 5.750110427e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 5.965321118e-06, ||x_it|| = 62.77642112, ||z|| / ||RHS|| = 2.422151174e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_22_x2_hat.bin
+CG took 0.141472017 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.6511591567, ||x_it|| = 0.04023455977, ||z|| / ||RHS|| = 0.02643958111
+[CG onsager] it = 1: relative error for onsager is 0.2294770926
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.3032109864, ||x_it|| = 0.05536490236, ||z|| / ||RHS|| = 0.01231153918
+[CG onsager] it = 2: relative error for onsager is 0.04464346061
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1291123045, ||x_it|| = 0.05952122841, ||z|| / ||RHS|| = 0.005242459103
+[CG onsager] it = 3: relative error for onsager is 0.007817980568
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.05308505483, ||x_it|| = 0.06046307419, ||z|| / ||RHS|| = 0.002155458613
+[CG onsager] it = 4: relative error for onsager is 0.001342537369
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.02223804323, ||x_it|| = 0.06066247642, ||z|| / ||RHS|| = 0.0009029505946
+[CG onsager] it = 5: relative error for onsager is 0.00022715275
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.009170852893, ||x_it|| = 0.06070260963, ||z|| / ||RHS|| = 0.0003723721097
+[CG onsager] it = 6: relative error for onsager is 3.91621275e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.003794648103, ||x_it|| = 0.06071062457, ||z|| / ||RHS|| = 0.0001540773946
+[CG onsager] it = 7: relative error for onsager is 6.776401326e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001568519883, ||x_it|| = 0.06071220323, ||z|| / ||RHS|| = 6.368797589e-05
+[CG onsager] it = 8: relative error for onsager is 1.148235713e-06
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0006522251034, ||x_it|| = 0.06071250328, ||z|| / ||RHS|| = 2.648286267e-05
+[CG onsager] it = 9: relative error for onsager is 1.985692884e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0002672936304, ||x_it|| = 0.06071256078, ||z|| / ||RHS|| = 1.085315556e-05
+[CG onsager] it = 10: relative error for onsager is 3.385679483e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 0.0001110395935, ||x_it|| = 0.06071257155, ||z|| / ||RHS|| = 4.508637109e-06
+onsager took 0.129123286 seconds.
+alpha2 = 0.6733640977
+onsager approx = 1.261986709
+u1 = 0.005763627815, u2 = -0.003815883936, u3 = -0.004047343674
+polyest1 = -1.754478679, polyest2 = 0.8116667404
+extremum = -0.4714059693
+polyest = 0.8116667404
+eta2= 18.12343313
+gam2 re-est = 12.41209039
+gam1 = 5.711342744
+true gam1 = 1.375400195
+l2_norm2(temp) / N = 0.03270264521
+trace_correction / N = 0.04380688394
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1808255714
+R2 = 0.9673021127
+prior variances = 0 0.0004801632111 0.001075094027 0.002404669266 0.005403998309 0.01224025088 0.02848985973 0.07711417217 0.5826305606 2.086626256 ;0 0.0004719491976 0.001034737548 0.002211400006 0.004513864523 0.008438622596 0.01378254157 0.0339647953 12.92648134 63.15126304 ;0 0.0004814469177 0.001081518844 0.002436688154 0.0055641866 0.01304144883 0.03248434191 0.09610604604 0.3694594261 0.6931472893 3.024383487 ;
+prior probabilities= 0.7306830414 0.01130111141 0.005651771758 0.002827338811 0.001415543051 0.0007104893281 0.0003599054259 0.0001906756684 0.0001717414109 0.2466883818 ;0.9522087796 0.01460087174 0.007225802244 0.003533609868 0.001686542362 0.0007700920932 0.0005370664456 1.945995876e-06 0.01091537867 0.008519911022 ;0.8076384385 0.01250806207 0.006265737154 0.003146060045 0.001588180153 0.0008119940454 0.0004285943329 0.0002484999378 0.0001961768109 0.0003073925694 0.1668608644 ;
+gamw = 13.07026734
+lmmse step took 0.313361503 seconds.
+total iteration time = 0.46300793
+total computation time so far = 14.1498829
+
+
+
+********************
+iteration = 23
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 5.734008641
+[old] it_revar = 2: gam1 = 5.744464482
+[old] it_revar = 3: gam1 = 5.749841013
+[old] it_revar = 4: gam1 = 5.752914001
+[old] it_revar = 5: gam1 = 5.754862416
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005798675 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_23.csv
+rho = 0.5976749198
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_23.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_23.bin
+time needed to save beta1 to an external file = 0.010033107 seconds
+eta1 = 19.07112414
+gam2 = 13.31626173
+true gam2 = 2.114596471
+time needed to calculate conditional expectation = 3.000000071e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1841809605
+R2 = 0.9660773738
+prior variances = 0 0.0004802386029 0.001075474373 0.002406598471 0.00541403304 0.01229490717 0.02882011551 0.07994733328 0.6052871224 2.077251448 ;0 0.0004715279215 0.001032714182 0.002202174416 0.004475556235 0.008305493409 0.01343011342 0.0318852929 13.09668626 62.93505227 ;0 0.0004818051921 0.00108332631 0.002445857012 0.005611910718 0.01330208375 0.0340600061 0.1075570441 0.3975627207 0.6492383186 3.018454339 ;
+prior probabilities= 0.7298214113 0.01128866893 0.005646100092 0.002825123779 0.001415152623 0.0007111543873 0.0003613766412 0.0001935533141 0.0001879461394 0.2475495128 ;0.9523695844 0.01459681895 0.00721995454 0.003526830206 0.001679660829 0.0007641334405 0.0005302656643 1.88622588e-06 0.01074352614 0.00856733963 ;0.8073080446 0.01250759864 0.006268410976 0.003150698703 0.001594363846 0.0008198533134 0.0004391560999 0.000265940364 0.00022790804 0.0003580604736 0.1670599649 ;
+gamw = 13.07026734
+denoising step took 0.136204651 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_23.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.005259658712, ||x_it|| = 63.0184804, ||z|| / ||RHS|| = 0.0001993517802
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.002405887832, ||x_it|| = 63.10158332, ||z|| / ||RHS|| = 9.118805011e-05
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0009989972278, ||x_it|| = 63.1192312, ||z|| / ||RHS|| = 3.786403009e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0004124586606, ||x_it|| = 63.12229134, ||z|| / ||RHS|| = 1.56330235e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0001668525618, ||x_it|| = 63.1226253, ||z|| / ||RHS|| = 6.324052004e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 6.780391739e-05, ||x_it|| = 63.12270541, ||z|| / ||RHS|| = 2.569906599e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 2.726012872e-05, ||x_it|| = 63.12270772, ||z|| / ||RHS|| = 1.033214413e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 1.11880941e-05, ||x_it|| = 63.12270015, ||z|| / ||RHS|| = 4.240515589e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 4.62500408e-06, ||x_it|| = 63.1227015, ||z|| / ||RHS|| = 1.752970767e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_23_x2_hat.bin
+CG took 0.116437607 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.6393938757, ||x_it|| = 0.03756353099, ||z|| / ||RHS|| = 0.02423433046
+[CG onsager] it = 1: relative error for onsager is 0.2231089959
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.2923803206, ||x_it|| = 0.05121013125, ||z|| / ||RHS|| = 0.01108180979
+[CG onsager] it = 2: relative error for onsager is 0.04207423046
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.122564067, ||x_it|| = 0.05484721285, ||z|| / ||RHS|| = 0.004645427828
+[CG onsager] it = 3: relative error for onsager is 0.007154144921
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.04966950339, ||x_it|| = 0.05564876689, ||z|| / ||RHS|| = 0.001882575365
+[CG onsager] it = 4: relative error for onsager is 0.001193795531
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.02051010294, ||x_it|| = 0.0558138539, ||z|| / ||RHS|| = 0.0007773746846
+[CG onsager] it = 5: relative error for onsager is 0.0001963575948
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.008341420919, ||x_it|| = 0.05584617784, ||z|| / ||RHS|| = 0.0003161568459
+[CG onsager] it = 6: relative error for onsager is 3.292027239e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.00340335698, ||x_it|| = 0.05585245847, ||z|| / ||RHS|| = 0.0001289941629
+[CG onsager] it = 7: relative error for onsager is 5.537857606e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001386964429, ||x_it|| = 0.05585366155, ||z|| / ||RHS|| = 5.256877738e-05
+[CG onsager] it = 8: relative error for onsager is 9.122312081e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.000568675626, ||x_it|| = 0.05585388391, ||z|| / ||RHS|| = 2.155396473e-05
+[CG onsager] it = 9: relative error for onsager is 1.533757206e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0002297918099, ||x_it|| = 0.05585392534, ||z|| / ||RHS|| = 8.709577726e-06
+[CG onsager] it = 10: relative error for onsager is 2.542048121e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 9.411055891e-05, ||x_it|| = 0.05585393289, ||z|| / ||RHS|| = 3.566981905e-06
+onsager took 0.1326018 seconds.
+alpha2 = 0.6779476936
+onsager approx = 1.249858424
+u1 = 0.003950749122, u2 = -0.00344911993, u3 = -0.003381344857
+polyest1 = -1.705228231, polyest2 = 0.6851844092
+extremum = -0.5100219109
+polyest = 0.6851844092
+eta2= 19.64201937
+gam2 re-est = 13.44831037
+gam1 = 6.193708995
+true gam1 = 1.400296722
+l2_norm2(temp) / N = 0.03248853888
+trace_correction / N = 0.04106678387
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.180232661
+R2 = 0.9675161879
+prior variances = 0 0.0004802386029 0.001075474373 0.002406598471 0.00541403304 0.01229490717 0.02882011551 0.07994733328 0.6052871224 2.077251448 ;0 0.0004715279215 0.001032714182 0.002202174416 0.004475556235 0.008305493409 0.01343011342 0.0318852929 13.09668626 62.93505227 ;0 0.0004818051921 0.00108332631 0.002445857012 0.005611910718 0.01330208375 0.0340600061 0.1075570441 0.3975627207 0.6492383186 3.018454339 ;
+prior probabilities= 0.7298214113 0.01128866893 0.005646100092 0.002825123779 0.001415152623 0.0007111543873 0.0003613766412 0.0001935533141 0.0001879461394 0.2475495128 ;0.9523695844 0.01459681895 0.00721995454 0.003526830206 0.001679660829 0.0007641334405 0.0005302656643 1.88622588e-06 0.01074352614 0.00856733963 ;0.8073080446 0.01250759864 0.006268410976 0.003150698703 0.001594363846 0.0008198533134 0.0004391560999 0.000265940364 0.00022790804 0.0003580604736 0.1670599649 ;
+gamw = 13.59520919
+lmmse step took 0.291751716 seconds.
+total iteration time = 0.427956367
+total computation time so far = 14.57783927
+
+
+
+********************
+iteration = 24
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 6.211372877
+[old] it_revar = 2: gam1 = 6.219865468
+[old] it_revar = 3: gam1 = 6.224400256
+[old] it_revar = 4: gam1 = 6.227088219
+[old] it_revar = 5: gam1 = 6.228788
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.006019307 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_24.csv
+rho = 0.6010437464
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_24.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_24.bin
+time needed to save beta1 to an external file = 0.005650983 seconds
+eta1 = 20.56902983
+gam2 = 14.34024183
+true gam2 = 2.086117401
+time needed to calculate conditional expectation = 2.000000165e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1836438084
+R2 = 0.9662749516
+prior variances = 0 0.0004803232163 0.001075901666 0.00240877051 0.005425383802 0.01235733362 0.02920462218 0.08336947662 0.6199621167 2.070703075 ;0 0.0004710709324 0.001030524427 0.002192238805 0.004434689517 0.008165728223 0.01306796977 0.02990808119 13.21997387 62.69779952 ;0 0.0004821972169 0.001085308262 0.002455959292 0.005665071992 0.01359987441 0.03596900432 0.1226314046 0.4209237454 3.01243119 ;
+prior probabilities= 0.7290023194 0.01127699006 0.005640876862 0.002823209599 0.001415004637 0.0007120602647 0.0003631533206 0.0001970493784 0.0002066804324 0.2483626561 ;0.9524960128 0.01459168097 0.007213254096 0.003519333975 0.001672200136 0.0007577832382 0.0005231484221 1.8272887e-06 0.01060476604 0.008619992997 ;0.8067403297 0.01250388892 0.006269735485 0.003154992149 0.001600809364 0.0008285204167 0.0004515364227 0.0002886832092 0.0006905239117 0.1674709805 ;
+gamw = 13.59520919
+denoising step took 0.146954536 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_24.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.004676882689, ||x_it|| = 63.32816433, ||z|| / ||RHS|| = 0.0001674344515
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.002097735895, ||x_it|| = 63.39839133, ||z|| / ||RHS|| = 7.509986507e-05
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0008511450241, ||x_it|| = 63.41316917, ||z|| / ||RHS|| = 3.047136517e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0003470778763, ||x_it|| = 63.4155798, ||z|| / ||RHS|| = 1.24255402e-05
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0001381683999, ||x_it|| = 63.41582093, ||z|| / ||RHS|| = 4.946489315e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 5.55314486e-05, ||x_it|| = 63.4159072, ||z|| / ||RHS|| = 1.988050215e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 2.197483372e-05, ||x_it|| = 63.41590514, ||z|| / ||RHS|| = 7.867086852e-07
+[CG] it = 7: ||r_it|| / ||RHS|| = 8.933287921e-06, ||x_it|| = 63.4158958, ||z|| / ||RHS|| = 3.198156256e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_24_x2_hat.bin
+CG took 0.126387529 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.628295023, ||x_it|| = 0.03548625205, ||z|| / ||RHS|| = 0.02249323739
+[CG onsager] it = 1: relative error for onsager is 0.2171428397
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.2823931344, ||x_it|| = 0.04795995443, ||z|| / ||RHS|| = 0.01010979807
+[CG onsager] it = 2: relative error for onsager is 0.03974859755
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1166225182, ||x_it|| = 0.05119007093, ||z|| / ||RHS|| = 0.0041751373
+[CG onsager] it = 3: relative error for onsager is 0.006570914537
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.04661258909, ||x_it|| = 0.05188322395, ||z|| / ||RHS|| = 0.001668751133
+[CG onsager] it = 4: relative error for onsager is 0.001066748619
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.01898435769, ||x_it|| = 0.05202225937, ||z|| / ||RHS|| = 0.0006796483318
+[CG onsager] it = 5: relative error for onsager is 0.0001707706205
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.007618608261, ||x_it|| = 0.05204877215, ||z|| / ||RHS|| = 0.0002727495172
+[CG onsager] it = 6: relative error for onsager is 2.787364903e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.003066890962, ||x_it|| = 0.05205378977, ||z|| / ||RHS|| = 0.0001097960416
+[CG onsager] it = 7: relative error for onsager is 4.563733164e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001232958782, ||x_it|| = 0.05205472556, ||z|| / ||RHS|| = 4.414046516e-05
+[CG onsager] it = 8: relative error for onsager is 7.316749162e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.000498758314, ||x_it|| = 0.05205489393, ||z|| / ||RHS|| = 1.785576639e-05
+[CG onsager] it = 9: relative error for onsager is 1.197408454e-07
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0001988338081, ||x_it|| = 0.05205492448, ||z|| / ||RHS|| = 7.118337538e-06
+[CG onsager] it = 10: relative error for onsager is 1.931382675e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 8.032722179e-05, ||x_it|| = 0.05205492989, ||z|| / ||RHS|| = 2.875749771e-06
+onsager took 0.122612909 seconds.
+alpha2 = 0.6822828065
+onsager approx = 1.238369753
+u1 = 0.002399171197, u2 = -0.00308022095, u3 = -0.002672689713
+polyest1 = -1.685164673, polyest2 = 0.5326848566
+extremum = -0.5762399082
+polyest = 0.5326848566
+eta2= 21.01803196
+gam2 re-est = 14.40574698
+gam1 = 6.612284973
+true gam1 = 1.418893249
+l2_norm2(temp) / N = 0.03239362552
+trace_correction / N = 0.03894965119
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1799691988
+R2 = 0.9676110875
+prior variances = 0 0.0004803232163 0.001075901666 0.00240877051 0.005425383802 0.01235733362 0.02920462218 0.08336947662 0.6199621167 2.070703075 ;0 0.0004710709324 0.001030524427 0.002192238805 0.004434689517 0.008165728223 0.01306796977 0.02990808119 13.21997387 62.69779952 ;0 0.0004821972169 0.001085308262 0.002455959292 0.005665071992 0.01359987441 0.03596900432 0.1226314046 0.4209237454 3.01243119 ;
+prior probabilities= 0.7290023194 0.01127699006 0.005640876862 0.002823209599 0.001415004637 0.0007120602647 0.0003631533206 0.0001970493784 0.0002066804324 0.2483626561 ;0.9524960128 0.01459168097 0.007213254096 0.003519333975 0.001672200136 0.0007577832382 0.0005231484221 1.8272887e-06 0.01060476604 0.008619992997 ;0.8067403297 0.01250388892 0.006269735485 0.003154992149 0.001600809364 0.0008285204167 0.0004515364227 0.0002886832092 0.0006905239117 0.1674709805 ;
+gamw = 14.01673775
+lmmse step took 0.292107953 seconds.
+total iteration time = 0.439062489
+total computation time so far = 15.01690176
+
+
+
+********************
+iteration = 25
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 6.626686072
+[old] it_revar = 2: gam1 = 6.633876924
+[old] it_revar = 3: gam1 = 6.637825037
+[old] it_revar = 4: gam1 = 6.64022277
+[old] it_revar = 5: gam1 = 6.641817614
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.006169143 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_25.csv
+rho = 0.6037113052
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_25.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_25.bin
+time needed to save beta1 to an external file = 0.004314802 seconds
+eta1 = 21.87221634
+gam2 = 15.23039873
+true gam2 = 2.062856391
+time needed to calculate conditional expectation = 3.999999976e-08 seconds
+correlation x1_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1830378811
+R2 = 0.9664971341
+prior variances = 0 0.0004804131337 0.001076356346 0.002411088496 0.005437573643 0.01242526357 0.02963438826 0.08740869817 0.6286111521 2.065987625 ;0 0.0004705887826 0.001028219886 0.002181836554 0.004392329921 0.008023248425 0.01270676462 0.02807810938 13.31949928 62.47635279 ;0 0.0004826161146 0.00108743099 0.002466835922 0.005723003076 0.01393378087 0.03826065395 0.1421865046 0.4380482984 3.008779876 ;
+prior probabilities= 0.7281903758 0.0112654811 0.005635776572 0.002821401746 0.001414966662 0.0007131028561 0.000365147439 0.000201130736 0.0002280727605 0.2491645443 ;0.9526000997 0.01458580526 0.007205971279 0.0035113576 0.001664375999 0.0007512251093 0.0005159255055 1.770776598e-06 0.01049182365 0.008671645083 ;0.8061723017 0.01250051281 0.006271449381 0.003159755854 0.001607874427 0.0008381594938 0.0004660291782 0.000318501078 0.0008220871366 0.1678433289 ;
+gamw = 14.01673775
+denoising step took 0.133456436 seconds.
+r2 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r2_it_25.bin
+______________________
+->LMMSE
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.004118705762, ||x_it|| = 63.59126622, ||z|| / ||RHS|| = 0.0001408383017
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.001813501262, ||x_it|| = 63.6491075, ||z|| / ||RHS|| = 6.201230499e-05
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.0007199630554, ||x_it|| = 63.6612221, ||z|| / ||RHS|| = 2.461898952e-05
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.0002913183113, ||x_it|| = 63.66309223, ||z|| / ||RHS|| = 9.961570113e-06
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.0001143107906, ||x_it|| = 63.66325322, ||z|| / ||RHS|| = 3.90883412e-06
+[CG] it = 5: ||r_it|| / ||RHS|| = 4.543961341e-05, ||x_it|| = 63.66333534, ||z|| / ||RHS|| = 1.553798293e-06
+[CG] it = 6: ||r_it|| / ||RHS|| = 1.779327507e-05, ||x_it|| = 63.66333198, ||z|| / ||RHS|| = 6.084374043e-07
+[CG] it = 7: ||r_it|| / ||RHS|| = 7.163073376e-06, ||x_it|| = 63.66332214, ||z|| / ||RHS|| = 2.4493983e-07
+x2_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_25_x2_hat.bin
+CG took 0.111832958 seconds.
+[CG onsager] it = 0: relative error for onsager is 1
+[CG] it = 0: ||r_it|| / ||RHS|| = 0.618805845, ||x_it|| = 0.03389923263, ||z|| / ||RHS|| = 0.02115993939
+[CG onsager] it = 1: relative error for onsager is 0.2120744399
+[CG] it = 1: ||r_it|| / ||RHS|| = 0.2740275883, ||x_it|| = 0.04547990062, ||z|| / ||RHS|| = 0.009370317371
+[CG onsager] it = 2: relative error for onsager is 0.03783372361
+[CG] it = 2: ||r_it|| / ||RHS|| = 0.1117178277, ||x_it|| = 0.04840517183, ||z|| / ||RHS|| = 0.003820168285
+[CG onsager] it = 3: relative error for onsager is 0.006103574714
+[CG] it = 3: ||r_it|| / ||RHS|| = 0.04412048657, ||x_it|| = 0.04901858372, ||z|| / ||RHS|| = 0.00150869102
+[CG onsager] it = 4: relative error for onsager is 0.0009675385483
+[CG] it = 4: ||r_it|| / ||RHS|| = 0.01775581401, ||x_it|| = 0.04913883108, ||z|| / ||RHS|| = 0.0006071564308
+[CG onsager] it = 5: relative error for onsager is 0.000151289055
+[CG] it = 5: ||r_it|| / ||RHS|| = 0.007043563173, ||x_it|| = 0.04916124053, ||z|| / ||RHS|| = 0.000240853203
+[CG onsager] it = 6: relative error for onsager is 2.41261365e-05
+[CG] it = 6: ||r_it|| / ||RHS|| = 0.002802470093, ||x_it|| = 0.04916538565, ||z|| / ||RHS|| = 9.582989201e-05
+[CG onsager] it = 7: relative error for onsager is 3.858445908e-06
+[CG] it = 7: ||r_it|| / ||RHS|| = 0.001113430829, ||x_it|| = 0.04916614098, ||z|| / ||RHS|| = 3.807353962e-05
+[CG onsager] it = 8: relative error for onsager is 6.042232037e-07
+[CG] it = 8: ||r_it|| / ||RHS|| = 0.0004451637622, ||x_it|| = 0.04916627375, ||z|| / ||RHS|| = 1.522228386e-05
+[CG onsager] it = 9: relative error for onsager is 9.659200836e-08
+[CG] it = 9: ||r_it|| / ||RHS|| = 0.0001753979638, ||x_it|| = 0.04916629729, ||z|| / ||RHS|| = 5.997697522e-06
+[CG onsager] it = 10: relative error for onsager is 1.521680127e-08
+[CG] it = 10: ||r_it|| / ||RHS|| = 7.002426458e-05, ||x_it|| = 0.04916630136, ||z|| / ||RHS|| = 2.394465415e-06
+onsager took 0.120270494 seconds.
+alpha2 = 0.6859986587
+onsager approx = 1.224933749
+u1 = 0.001159781292, u2 = -0.002706952442, u3 = -0.001935515977
+polyest1 = -1.742457076, polyest2 = 0.343888181
+extremum = -0.6992844475
+polyest = 0.343888181
+eta2= 22.20179083
+gam2 re-est = 15.24234517
+gam1 = 6.959445654
+true gam1 = 1.432255041
+l2_norm2(temp) / N = 0.03233775448
+trace_correction / N = 0.0373364743
+correlation x2_hat = -nan
+l2 signal error = inf
+l2 prediction error = 0.1798139305
+R2 = 0.9676669504
+prior variances = 0 0.0004804131337 0.001076356346 0.002411088496 0.005437573643 0.01242526357 0.02963438826 0.08740869817 0.6286111521 2.065987625 ;0 0.0004705887826 0.001028219886 0.002181836554 0.004392329921 0.008023248425 0.01270676462 0.02807810938 13.31949928 62.47635279 ;0 0.0004826161146 0.00108743099 0.002466835922 0.005723003076 0.01393378087 0.03826065395 0.1421865046 0.4380482984 3.008779876 ;
+prior probabilities= 0.7281903758 0.0112654811 0.005635776572 0.002821401746 0.001414966662 0.0007131028561 0.000365147439 0.000201130736 0.0002280727605 0.2491645443 ;0.9526000997 0.01458580526 0.007205971279 0.0035113576 0.001664375999 0.0007512251093 0.0005159255055 1.770776598e-06 0.01049182365 0.008671645083 ;0.8061723017 0.01250051281 0.006271449381 0.003159755854 0.001607874427 0.0008381594938 0.0004660291782 0.000318501078 0.0008220871366 0.1678433289 ;
+gamw = 14.35250906
+lmmse step took 0.274963085 seconds.
+total iteration time = 0.408419521
+total computation time so far = 15.42532128
+
+
+
+********************
+iteration = 26
+********************
+->DENOISING
+[old] it_revar = 1: gam1 = 6.972416416
+[old] it_revar = 2: gam1 = 6.979115507
+[old] it_revar = 3: gam1 = 6.982869309
+[old] it_revar = 4: gam1 = 6.985185857
+[old] it_revar = 5: gam1 = 6.986744648
+A total of 5 variance and prior tuning iterations were performed
+time needed to calculate z1 = 0.005966297 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_z1_it_26.csv
+rho = 0.6058074165
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_it_26.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output_test/x1_hat_SYN_gen_matrix_G1_r1_it_26.bin
+time needed to save beta1 to an external file = 0.037464013 seconds
+eta1 = 22.95456342
+gam2 = 15.96781877
+slurmstepd-eta295: error: *** JOB 27836437 ON eta295 CANCELLED AT 2025-02-10T10:17:52 DUE TO TIME LIMIT ***
+--------------------------------------------------------------------------
+ORTE has lost communication with a remote daemon.
+
+  HNP daemon   : [[54063,0],0] on node eta295
+  Remote daemon: [[54063,0],3] on node eta300
+
+This is usually due to either a failure of the TCP network
+connection to the node, or possibly an internal failure of
+the daemon itself. We cannot recover from this failure, and
+therefore will terminate the job.
+--------------------------------------------------------------------------

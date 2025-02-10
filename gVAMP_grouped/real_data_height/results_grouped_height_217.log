@@ -1,0 +1,211 @@
+
+Currently Loaded Modules:
+  1) gcc/14.2    (T)   3) ucx/1.15.0      5) boost/1.83.0
+  2) cuda/12.0.0       4) openmpi/4.1.6
+
+  Where:
+   T:  Testing
+
+ 
+
+bed_name =  ukb22828_UKB_EST_v3_ldp08_fd_HT_train
+phen_name =  ukb22828_UKB_EST_v3_ldp08_fd_HT_train
+[1738932188.809623] [zeta245:3197045:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.809607] [zeta245:3197050:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.809642] [zeta245:3197044:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.811511] [zeta262:3354687:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.811650] [zeta262:3354686:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.812012] [zeta262:3354688:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.812999] [zeta262:3354685:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.813144] [zeta262:3354689:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.813253] [zeta245:3197047:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.813432] [zeta245:3197046:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.813570] [zeta245:3197049:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.813772] [zeta245:3197048:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.830761] [zeta263:604731:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.830764] [zeta263:604727:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.830764] [zeta263:604730:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.832046] [zeta263:604728:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.832091] [zeta263:604729:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.830891] [zeta248:4161954:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.831364] [zeta248:4161955:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.832574] [zeta248:4161956:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.834202] [zeta248:4161951:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.834818] [zeta248:4161960:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.834861] [zeta248:4161959:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.835178] [zeta248:4161962:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.835241] [zeta248:4161953:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.835498] [zeta248:4161952:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.836614] [zeta248:4161957:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.836626] [zeta248:4161958:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932184.412021] [zeta250:1918998:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932184.412021] [zeta250:1918999:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947797] [zeta263:604727:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947988] [zeta263:604731:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.948035] [zeta263:604729:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947840] [zeta262:3354686:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947959] [zeta262:3354685:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947930] [zeta262:3354689:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947630] [zeta262:3354688:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.947997] [zeta262:3354687:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.948776] [zeta245:3197049:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.949016] [zeta245:3197050:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.949780] [zeta263:604730:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.949921] [zeta263:604728:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.949409] [zeta245:3197047:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.949409] [zeta245:3197045:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.949494] [zeta245:3197048:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.951439] [zeta245:3197046:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.951621] [zeta245:3197044:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.953987] [zeta248:4161954:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.954244] [zeta248:4161952:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.954286] [zeta248:4161960:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.955580] [zeta248:4161962:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.956130] [zeta248:4161957:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.957032] [zeta248:4161955:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.957094] [zeta248:4161956:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.957610] [zeta248:4161959:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.957589] [zeta248:4161953:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.959047] [zeta248:4161958:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932188.959188] [zeta248:4161951:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932184.476347] [zeta250:1918999:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+[1738932184.476687] [zeta250:1918998:0]     ucp_context.c:1177 UCX  WARN  network device 'ib0' is not available, please use one or more of: 'enp65s0f0'(tcp), 'ibp193s0'(tcp), 'ibp193s0:1'(ib), 'lo'(tcp)
+INFO   : rank    6 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 434815
+INFO   : rank    4 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 289877
+
+ardyh command line options:
+--bed-file /nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/data//ukb22828_UKB_EST_v3_ldp08_fd_HT_train.bed
+--num-groups 10
+--group-file /nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/data/ukb22828_UKB_EST_v3_ldp08_fd_HT_train.groupindex
+--phen-files /nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/data//ukb22828_UKB_EST_v3_ldp08_fd_HT_train.phen
+--N 414055
+--Mt 2174071
+--out-dir /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output/
+--out-name x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_HT_train_G1
+--iterations 50
+--num-mix-comp 23
+--CG-max-iter 100
+--probs 9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871INFO   : rank    1 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 72470
+INFO   : rank    3 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 217408
+e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09@9.700000000000e-01,1.500000357658e-02,7.500001788289e-03,3.750000894144e-03,1.875000447072e-03,9.375002235361e-04,4.687501117680e-04,2.343750558840e-04,1.171875279420e-04,5.859376397100e-05,2.929688198550e-05,1.464844099275e-05,7.324219246375e-06,3.662110873188e-06,1.831055186594e-06,9.155274682969e-07,4.577638591485e-07,2.288818795742e-07,1.144409522871e-07,5.722046364356e-08,2.861023182178e-08,1.430511841089e-08,7.152559205445e-09
+--vars 0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773@0,0.0000001,0.0000002238,0.0000005,0.00000112,0.00000251,0.00000561,0.000012565,0.00002812,0.0000629,0.0001408448,0.0003152106,0.0007054413,0.001578778,0.001578778,0.003533305,0.007907536,0.01769706,0.03960603,0.0886383,0.1983725,0.4439577,0.9935773
+--model linear
+--run-mode infere
+--store-pvals 0
+--learn-vars 1
+--rho 0.1
+
+INFO   : rank    0 has 72470 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 0
+INFO   : rank    5 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 362346
+INFO   : rank    2 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 144939
+INFO   : rank   25 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1811726
+INFO   : rank   27 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1956664
+INFO   : rank   20 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1449381
+INFO   : rank   21 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1521850
+INFO   : rank   28 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 2029133
+INFO   : rank   22 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1594319
+INFO   : rank   24 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1739257
+INFO   : rank   23 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1666788
+INFO   : rank   29 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 2101602
+INFO   : rank   26 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1884195
+INFO   : rank    9 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 652222
+INFO   : rank   10 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 724691
+INFO   : rank   17 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1231974
+INFO   : rank    8 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 579753
+INFO   : rank   11 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 797160
+INFO   : rank   15 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1087036
+INFO   : rank   16 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1159505
+INFO   : rank    7 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 507284
+INFO   : rank   13 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 942098
+INFO   : rank   14 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1014567
+INFO   : rank   12 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 869629
+INFO   : rank   19 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1376912
+INFO   : rank   18 has 72469 markers over tot Mt = 2174071, max Mm = 72470, starting at S = 1304443
+rank = 6: setting last 1 bits to NAs
+rank = 4: setting last 1 bits to NAs
+rank = 0: setting last 1 bits to NAs
+rank = 1: setting last 1 bits to NAs
+rank = 3: setting last 1 bits to NAs
+rank = 5: setting last 1 bits to NAs
+rank = 2: setting last 1 bits to NAs
+rank = 20: setting last 1 bits to NAs
+rank = 22: setting last 1 bits to NAs
+rank = 24: setting last 1 bits to NAs
+rank = 21: setting last 1 bits to NAs
+rank = 23: setting last 1 bits to NAs
+rank = 26: setting last 1 bits to NAs
+rank = 25: setting last 1 bits to NAs
+rank = 29: setting last 1 bits to NAs
+rank = 28: setting last 1 bits to NAs
+rank = 27: setting last 1 bits to NAs
+rank = 11: setting last 1 bits to NAs
+rank = 17: setting last 1 bits to NAs
+rank = 13: setting last 1 bits to NAs
+rank = 14: setting last 1 bits to NAs
+rank = 10: setting last 1 bits to NAs
+rank = 8: setting last 1 bits to NAs
+rank = 7: setting last 1 bits to NAs
+rank = 15: setting last 1 bits to NAs
+rank = 16: setting last 1 bits to NAs
+rank = 9: setting last 1 bits to NAs
+rank = 12: setting last 1 bits to NAs
+rank = 18: setting last 1 bits to NAs
+rank = 19: setting last 1 bits to NAs
+INFO   : rank 1 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 0 has allocated 7501659580 bytes (7.502 GB) for raw data.
+INFO   : rank 5 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 4 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 3 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 2 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 6 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 18 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 23 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 19 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 8 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 26 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 20 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 16 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 28 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 22 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 11 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 27 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 21 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 17 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 25 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 24 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 9 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 7 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 12 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 13 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 10 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 29 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 15 has allocated 7501556066 bytes (7.502 GB) for raw data.
+INFO   : rank 14 has allocated 7501556066 bytes (7.502 GB) for raw data.
+reading genotype data took 1038.66 seconds.
+rank = 0: statistics took 37.78 seconds to run.
+
+********************
+iteration = 1
+********************
+->DENOISING
+A total of 1 variance and prior tuning iterations were performed
+time needed to calculate z1 = 37.5427 seconds
+filepath_out_z1 = /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_HT_train_G1_z1_it_1.csv
+rho = 0.1
+x1_hat filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_HT_train_G1_it_1.bin
+r1 filepath_out is /nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output/x1_hat_HT_ukb22828_UKB_EST_v3_ldp08_fd_HT_train_G1_r1_it_1.bin
+time needed to save beta1 to an external file = 0.0879304 seconds
+eta1 = 30.607
+gam2 = 30.607
+--------------------------------------------------------------------------
+ORTE has lost communication with a remote daemon.
+
+  HNP daemon   : [[5183,0],0] on node zeta245
+  Remote daemon: [[5183,0],1] on node zeta248
+
+This is usually due to either a failure of the TCP network
+connection to the node, or possibly an internal failure of
+the daemon itself. We cannot recover from this failure, and
+therefore will terminate the job.
+--------------------------------------------------------------------------
+slurmstepd-zeta245: error: *** JOB 27809720 ON zeta245 CANCELLED AT 2025-02-09T13:43:29 DUE TO TIME LIMIT ***

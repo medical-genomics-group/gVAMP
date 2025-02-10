@@ -1,0 +1,313 @@
+import numpy as np
+import numpy.random as rd
+import matplotlib.pyplot as plt
+from Supplement.vamp_supp import sensing_matrix
+from VAMP_Linear_grouped import vamp_linear_grouped
+from VAMP_Linear_SE_grouped import vamp_linear_grouped_SE
+from Supplement.vamp_supp import GaussianMixture, convert_weights_to_ints, signal_grouped
+import pandas as pd 
+import pandas_plink as pdp
+from pandas_plink import write_plink1_bin, read_plink1_bin
+from pathlib import Path
+from xarray import DataArray
+
+
+
+# dict with each entry containing x_prior_EM, x_prior_EM_weights, x_prior_oracle, x_prior_oracle_weights, not synced with run file
+def get_test_cases_EM(case_id):
+    cases = {}
+
+    # Case 1 not mixed
+    meanc_init = np.array([0, 0])
+    varc_init = np.array([0.0, 1])
+    probc_init = np.array([0.1, 0.9])
+
+    meanc_true = np.array([0, 0])
+    varc_true = np.array([0.0, 1])
+    probc_true = np.array([0.7, 0.3])
+
+    GM_EM = GaussianMixture(meanc=meanc_init, varc=varc_init, probc=probc_init)
+    GM_Oracle = GaussianMixture(meanc=meanc_true, varc=varc_true, probc=probc_true)
+    x_prior_EM = [GM_EM]
+    x_prior_weights = [1]
+    x_prior_oracle = [GM_Oracle]
+    cases[1] = x_prior_EM, x_prior_oracle, x_prior_weights
+
+    # Case 2
+    GM_EM1 = GaussianMixture(meanc=meanc_init, varc=varc_init, probc=probc_init)
+    GM_EM2 = GaussianMixture(meanc=meanc_true, varc=varc_true, probc=probc_true)
+    GM_Oracle1 = GaussianMixture(meanc=meanc_true, varc=varc_true, probc=probc_true)
+    GM_Oracle2 = GaussianMixture(meanc=meanc_init, varc=varc_init, probc=probc_init)
+
+    x_prior_EM = [GM_EM1, GM_EM2]
+    x_prior_weights = [1/2, 1/2]
+    x_prior_oracle = [GM_Oracle1, GM_Oracle2]
+    cases[2] = x_prior_EM, x_prior_oracle, x_prior_weights
+
+
+    # Case 3
+    meanc_init1 = np.array([0, 0, 0])
+    varc_init1 = np.array([0.0, 1, 2])
+    probc_init1 = np.array([1, 0.5, 0.25])
+    meanc_init2 = np.array([0, 0, 0])
+    varc_init2 = np.array([0.0, 1, 2])
+    probc_init2 = np.array([1, 0.5, 0.25])
+    meanc_init3 = np.array([0, 0, 0])
+    varc_init3 = np.array([0.0, 1, 2])
+    probc_init3 = np.array([1, 0.5, 0.25])
+
+    meanc_true1 = np.array([0, 0, 0])
+    varc_true1 = np.array([0.0, 1, 4])
+    probc_true1 = np.array([0.7, 0.25, 0.05])
+    meanc_true2 = np.array([0, 0, 0])
+    varc_true2 = np.array([0.0, 1, 4])
+    probc_true2 = np.array([0.98, 0.01, 0.01])
+    meanc_true3 = np.array([0, 0, 0])
+    varc_true3 = np.array([0.0, 1, 6])
+    probc_true3 = np.array([0.8, 0.05, 0.15])
+
+    x_prior_weights = [1 / 2, 1 / 4,  1 / 4]
+
+    GM_EM1 = GaussianMixture(meanc=meanc_init1, varc=varc_init1, probc=probc_init1)
+    GM_EM2 = GaussianMixture(meanc=meanc_init2, varc=varc_init2, probc=probc_init2)
+    GM_EM3 = GaussianMixture(meanc=meanc_init3, varc=varc_init3, probc=probc_init3)
+
+    GM_Oracle1 = GaussianMixture(meanc=meanc_true1, varc=varc_true1, probc=probc_true1)
+    GM_Oracle2 = GaussianMixture(meanc=meanc_true2, varc=varc_true2, probc=probc_true2)
+    GM_Oracle3 = GaussianMixture(meanc=meanc_true3, varc=varc_true3, probc=probc_true3)
+
+    x_prior_EM = [GM_EM1, GM_EM2, GM_EM3]
+    x_prior_oracle = [GM_Oracle1, GM_Oracle2, GM_Oracle3]
+
+    cases[3] = x_prior_EM, x_prior_oracle, x_prior_weights
+
+    return cases[case_id]
+
+
+def numpy_to_plink(array: np.ndarray, output_path: str, 
+                  sample_ids=None, variant_ids=None,
+                  chromosome="1", verbose=False):
+    """
+    Convert a binary numpy array to PLINK binary format (.bed, .bim, .fam)
+    
+    Parameters:
+    -----------
+    array : np.ndarray
+        2D binary numpy array where rows are samples and columns are variants
+    output_path : str
+        Path to output .bed file (without extension)
+    sample_ids : list, optional
+        List of sample IDs. If None, will use "sample1", "sample2", etc.
+    variant_ids : list, optional
+        List of variant IDs. If None, will use "rs1", "rs2", etc.
+    chromosome : str, optional
+        Chromosome number/name for all variants
+    verbose : bool, optional
+        Whether to print progress information
+    """
+    # Convert binary values to PLINK encoding (0=homozygous A1, 1=heterozygous, 2=homozygous A2)
+    # Assuming your binary array uses 0s and 1s
+    plink_array = array.astype(np.float32) * 2
+    
+    # Generate default IDs if none provided
+    n_samples, n_variants = array.shape
+    if sample_ids is None:
+        sample_ids = [f"sample{i+1}" for i in range(n_samples)]
+    if variant_ids is None:
+        variant_ids = [f"rs{i+1}" for i in range(n_variants)]
+        
+    # Create xarray DataArray with required coordinates
+    G = DataArray(
+        plink_array,
+        dims=["sample", "variant"],
+        coords={
+            "sample": sample_ids,
+            "variant": [f"variant{i}" for i in range(n_variants)],
+            "fid": ("sample", sample_ids),  # Family ID (using sample ID as family ID)
+            "iid": ("sample", sample_ids),  # Individual ID
+            "father": ("sample", ["0"] * n_samples),  # Unknown father
+            "mother": ("sample", ["0"] * n_samples),  # Unknown mother
+            "sex": ("sample", [0] * n_samples),  # Unknown sex
+            "trait": ("sample", [-9] * n_samples),  # Missing phenotype
+            "chrom": ("variant", [chromosome] * n_variants),
+            "snp": ("variant", variant_ids),
+            "cm": ("variant", [0.0] * n_variants),  # Default genetic distance
+            "pos": ("variant", [i * 100 for i in range(n_variants)]),  # Arbitrary positions
+            "a0": ("variant", ["A"] * n_variants),  # Reference allele
+            "a1": ("variant", ["T"] * n_variants)   # Alternate allele
+        }
+    )
+    
+    # Write to PLINK binary format
+    output_path = str(Path(output_path))
+    write_plink1_bin(G, output_path, verbose=verbose)
+    
+    if verbose:
+        print(f"Written to {output_path}.bed, {output_path}.bim, and {output_path}.fam")
+
+def plink_to_numpy(bed_path: str, verbose=False) -> np.ndarray:
+    """
+    Load a PLINK binary file (.bed) into a numpy array
+    
+    Parameters:
+    -----------
+    bed_path : str
+        Path to the .bed file (with or without extension)
+    verbose : bool, optional
+        Whether to print progress information
+        
+    Returns:
+    --------
+    tuple:
+        - numpy.ndarray: The genotype matrix where rows are samples and columns are variants
+        - list: Sample IDs
+        - list: Variant IDs
+    """
+    # Read the PLINK binary file
+    G = read_plink1_bin(bed_path, verbose=verbose)
+    
+    # Convert to numpy array, handling both dask and numpy arrays
+    if hasattr(G.values, 'compute'):
+        genotype_array = G.values.compute()
+    else:
+        genotype_array = G.values
+    
+    # Get sample and variant IDs
+    sample_ids = list(G.sample.values)
+    variant_ids = list(G.snp.values)
+    
+    # Convert from PLINK encoding (0,1,2) back to binary (0,1)
+    # Note: This assumes you want binary values. Adjust the threshold if needed.
+    binary_array = (genotype_array >= 1).astype(np.int8)
+    
+    if verbose:
+        print(f"Loaded array with shape {binary_array.shape}")
+        print(f"Number of samples: {len(sample_ids)}")
+        print(f"Number of variants: {len(variant_ids)}")
+    
+    return binary_array, sample_ids, variant_ids
+
+# generate the .txt files with the correct groups
+def generate_group_assignment(d, weights):
+    total = sum(weights)
+    normalized_weights = [w/total for w in weights]
+    counts = [int(w * d) for w in normalized_weights[:-1]]
+    counts.append(d - sum(counts))
+
+    with open('gVAMP_synthetic_data/signal_groups.txt', 'w') as f:
+        for i, count in enumerate(counts):
+            for _ in range(count):
+                f.write(f"{i}\n")
+
+
+
+def convert_grouped_to_mixture(x_prior_list: list[GaussianMixture], x_prior_weights):
+    params = [[x_prior.meanc, x_prior.varc, x_prior.probc] for x_prior in x_prior_list]
+    mixed_meanc = [x for param in params for x in param[0]]
+    mixed_varc = [x for param in params for x in param[1]]
+
+    mixed_probc = []
+    for i, param in enumerate(params):
+        weighted_probc = [prob * x_prior_weights[i] for prob in param[2]]
+        mixed_probc.extend(weighted_probc)
+    gaussian_mixture = GaussianMixture(meanc=mixed_meanc, varc=mixed_varc, probc=mixed_probc)
+    return [gaussian_mixture]
+
+# run SE with gaussian spectrum and VAMP with bernoulli matrix
+
+def main():
+    delta = 0.6
+    n_iter = 10
+    d = 8000
+    mat_distr = 'gaussian'
+
+    corr0 = 0.0
+    gam_noise = 10
+    num_runs = 1
+
+    case_id = 3
+
+
+    x_prior_list_EM, x_prior_list_oracle, x_prior_weights = get_test_cases_EM(case_id)
+    x_prior_list_mixed_EM = convert_grouped_to_mixture(x_prior_list_EM, x_prior_weights)
+    x_prior_list_mixed_oracle = convert_grouped_to_mixture(x_prior_list_oracle, x_prior_weights)
+
+
+    d_list = convert_weights_to_ints(d, x_prior_weights)
+    n = int(delta * d)
+    
+    # generate the parameters
+    x_true = signal_grouped(d_list, x_prior_list_oracle)
+    np.savetxt('gVAMP_synthetic_data/true_signal.txt', x_true)
+    A = rd.binomial(1, 1/2, (n, d))
+    noise = rd.normal(0, 1, n)
+    z_true = 1/np.sqrt(n) * ( 2 * A - 1) @ x_true
+    w = noise / np.sqrt(gam_noise) # gam_noise != 0
+    y = z_true + w
+
+    # dummy data for plink
+    sample_ids = [f"sample_{i}" for i in range(n)]
+    variant_ids = [f"variant_{i}" for i in range(d)]
+    fids = [f"fam_{i}" for i in range(n)]
+    iids = sample_ids
+
+    # saving to plink
+    #pdp.write_plink1_bin("mydata", G=A) # .bed file
+    numpy_to_plink(A,'gVAMP_synthetic_data/gen_matrix.bed')
+    pd.DataFrame({'FID': fids,'IID': iids,'phenotype': y}).to_csv("gVAMP_synthetic_data/phen_vector.phen", sep='\t', index=False) # .phen file
+    generate_group_assignment(d, x_prior_weights) # generate .txt file with group assignments
+
+    # loading from plink
+    A,_, _ = plink_to_numpy('gVAMP_synthetic_data/gen_matrix.bed')  # Load genetic data
+    print(A[:3, :3])
+    A = 1/np.sqrt(n) * (2 * A - 1) # normalization required for current VAMP implementation
+    phen = pd.read_csv("gVAMP_synthetic_data/phen_vector.phen", sep='\t')  # Load phenotypes
+    y = phen['phenotype'].values
+
+
+
+    SE_results = vamp_linear_grouped_SE(delta=delta, gam_noise=gam_noise, corr0=corr0, n_iter=n_iter,
+                                        x_prior_list=x_prior_list_oracle, x_prior_weights=x_prior_weights,
+                                        mat_distr=mat_distr)
+
+    vamp_EM_result, vamp_EM_param = vamp_linear_grouped(d=d, delta=delta, gam_noise=gam_noise, corr0=corr0, n_iter=n_iter,
+                                                  x_prior_list=x_prior_list_oracle, x_prior_weights=x_prior_weights,
+                                                  mat_distr='bernoulli', EM_tune=True, x_true=x_true, A=A, y=y)
+
+    vamp_oracle_result, _ = vamp_linear_grouped(d=d, delta=delta, gam_noise=gam_noise, corr0=corr0, n_iter=n_iter,
+                                                  x_prior_list=x_prior_list_oracle, x_prior_weights=x_prior_weights,
+                                                  mat_distr='bernoulli', EM_tune=False, x_true=x_true, A=A, y=y)
+    
+    vamp_mixed_EM_result, _ = vamp_linear_grouped(d=d, delta=delta, gam_noise=gam_noise, corr0=corr0, n_iter=n_iter,
+                                                  x_prior_list=x_prior_list_mixed_EM, x_prior_weights=x_prior_weights,
+                                                  mat_distr='bernoulli', EM_tune=True, x_true=x_true, A=A, y=y)
+    
+    vamp_mixed_oracle_result, _ = vamp_linear_grouped(d=d, delta=delta, gam_noise=gam_noise, corr0=corr0, n_iter=n_iter,
+                                                  x_prior_list=x_prior_list_mixed_oracle, x_prior_weights=x_prior_weights,
+                                                  mat_distr='bernoulli', EM_tune=True, x_true=x_true, A=A, y=y)
+
+
+    start_ind = 1
+    plt.plot(range(n_iter - start_ind), [1 - x for x in SE_results[start_ind:]], label='SE_oracle')
+    plt.plot(range(n_iter - start_ind), [1 - x[0] for x in vamp_oracle_result[start_ind:]],
+            label='vamp_oracle')
+    plt.plot(range(n_iter - start_ind), [1 - x[0] for x in vamp_EM_result[start_ind:]],
+            label='vamp_EM')
+    plt.plot(range(n_iter - start_ind), [1 - x[0] for x in vamp_mixed_EM_result[start_ind:]],
+            label='vamp_EM_mixed')
+    plt.plot(range(n_iter - start_ind), [1 - x[0] for x in vamp_mixed_oracle_result[start_ind:]],
+            label='vamp_EM_mixed')
+
+
+    plt.title(f'{delta=}, {case_id=}, {gam_noise=}, {d=}, {num_runs=}')
+    plt.xlabel('Iteration')
+    plt.ylabel('MMSE')
+    plt.legend()
+    plt.savefig('gVAMP_synthetic_data/plot_plink')
+
+
+if __name__ == '__main__':
+    d = 8000
+    x_prior_list_EM, x_prior_list_oracle, x_prior_weights = get_test_cases_EM(case_id)
+    generate_group_assignment(d, x_prior_weights)
+   
