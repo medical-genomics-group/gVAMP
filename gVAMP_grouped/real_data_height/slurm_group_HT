@@ -1,35 +1,29 @@
-The code in gVAMP_grouped_code is complied using 
-
-mpic++ /$loc/main_real.cpp /$loc/vamp.cpp /$loc/utilities.cpp /$loc/data.cpp /$loc/options.cpp -march=native  -Ofast -g -fopenmp -lstdc++fs -D_GLIBCXX_DEBUG -o  /$loc/main_real_grouped_large_data.exe
-
-It is then run using the slurm script of the following form
-
-,,,
 #!/bin/bash
 
-#SBATCH --job-name=gVAMP_large_data
+#SBATCH --job-name=gVAMP_large_data_HT
 
-#SBATCH --time=2-00:00:00
-
-#SBATCH --mem-per-cpu=5gb
-
+#SBATCH --nodes=1
 #SBATCH --ntasks=30
-
 #SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=5gb
+#SBATCH --time=4-00:00:00
+#SBATCH --output=/nfs/scistore17/robingrp/human_data/gVAMP/gVAMP_grouped/real_data_height/results_grouped_height_217.log
 
-#SBATCH --output=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/results_grouped_height_217.log
+unset SLURM_EXPORT_ENV
 
 module purge
-
-ml gcc boost openmpi
-
+ml gcc/10.5 boost/1.86.0 openmpi/4.1.6
 module list
 
-export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export OMP_NUM_THREADS=2
+
+
+vloc=/nfs/scistore17/robingrp/human_data/gVAMP/gVAMP_grouped/gVAMP_grouped_code
+mpic++ $vloc/main_real.cpp $vloc/vamp.cpp $vloc/utilities.cpp $vloc/data.cpp $vloc/options.cpp -march=native -Ofast -g -fopenmp -lstdc++fs -D_GLIBCXX_DEBUG -o  $vloc/main_real_grouped_HT.exe
 
 # printing out the details of the job
 
-out_dir=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height/output/
+out_dir=/nfs/scistore17/robingrp/human_data/gVAMP/gVAMP_grouped/real_data_height/output/
 bed_file_loc=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/data/
 phen_file_loc=/nfs/scistore17/robingrp/human_data/adepope_preprocessing/PNAS_traits/HT/data/
 bed_name='ukb22828_UKB_EST_v3_ldp08_fd_HT_train'
@@ -46,9 +40,8 @@ echo "phen_name = " $phen_name
 
 Mt=2174071
 
-vloc=/nfs/scistore13/mondegrp/kkoegler/gVAMP_grouped/real_data_height
 
-time mpirun -np 30 $vloc/main_real_grouped_large_data.exe \
+time srun -n 30 $vloc/main_real_grouped_HT.exe \
 			        --bed-file $bed_file_loc/${bed_name}.bed \
                                 --K 10 \
                                 --group-file $group_file_loc \
@@ -67,5 +60,3 @@ time mpirun -np 30 $vloc/main_real_grouped_large_data.exe \
                                 --store-pvals 0 \
                                 --learn-vars 1 \
                                 --rho 0.1
-
-```
