@@ -66,6 +66,8 @@ public:
 
     std::vector<std::vector<double>> get_vars() const { return vars; } 
     std::vector<std::vector<double>> get_probs() const { return probs; }
+    std::vector<std::vector<double>> get_EM_parameters() const { return EM_parameters; }  // custom EM parameteres
+    std::vector<std::vector<double>> get_test_parameters() const {return test_parameters; } 
 
     std::vector<int> get_test_iter_range() const { return test_iter_range; }
 
@@ -139,6 +141,8 @@ private:
 
     std::vector<std::vector<double>> vars;
     std::vector<std::vector<double>> probs;
+    std::vector<std::vector<double>> EM_parameters;
+    std::vector<std::vector<double>> test_parameters;
     std::vector<int> test_iter_range = std::vector<int>(2, -1);
 
     double rho = 0.15;

@@ -151,8 +151,8 @@ int main(int argc, char** argv)
         // reading test set
         const std::string bedfp_test = opt.get_bed_file_test();
         const std::string pheno_test = (opt.get_phen_files_test())[0]; // currently it is only supported passing one pheno files as an input argument
-        const std::string groupfp_test = opt.get_group_file(); //??
-        int K_test = 3; // ??
+        const std::string groupfp_test = opt.get_group_file();
+        int K_test = opt.get_K(); // 
         int N_test = opt.get_N_test();
         int Mt_test = opt.get_Mt_test();
         std::vector<double> MS = divide_work(Mt_test);
@@ -163,6 +163,7 @@ int main(int argc, char** argv)
         std::string bimfp = opt.get_bim_file();
 
         data dataset_test(pheno_test, bedfp_test, groupfp_test, N_test, M_test, Mt_test, K_test, S_test, rank, type_data, alpha_scale, bimfp);
+        std::vector<int> group_assignments = dataset_test.get_group_assignments(); 
         // dataset_test.read_phen();
         // dataset_test.read_genotype_data();
         // dataset_test.compute_markers_statistics();
@@ -183,83 +184,95 @@ int main(int argc, char** argv)
         if (rank == 0)
             std::cout << "iter range = [" << min_it << ", " << max_it << "]" << std::endl;
 
+
+
+
+        // --- Retrieve and validate group-specific taus ---
+        std::vector<std::vector<double>> test_params = opt.get_test_parameters();
+        std::vector<double> taus(K_test); // Vector to hold one tau per group (0-based index)
+
+        for (int k = 0; k < K_test; ++k) {
+            taus[k] = test_params[k][0]; // Assign tau for group k (0-based)
+        }
+        if (rank == 0) {
+            std::cout << "INFO: Using group-specific taus: [";
+            for(int k=0; k<K_test; ++k) std::cout << taus[k] << (k == K_test - 1 ? "" : ", ");
+            std::cout << "]" << std::endl;
+        }
+
         double maxR2 = -1;
         int maxind = -1;
-
-        if (min_it != -1){
-            for (int it = min_it; it <= max_it; it++){
-                std::vector<double> x_est;
-                std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
-                //if (rank == 0)
-                    //std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
-                if (end_est_file_name == "bin")
-                    x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
-                else
-                    x_est = read_vec_from_file(est_file_name_it, M_test, S_test);
-
-                for (int i0 = 0; i0 < x_est.size(); i0++)
-                    x_est[i0] *= sqrt( (double) N_test );
-                
-                std::vector<double> z_test = dataset_test.Ax(x_est.data());
-
-                double l2_pred_err2 = 0;
-                for (int i0 = 0; i0 < N_test; i0++){
-                    // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
-                    l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
-                }  
-
-                double stdev = calc_stdev(y_test);
-                double R2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
-                if (rank == 0){
-                    //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-                    //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-                    // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
-                    std::cout <<  R2 << ", ";
-                }
-
-                if (R2 > maxR2){
-                    maxR2 = R2;
-                    maxind = it;
-                }
-            }
-
-            if (rank == 0){
-                std::cout << std::endl << "max R2 = " << maxR2 << std::endl;
-                std::cout << std::endl << "max ind = " << maxind << std::endl;
-            }
-
-        }
-        else 
-        {
+        double maxR2_corr = -1;
+        int maxind_corr = -1;
+        for (int it = min_it; it <= max_it; it++){
             std::vector<double> x_est;
-            if (rank == 0)
-                std::cout << "est_file_name = " << est_file_name << std::endl;
+            std::string est_file_name_it = est_file_name.substr(0, pos_it) + "it_" + std::to_string(it) + "." + end_est_file_name;
+            //if (rank == 0)
+                //std::cout << "est_file_name_it = " << est_file_name_it << std::endl;
             if (end_est_file_name == "bin")
-                x_est = mpi_read_vec_from_file(est_file_name, M_test, S_test);
+                x_est = mpi_read_vec_from_file(est_file_name_it, M_test, S_test);
             else
-                x_est = read_vec_from_file(est_file_name, M_test, S_test);
+                x_est = read_vec_from_file(est_file_name_it, M_test, S_test);
+
+            // Apply treshold tau
+            int zeroed_count_loop = 0;
+            for (int i = 0; i < M_test; ++i) {      // Loop over LOCAL markers for this rank
+                int global_idx = S_test + i;        // Calculate global marker index
+
+                int group_k = group_assignments[global_idx]; // Get 0-based group index
+                double tau_k = taus[group_k];            // Get tau for this group
+                if (std::abs(x_est[i]) < tau_k) {
+                    x_est[i] = 0.0;
+                    zeroed_count_loop++;
+                }
+            }
 
             for (int i0 = 0; i0 < x_est.size(); i0++)
                 x_est[i0] *= sqrt( (double) N_test );
-
+            
             std::vector<double> z_test = dataset_test.Ax(x_est.data());
 
             double l2_pred_err2 = 0;
+            double l2_pred_err2_corr = 0;
+            double l2_y_test2 = 0;
+            double l2_z_test2 = 0;
             for (int i0 = 0; i0 < N_test; i0++){
+                // std::cout << "(y_test-z_test)[" << i0 << "] = " << y_test[i0] - z_test[i0] << std::endl;
+                l2_pred_err2_corr += y_test[i0] * z_test[i0];
+                l2_y_test2 += y_test[i0] * y_test[i0];
+                l2_z_test2 += z_test[i0] * z_test[i0];
                 l2_pred_err2 += (y_test[i0] - z_test[i0]) * (y_test[i0] - z_test[i0]);
-                //if ( std::isinf(l2_pred_err2) == 1 || i0 <= 4)
-                //    std::cout << "y_test[" << i0 << "] = " << y_test[i0] << ", z_test[i0] = " << z_test[i0] << std::endl;
-                //if (i0 % 1000 == 0)
-                //    std::cout << "l2_pred_err2 = " << l2_pred_err2 << std::endl;
             }  
 
             double stdev = calc_stdev(y_test);
+            double R2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
+            double R2_corr = l2_pred_err2_corr * l2_pred_err2_corr / (l2_y_test2 * l2_z_test2);
             if (rank == 0){
-                std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-                std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
-                std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+                //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
+                //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
+                // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
+                std::cout << '(' << R2 << ',' << R2_corr << ')' << ", ";
+            }
+
+            if (R2 > maxR2){
+                maxR2 = R2;
+                maxind = it;
+            }
+            if (R2_corr > maxR2_corr){
+                maxR2_corr = R2_corr;
+                maxind_corr = it;
             }
         }
+
+        if (rank == 0){
+            std::cout << std::endl << "max R2 = " << maxR2 << std::endl;
+            std::cout << std::endl << "max ind = " << maxind << std::endl;
+            std::cout << std::endl << "max R2_corr = " << maxR2_corr << std::endl;
+            std::cout << std::endl << "max ind_corr = " << maxind_corr << std::endl;
+        }
+
+    
+    
         
     }
     else if (opt.get_run_mode() == "both")

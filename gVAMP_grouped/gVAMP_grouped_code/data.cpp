@@ -428,22 +428,88 @@ void data::read_group_assignments() {
     inFile.clear();
     inFile.seekg(0);
 
+    // Uniqje groups
+    std::set<int> unique_groups;
+    std::string line;
+    while (std::getline(inFile, line)) {
+        std::istringstream ss(line);
+        int group;
+        if (ss >> group) {
+            unique_groups.insert(group);
+        }
+    }
+
+    // Check if we get K different numbers between 0 and K (inclusive)
+    bool has_zero = unique_groups.count(0) > 0;
+    bool has_k = unique_groups.count(K) > 0;
+    bool shift_needed = false;
+    
+    // Count how many numbers in range [0,K] we have
+    int count_in_range = 0;
+    for (int i = 0; i <= K; ++i) {
+        if (unique_groups.count(i) > 0) {
+            count_in_range++;
+        }
+    }
+
+    // If we don't have K different numbers, we have an empty group
+    if (count_in_range != K) {
+        std::cout << "WARNING: Empty groups detected" << std::endl;
+        
+        // Print all empty groups
+        std::cout << "Empty groups: ";
+        bool first = true;
+        for (int i = 0; i <= K; ++i) {
+            if (unique_groups.count(i) == 0) {
+                if (!first) {
+                    std::cout << ", ";
+                }
+                std::cout << i;
+                first = false;
+            }
+        }
+        std::cout << std::endl;
+    }
+
+
+    // Check if K is present and handle appropriately
+    if (has_k) {
+        if (has_zero) {
+            // Both K and 0 are present - illegal range
+            std::cout << "FATAL: Found both group K (" << K << ") and group 0, suggesting out of range group numbering" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        // K is present but 0 is not - shift needed
+        shift_needed = true;
+        std::cout << "Found group labels from 1 to K. Shifting values by -1." << std::endl;
+    }
+
+    // Reset file pointer
+    inFile.clear();
+    inFile.seekg(0);
+
     // Skip to this rank's section
     for (int i = 0; i < S; i++) {
-        std::string line;
         std::getline(inFile, line);
     }
 
-    // Read only this rank's assignments
+    // Read only this rank's assignments with appropriate shifting
     group_assignments.resize(M);
     for (int i = 0; i < M; i++) {
         int group;
         inFile >> group;
-        group = group - 1; // if groups are labled from 1 to K instead of 0 to K-1
-        if (group < 0 || group > K - 1) {
+        
+        // Apply shift if needed
+        if (shift_needed) {
+            group = group - 1;
+        }
+        
+        // Check if group is in valid range after any shifting
+        if (group < 0 || group >= K) {
             std::cout << "FATAL: group assignment " << group << " out of range [0," << K - 1 << "]" << std::endl;
             exit(EXIT_FAILURE);
         }
+        
         group_assignments[i] = group;
     }
 

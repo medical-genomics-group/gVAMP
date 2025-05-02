@@ -27,6 +27,7 @@ private:
     
     std::vector<std::vector<double>> probs, probs_before;
     std::vector<std::vector<double>> vars, vars_before;
+    std::vector<std::vector<double>> EM_parameters;
 
     double gamma_min = 1e-11;
     double gamma_max = 1e11;

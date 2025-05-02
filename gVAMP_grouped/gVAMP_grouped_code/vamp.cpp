@@ -51,6 +51,7 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     true_signal(true_signal),
     estimate_file(opt.get_estimate_file()),
     learn_vars(opt.get_learn_vars()),
+    EM_parameters(opt.get_EM_parameters()),
     model(model),
     gamma_damp(opt.get_gamma_damp()),
     use_freeze(opt.get_use_freeze()),
@@ -99,6 +100,7 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     eta2(0),
     rho(opt.get_rho()),
     probs(opt.get_probs()),
+    EM_parameters(opt.get_EM_parameters()),
     out_dir(opt.get_out_dir()),
     out_name(opt.get_out_name()),
     learn_vars(opt.get_learn_vars()),
@@ -339,8 +341,10 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 gam1 = std::min( std::max(  1.0 / (1.0/eta1 + l2_norm2(x1_hat_m_r1, 1)/Mt), gamma_min ), gamma_max );
             else
                 break;
+
             for (int g = 0; g < K; g++)
-                updatePrior(g, 0); 
+                updatePrior(g, 1); 
+            
              
 
             if (rank == 0 && it_revar % 1 == 0)
@@ -944,7 +948,6 @@ void vamp::updatePrior(int group, int verbose = 1) {
                        
         // calculating normalized beta and pin
         int it;
-        double start_updatePrior = MPI_Wtime();
         for (it = 0; it < EM_max_iter; it++){
 
 
@@ -1077,11 +1080,42 @@ void vamp::updatePrior(int group, int verbose = 1) {
                 }
             }
         }
+
+
+        // Experimental, enforces fixed sparsity and renormalizes probs
+        if (!EM_parameters.empty() && group < EM_parameters.size() && !EM_parameters[group].empty()) {
+            double lambda0 = EM_parameters[group][0]; // Get the first parameter as lambda0
+            
+            if (verbose == 1 && rank == 0) {
+                std::cout << "Using lambda0 = " << lambda0 << " for group " << group << std::endl;
+            }
+            
+            // Set first entry to lambda0
+            group_probs[0] = lambda0;
+            
+            // Calculate sum of remaining probabilities
+            double remaining_sum = 0.0;
+            for (int j = 1; j < group_probs.size(); j++) {
+                remaining_sum += group_probs[j];
+            }
+            
+            // Scale remaining entries to sum to (1-lambda0)
+            if (remaining_sum > 0) {
+                double scale_factor = (1.0 - lambda0) / remaining_sum;
+                for (int j = 1; j < group_probs.size(); j++) {
+                    group_probs[j] *= scale_factor;
+                }
+            } else if (group_probs.size() > 1) {
+                // If no remaining probability, distribute evenly
+                double even_prob = (1.0 - lambda0) / (group_probs.size() - 1);
+                for (int j = 1; j < group_probs.size(); j++) {
+                    group_probs[j] = even_prob;
+                }
+            }
+        }
     vars[group] = group_vars;
     probs[group] = group_probs;
-    end_updatePrior = MPI_Wtime();
-    if (rank == 0)
-        std::cout << "lmmse step took "  << end_updatePrior - start_updatePrior << " seconds." << std::endl;   
+
 }
 
 std::vector<double> vamp::lmmse_mult(std::vector<double> v, double tau, data* dataset, int red){ // multiplying with (tau*A^TAv + gam2*v)
@@ -1366,16 +1400,22 @@ void vamp::err_measures(data *dataset, int ind){
 
         for (int i = 0; i < vars.size(); i++){
             for (int j = 0; j < vars[i].size(); j++) {
-                std::cout << vars[i][j] << ' ';
+                std::cout << vars[i][j];
+                if (j < vars[i].size() - 1) 
+                    std::cout << ',';
             }
-            std::cout << ';';
+            if (i < vars.size() - 1)
+                std::cout << '@';
         }
         std::cout << std::endl << "prior probabilities= "; 
         for (int i = 0; i < probs.size(); i++){
                 for (int j = 0; j < probs[i].size(); j++) {
-                    std::cout << probs[i][j] << ' ';
+                    std::cout << probs[i][j];
+                    if (j < probs[i].size() - 1) 
+                        std::cout << ',';
                 }
-                std::cout << ';';
+                if (i < vars.size() - 1)
+                    std::cout << '@';
         }
         if (rank == 0){
             std::cout << std::endl;

@@ -158,10 +158,18 @@ void Options::read_command_line_options(int argc, char** argv) {
                 }
                 group_idx++;
             }
-            
+
             if (group_idx < K) {
-                std::cout << "FATAL: too few groups in vars list (got " << group_idx << ", expected " << K << ")" << std::endl;
-                exit(EXIT_FAILURE);
+                if (group_idx == 1) {
+                    std::cout << "only one group passed, using same vars for each group" << std::endl;
+                    // Duplicate the first group's values for all remaining groups
+                    for (int i = 1; i < K; i++) {
+                        vars[i] = vars[0];
+                    }
+                } else {
+                    std::cout << "FATAL: too few groups in vars list (got " << group_idx << ", expected " << K << ")" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
             }
         }
         else if (!strcmp(argv[i], "--probs")) {
@@ -191,18 +199,112 @@ void Options::read_command_line_options(int argc, char** argv) {
                 // Split values within each group, separated by comma
                 std::stringstream value_list(group_values);
                 std::string value;
+                double sum = 0.0;
+
+                // Normalize probs to sum up to 1 in each group
                 while (getline(value_list, value, ',')) {
-                    probs[group_idx].push_back(atof(value.c_str()));
+                    double prob = atof(value.c_str());
+                    probs[group_idx].push_back(prob);
+                    sum += prob;
+                }
+                for (double& prob : probs[group_idx]){ 
+                    prob /= sum;
+                }
+
+                group_idx++;
+            
+            }
+            if (group_idx < K) {
+                if (group_idx == 1) {
+                    std::cout << "only one group passed, using same probs for each group" << std::endl;
+                    // Duplicate the first group's values for all remaining groups
+                    for (int i = 1; i < K; i++) {
+                        probs[i] = probs[0];
+                    }
+                } else {
+                    std::cout << "FATAL: too few groups in probs list (got " << group_idx << ", expected " << K << ")" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+        else if (!strcmp(argv[i], "--EM-parameters")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            std::string cslist = argv[++i];
+            ss << "--EM-parameters " << cslist << "\n";
+            
+            // Split into groups first, groups are separated by @
+            std::stringstream group_list(cslist);
+            std::string group_values;
+            EM_parameters = std::vector<std::vector<double>>(K); // Initialize with K empty vectors
+            int group_idx = 0;
+            
+            while (getline(group_list, group_values, '@')) {
+                if (group_idx >= K) {
+                    std::cout << "FATAL: too many groups in EM-parameters list (expected " << K << ")" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+                
+                // Split values within each group, separated by comma
+                std::stringstream value_list(group_values);
+                std::string value;
+                while (getline(value_list, value, ',')) {
+                    EM_parameters[group_idx].push_back(atof(value.c_str()));
                 }
                 group_idx++;
             }
-            
+
             if (group_idx < K) {
-                std::cout << "FATAL: too few groups in probs list (got " << group_idx << ", expected " << K << ")" << std::endl;
-                exit(EXIT_FAILURE);
+                if (group_idx == 1) {
+                    std::cout << "only one group passed, using same EM-parameters for each group" << std::endl;
+                    // Duplicate the first group's values for all remaining groups
+                    for (int i = 1; i < K; i++) {
+                        EM_parameters[i] = EM_parameters[0];
+                    }
+                } else {
+                    std::cout << "FATAL: too few groups in EM-parameters list (got " << group_idx << ", expected " << K << ")" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
             }
         }
-            
+        else if (!strcmp(argv[i], "--test-parameters")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            std::string cslist = argv[++i];
+            ss << "--test-parameters " << cslist << "\n";
+
+            // Split into groups first, groups are separated by @
+            std::stringstream group_list(cslist);
+            std::string group_values;
+            test_parameters = std::vector<std::vector<double>>(K); // Initialize with K empty vectors
+            int group_idx = 0;
+
+            while (getline(group_list, group_values, '@')) {
+                if (group_idx >= K) {
+                    std::cout << "FATAL: too many groups in test-parameters list (expected " << K << ")" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+
+                // Split values within each group, separated by comma
+                std::stringstream value_list(group_values);
+                std::string value;
+                while (getline(value_list, value, ',')) {
+                    test_parameters[group_idx].push_back(atof(value.c_str()));
+                }
+                group_idx++;
+            }
+
+            if (group_idx < K) {
+                if (group_idx == 1) {
+                     if (rank == 0) std::cout << "INFO: only one group passed for --test-parameters, using same test-parameters for each group" << std::endl;
+                    // Duplicate the first group's values for all remaining groups
+                    for (int grp_i = 1; grp_i < K; grp_i++) {
+                        test_parameters[grp_i] = test_parameters[0];
+                    }
+                } else {
+                    std::cout << "FATAL: too few groups in test-parameters list (got " << group_idx << ", expected " << K << ")" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
         else if (!strcmp(argv[i], "--test-iter-range")) {
             if (i == argc - 1) fail_if_last(argv, i);
             std::string cslist = argv[++i];
