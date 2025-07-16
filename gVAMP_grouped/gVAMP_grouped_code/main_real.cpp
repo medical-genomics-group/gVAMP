@@ -185,19 +185,40 @@ int main(int argc, char** argv)
             std::cout << "iter range = [" << min_it << ", " << max_it << "]" << std::endl;
 
 
-
-
-        // --- Retrieve and validate group-specific taus ---
+        // --- Check if test parameters are provided and retrieve group-specific taus if available ---
         std::vector<std::vector<double>> test_params = opt.get_test_parameters();
-        std::vector<double> taus(K_test); // Vector to hold one tau per group (0-based index)
-
-        for (int k = 0; k < K_test; ++k) {
-            taus[k] = test_params[k][0]; // Assign tau for group k (0-based)
-        }
-        if (rank == 0) {
-            std::cout << "INFO: Using group-specific taus: [";
-            for(int k=0; k<K_test; ++k) std::cout << taus[k] << (k == K_test - 1 ? "" : ", ");
-            std::cout << "]" << std::endl;
+        bool use_thresholding = !test_params.empty();
+        std::vector<double> taus(K_test, 0.0); // Default to zero thresholds
+        
+        // thresholding is experimental
+        if (use_thresholding) {
+            // Validate that we have parameters for each group
+            if (test_params.size() < K_test) {
+                if (rank == 0) {
+                    std::cout << "WARNING: Not enough group parameters provided. Expected " << K_test 
+                              << " groups but got " << test_params.size() << ". Thresholding will be disabled." << std::endl;
+                }
+                use_thresholding = false;
+            } else {
+                // Assign tau for each group
+                for (int k = 0; k < K_test; ++k) {
+                    if (!test_params[k].empty()) {
+                        taus[k] = test_params[k][0]; 
+                    } else {
+                        if (rank == 0) {
+                            std::cout << "WARNING: Missing parameter for group " << k << ". Using tau=0 for this group." << std::endl;
+                        }
+                    }
+                }
+                
+                if (rank == 0) {
+                    std::cout << "INFO: Using group-specific taus: [";
+                    for(int k=0; k<K_test; ++k) std::cout << taus[k] << (k == K_test - 1 ? "" : ", ");
+                    std::cout << "]" << std::endl;
+                }
+            }
+        } else if (rank == 0) {
+            std::cout << "INFO: No test parameters provided. Thresholding will be skipped." << std::endl;
         }
 
         double maxR2 = -1;
@@ -214,16 +235,22 @@ int main(int argc, char** argv)
             else
                 x_est = read_vec_from_file(est_file_name_it, M_test, S_test);
 
-            // Apply treshold tau
+            // Apply threshold tau only if thresholding is enabled
             int zeroed_count_loop = 0;
-            for (int i = 0; i < M_test; ++i) {      // Loop over LOCAL markers for this rank
-                int global_idx = S_test + i;        // Calculate global marker index
-
-                int group_k = group_assignments[global_idx]; // Get 0-based group index
-                double tau_k = taus[group_k];            // Get tau for this group
-                if (std::abs(x_est[i]) < tau_k) {
-                    x_est[i] = 0.0;
-                    zeroed_count_loop++;
+            if (use_thresholding) {
+                for (int i = 0; i < M_test; ++i) {      // Loop over LOCAL markers for this rank
+                    int global_idx = S_test + i;        // Calculate global marker index
+                    int group_k = group_assignments[global_idx]; // Get 0-based group index
+                    double tau_k = taus[group_k];       // Get tau for this group
+                    
+                    if (std::abs(x_est[i]) < tau_k) {
+                        x_est[i] = 0.0;
+                        zeroed_count_loop++;
+                    }
+                }
+                
+                if (rank == 0 && it == min_it) {
+                    std::cout << "INFO: Zeroed " << zeroed_count_loop << " values in first iteration due to thresholding." << std::endl;
                 }
             }
 
@@ -248,8 +275,8 @@ int main(int argc, char** argv)
             double R2 = 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() );
             double R2_corr = l2_pred_err2_corr * l2_pred_err2_corr / (l2_y_test2 * l2_z_test2);
             if (rank == 0){
-                //std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
-                //std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
+                std::cout << "y stdev^2 = " << stdev * stdev << std::endl;  
+                std::cout << "test l2 pred err^2 = " << l2_pred_err2 << std::endl;
                 // std::cout << "test R2 = " << 1 - l2_pred_err2 / ( stdev * stdev * y_test.size() ) << std::endl;
                 std::cout << '(' << R2 << ',' << R2_corr << ')' << ", ";
             }
@@ -270,10 +297,6 @@ int main(int argc, char** argv)
             std::cout << std::endl << "max R2_corr = " << maxR2_corr << std::endl;
             std::cout << std::endl << "max ind_corr = " << maxind_corr << std::endl;
         }
-
-    
-    
-        
     }
     else if (opt.get_run_mode() == "both")
     {

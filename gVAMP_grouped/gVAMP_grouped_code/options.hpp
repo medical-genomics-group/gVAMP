@@ -27,6 +27,7 @@ public:
     //std::string get_ref_bim_file() const { return ref_bim_file; }
     //std::string get_group_index_file() const { return group_index_file; }
     //std::string get_group_mixture_file() const { return group_mixture_file; }
+    std::string get_prior_distribution() const { return prior_distribution;}
 
     std::string get_out_dir() const { return out_dir; }
     std::string get_out_name() const { return out_name; }
@@ -61,12 +62,16 @@ public:
     double get_alpha_scale() const { return alpha_scale; }
     double get_gamw_init() const { return gamw_init; }
     double get_gam1_init() const { return gam1_init; }
-    double get_gamma_damp() const { return gamma_damp; }
+    double get_gamma1_damp() const { return gamma1_damp; }
+    double get_gamma2_damp() const { return gamma2_damp; }
+    double get_sigma_init() const { return sigma_init; }
+    double get_merge_factor() const { return merge_factor; }
+
     
 
     std::vector<std::vector<double>> get_vars() const { return vars; } 
     std::vector<std::vector<double>> get_probs() const { return probs; }
-    std::vector<std::vector<double>> get_EM_parameters() const { return EM_parameters; }  // custom EM parameteres
+    std::vector<std::vector<double>> get_EM_parameters() const { return EM_parameters; }  // experimental custom EM parameteres
     std::vector<std::vector<double>> get_test_parameters() const {return test_parameters; } 
 
     std::vector<int> get_test_iter_range() const { return test_iter_range; }
@@ -109,6 +114,7 @@ private:
     std::string out_dir = "";
     std::string out_name = "";
     std::string model = "linear";
+    std::string prior_distribution = "gaussian_mixture"; // gaussian_mixture or student_t 
 
     double stop_criteria_thr = 1e-4;
     double EM_err_thr = 1e-2;
@@ -134,7 +140,10 @@ private:
     double probit_var = 1;
     double gamw_init;
     double gam1_init = -1;
-    double gamma_damp = 1;
+    double gamma1_damp = 1;
+    double gamma2_damp = 1;
+    double sigma_init = 0.0;// std of initial vector i.e. r1 = N(0, \sigma ^ 2), this is overwritten if init_est = 1
+    double merge_factor = 0.5; // factor for merging groups for gaussian mixture prior in updatePrior in vamp.cpp
 
 
     // unsigned int meth_imp = 0;

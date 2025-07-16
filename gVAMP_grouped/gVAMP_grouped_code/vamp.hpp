@@ -28,6 +28,7 @@ private:
     std::vector<std::vector<double>> probs, probs_before;
     std::vector<std::vector<double>> vars, vars_before;
     std::vector<std::vector<double>> EM_parameters;
+    std::string prior_distribution;
 
     double gamma_min = 1e-11;
     double gamma_max = 1e11;
@@ -43,7 +44,10 @@ private:
     double damp_max = 1;
     double damp_min = 0.05;
     double stop_criteria_thr; // = 1e-5;
-    double gamma_damp;
+    double gamma1_damp;
+    double gamma2_damp;
+    double sigma_init; // default is 0.0
+    double merge_factor; // default is 0.5
 
     std::string model;
     std::string out_dir;
@@ -68,6 +72,10 @@ private:
     double gamw_init;
     std::string r1_init_file;
 
+    std::vector<double> integral_cache;  // cache of integral values per groupd
+    std::vector<bool> integral_computed;
+    void clearIntegralCache() { std::fill(integral_computed.begin(), integral_computed.end(), false);} // helper function for clearing cache for student_t prior
+
     std::string estimate_file;
     std::string freeze_index_file;
 
@@ -91,7 +99,14 @@ public:
 
     //std::vector<double> predict(std::vector<double> est, data* dataset);
 
+    //********************************************
+    // Numerical approximation helper functions
+    //********************************************
 
+    void gaussLaguerreNodesWeights(int n, std::vector<double>& nodes, std::vector<double>& weights);
+    double digamma(double x);
+    double trigamma(double x);
+    double logGamma(double x);
     //********************************************
     // DENOISING PROCEDURES & ONSAGER CALCULATION
     //********************************************
@@ -106,6 +121,8 @@ public:
     double g1d_Huber(double p1, double tau1, double deltaH, double y);
     double g1d_Huber_der(double p1, double tau1, double deltaH, double y);
 
+    double studt_integral(double gam1, double nu, double sigma2);
+
 
     //************************
     // HYPERPARAMETERS UPDATE
@@ -113,6 +130,8 @@ public:
     void updatePrior(int group, int verbose);
     void updateNoisePrec(data* dataset);
     void updateNoisePrecAAT(data* dataset);
+
+
 
     double Huber_loss(double z, double deltaH, double y);
     double E_MC_eval_ind(double p1, double tau1, double deltaH, double y, int num_MC_steps);

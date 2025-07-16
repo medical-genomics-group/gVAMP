@@ -45,6 +45,8 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     rho(rho),
     vars(vars),
     seed(opt.get_seed()),
+    sigma_init(opt.get_sigma_init()),
+    merge_factor(opt.get_merge_factor()),
     probs(probs),
     out_dir(out_dir),
     out_name(out_name),
@@ -52,8 +54,10 @@ vamp::vamp(int N, int M,  int Mt, double gam1, double gamw, int max_iter, double
     estimate_file(opt.get_estimate_file()),
     learn_vars(opt.get_learn_vars()),
     EM_parameters(opt.get_EM_parameters()),
+    prior_distribution(opt.get_prior_distribution()),
     model(model),
-    gamma_damp(opt.get_gamma_damp()),
+    gamma1_damp(opt.get_gamma1_damp()),
+    gamma2_damp(opt.get_gamma2_damp()),
     use_freeze(opt.get_use_freeze()),
     freeze_index_file(opt.get_freeze_index_file()),
     redglob(opt.get_redglob()),
@@ -101,10 +105,13 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     rho(opt.get_rho()),
     probs(opt.get_probs()),
     EM_parameters(opt.get_EM_parameters()),
+    prior_distribution(opt.get_prior_distribution()),
     out_dir(opt.get_out_dir()),
     out_name(opt.get_out_name()),
     learn_vars(opt.get_learn_vars()),
     seed(opt.get_seed()),
+    sigma_init(opt.get_sigma_init()),
+    merge_factor(opt.get_merge_factor()),
     true_signal(true_signal),
     model(opt.get_model()),
     redglob(opt.get_redglob()),
@@ -113,10 +120,13 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
     freeze_index_file(opt.get_freeze_index_file()),
     estimate_file(opt.get_estimate_file()),
     store_pvals(opt.get_store_pvals()),
-    gamma_damp(opt.get_gamma_damp()),
+    gamma1_damp(opt.get_gamma1_damp()),
+    gamma2_damp(opt.get_gamma2_damp()),
     rank(rank),
     reverse(opt.get_use_XXT_denoiser()),
-    use_lmmse_damp(opt.get_use_lmmse_damp())  {
+    use_lmmse_damp(opt.get_use_lmmse_damp()),
+    integral_cache(opt.get_N(), 0.0), 
+    integral_computed(opt.get_N(), false){
     N = opt.get_N();
     Mt = opt.get_Mt();
     max_iter = opt.get_iterations();
@@ -147,6 +157,110 @@ vamp::vamp(int M, double gam1, double gamw, std::vector<double> true_signal, int
 //    return (*dataset).Ax(est.data());
 //}
 
+
+//*********************************
+// VAMP - Numerical approximation
+//*********************************
+
+void vamp::gaussLaguerreNodesWeights(int n, std::vector<double>& nodes, std::vector<double>& weights) {
+    n = 20;
+    nodes = {0.0705398896919887, 0.372126818001611, 0.916582102483274, 1.707306531028346,
+            2.749199255315629, 4.048925313808128, 5.615174565874309, 7.459017454225492,
+            9.594392865483272, 12.038802560608859, 14.814293416699253, 17.948895520632110,
+            21.478788242285020, 25.451702644415552, 29.932554890200450, 35.013433968980548,
+            40.833057239401291, 47.619994047245906, 55.810795731051789, 66.524416523920317};
+    
+    weights = {0.168746801851113, 0.291254362006068, 0.266686102867001, 0.166002453269507,
+            0.0748260646687924, 0.0249644173092833, 0.00620255084457223, 0.00114496238647690,
+            0.000155741773027813, 0.0000154014403802851, 1.08648636651798e-6, 5.33012090955821e-8,
+            1.75798117905514e-9, 3.72550039060823e-11, 4.76752925157753e-13, 3.37284423797562e-15,
+            1.15501433950143e-17, 1.53952214030134e-20, 5.28644272556897e-24, 1.65645661248902e-28};
+
+}
+
+double vamp::digamma(double x) {
+    // Use asymptotic expansion for x > 10
+    if (x > 10.0) {
+        double inv_x = 1.0 / x;
+        double inv_x2 = inv_x * inv_x;
+        return log(x) - 0.5 * inv_x - inv_x2 / 12.0 + inv_x2 * inv_x2 / 120.0;
+    }
+    
+    // Use recurrence relation to shift to asymptotic regime
+    double result = 0.0;
+    while (x < 10.0) {
+        result -= 1.0 / x;
+        x += 1.0;
+    }
+    
+    // Now x >= 10, use asymptotic expansion
+    double inv_x = 1.0 / x;
+    double inv_x2 = inv_x * inv_x;
+    result += log(x) - 0.5 * inv_x - inv_x2 / 12.0 + inv_x2 * inv_x2 / 120.0;
+    
+    return result;
+}
+
+// Helper function for trigamma (psi') function
+double vamp::trigamma(double x) {
+    // Use asymptotic expansion for x > 10
+    if (x > 10.0) {
+        double inv_x = 1.0 / x;
+        double inv_x2 = inv_x * inv_x;
+        double inv_x3 = inv_x2 * inv_x;
+        double inv_x5 = inv_x3 * inv_x2;
+        return inv_x + 0.5 * inv_x2 + inv_x3 / 6.0 - inv_x5 / 30.0;
+    }
+    
+    // Use recurrence relation to shift to asymptotic regime
+    double result = 0.0;
+    while (x < 10.0) {
+        result += 1.0 / (x * x);
+        x += 1.0;
+    }
+    
+    // Now x >= 10, use asymptotic expansion
+    double inv_x = 1.0 / x;
+    double inv_x2 = inv_x * inv_x;
+    double inv_x3 = inv_x2 * inv_x;
+    double inv_x5 = inv_x3 * inv_x2;
+    result += inv_x + 0.5 * inv_x2 + inv_x3 / 6.0 - inv_x5 / 30.0;
+    
+    return result;
+}
+
+// Helper function for log gamma
+double vamp::logGamma(double x) {
+    // Simple approximation using Stirling's formula for large x
+    if (x > 10.0) {
+        return (x - 0.5) * log(x) - x + 0.5 * log(2 * M_PI) + 1.0 / (12.0 * x);
+    }
+    
+    // For smaller x, use lgamma from cmath
+    return lgamma(x);
+}
+
+double vamp::studt_integral(double gam1, double nu, double sigma2){   
+        int n_quad = 20;  // Use high-precision quadrature
+        std::vector<double> nodes, weights;
+        gaussLaguerreNodesWeights(n_quad, nodes, weights);
+        
+        double integral = 0.0;
+        double nu_half = nu / 2.0;
+        double gamma_normalizer = pow(nu_half, nu_half) / exp(logGamma(nu_half));
+
+        for (int k = 0; k < n_quad; k++) {
+            double t = nodes[k];
+            double u = 2.0 * t / nu;
+            
+            double shrinkage = gam1 / (gam1 + u / sigma2);
+            double gamma_term = gamma_normalizer * pow(u, nu_half - 1.0);
+            
+            integral += weights[k] * shrinkage * gamma_term * (2.0 / nu);
+        }
+        
+        return integral;
+}
 
 //*********************************
 // VAMP - MAIN INFERENCE PROCEDURE
@@ -235,8 +349,19 @@ std::vector<double> vamp::infere_linear(data* dataset){
 
     // Gaussian noise start
     // r1 = simulate(M, std::vector<double> {1.0/gam1}, std::vector<double> {1});
-    r1 = std::vector<double> (M, 0.0);
 
+    if (sigma_init == 0.0) {
+        r1 = std::vector<double>(M, 0.0);
+    } else {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::normal_distribution<double> dist(0.0, std::sqrt(sigma_init));
+        
+        r1 = std::vector<double>(M);
+        for (int i = 0; i < M; ++i) {
+            r1[i] = dist(gen);
+        }
+    }
     // restart option
     if (gam1_init != -1){
         gam1 = gam1_init;
@@ -290,7 +415,30 @@ std::vector<double> vamp::infere_linear(data* dataset){
         // updating parameters of prior distribution
         probs_before = probs;
         vars_before = vars;
+        
+        if (rank == 0) {
+            std::cout << "initial variances = ";
 
+            for (int i = 0; i < vars.size(); i++){
+                for (int j = 0; j < vars[i].size(); j++) {
+                    std::cout << vars[i][j];
+                    if (j < vars[i].size() - 1) 
+                        std::cout << ',';
+                }
+                if (i < vars.size() - 1)
+                    std::cout << '@';
+            }
+            std::cout << std::endl << "initial probabilities= "; 
+            for (int i = 0; i < probs.size(); i++){
+                    for (int j = 0; j < probs[i].size(); j++) {
+                        std::cout << probs[i][j];
+                        if (j < probs[i].size() - 1) 
+                            std::cout << ',';
+                    }
+                    if (i < vars.size() - 1)
+                        std::cout << '@';
+            }
+        }
         // if (it == 1)
         //    gam1 = pow(calc_stdev(true_signal), -2); // setting the right gam1 at the beginning
 
@@ -323,6 +471,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
                 if (!use_freeze || (use_freeze && freeze_ind[i]==0))
                     sum_d += x1_hat_d[i];
             }
+            MPI_Barrier(MPI_COMM_WORLD); // sync before clearing cache only needed for student_t prior
+            clearIntegralCache();
 
             alpha1 = 0;
             MPI_Allreduce(&sum_d, &alpha1, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -566,8 +716,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
             std::cout << "______________________" << std::endl<< "->LMMSE" << std::endl;
 
 
-        // gamma_damp
-        // gam2 = gam2 * gamma_damp;
+        // gamma2_damp
+        gam2 = gam2 * gamma2_damp;
 
         // running conjugate gradient solver to compute LMMSE
         double start_CG = MPI_Wtime();
@@ -655,8 +805,8 @@ std::vector<double> vamp::infere_linear(data* dataset){
         if (rank == 0)
             std::cout << "alpha2 = " << alpha2 << std::endl;
 
-        // gamma_damp back
-        // gam2 = gam2 / gamma_damp;
+        // gamma2_damp back
+        gam2 = gam2 / gamma2_damp;
 
         // onsager approx
         if (it > 1){
@@ -821,58 +971,115 @@ std::vector<double> vamp::infere_linear(data* dataset){
 }
 
 double vamp::g1(double y, double gam1, int group) {
-    double sigma = 1 / gam1;
-    const std::vector<double>& group_vars = vars[group];
-    const std::vector<double>& group_probs = probs[group];
-    
-    double eta_max = *(std::max_element(group_vars.begin(), group_vars.end()));
-    double pk = 0, pkd = 0, val;
-
-    if (sigma < 1e-10 && sigma > -1e-10) {
-        return y;
-    }
-
-    for (int i = 0; i < group_probs.size(); i++) {
-        double expe_sum = -0.5 * pow(y,2) * (eta_max - group_vars[i]) / 
-                         (group_vars[i] + sigma) / (eta_max + sigma);
+    if (prior_distribution == "gaussian_mixture"){
+        double sigma = 1 / gam1;
+        const std::vector<double>& group_vars = vars[group];
+        const std::vector<double>& group_probs = probs[group];
         
-        double z = group_probs[i] / sqrt(group_vars[i] + sigma) * exp(expe_sum);
-        pk = pk + z;
-        z = z / (group_vars[i] + sigma) * y;
-        pkd = pkd - z;
-    }
+        double eta_max = *(std::max_element(group_vars.begin(), group_vars.end()));
+        double pk = 0, pkd = 0, val;
 
-    val = (y + sigma * pkd / pk);
-    return val;
+        if (sigma < 1e-10 && sigma > -1e-10) {
+            return y;
+        }
+
+        for (int i = 0; i < group_probs.size(); i++) {
+            double expe_sum = -0.5 * pow(y,2) * (eta_max - group_vars[i]) / 
+                            (group_vars[i] + sigma) / (eta_max + sigma);
+            
+            double z = group_probs[i] / sqrt(group_vars[i] + sigma) * exp(expe_sum);
+            pk = pk + z;
+            z = z / (group_vars[i] + sigma) * y;
+            pkd = pkd - z;
+        }
+
+        val = (y + sigma * pkd / pk);
+        return val;
+    }
+    else if (prior_distribution == "student_t"){
+        double noise_var = 1.0 / gam1;  // variance of noise g
+    
+        // For Student-t, vars[group] contains [sigma^2] and probs[group] contains [nu]
+        double sigma2 = vars[group][0];  // scale parameter squared
+        double nu = probs[group][0];     // degrees of freedom
+        
+        if (noise_var < 1e-10) {
+            return y;  // No noise case
+        }
+        
+        // Compute integral using Gauss-Laguerre quadrature
+        // I = r * ∫ γ/(γ + u/σ²) * Gamma(u|ν/2, ν/2) du
+        double integral = 0.0;
+        if (integral_computed[group]) {
+            integral = integral_cache[group];
+        }
+        else {
+            integral = studt_integral(gam1, nu, sigma2);  
+        } 
+
+        return y * integral;
+    }
+    else {
+        std::cout << "FATAL: prior" << prior_distribution << "not implemented";
+        exit(EXIT_FAILURE);
+    }
 }
 
 double vamp::g1d(double y, double gam1, int group) {
-    double sigma = 1 / gam1;
-    const std::vector<double>& group_vars = vars[group];
-    const std::vector<double>& group_probs = probs[group];
-    
-    double eta_max = *std::max_element(group_vars.begin(), group_vars.end());
-    double pk = 0, pkd = 0, pkdd = 0;
-
-    if (sigma < 1e-10 && sigma > -1e-10) {
-        return 1;
-    }
-
-    for (int i = 0; i < group_probs.size(); i++) {
-        double expe_sum = -0.5 * pow(y,2) * (eta_max - group_vars[i]) / 
-                         (group_vars[i] + sigma) / (eta_max + sigma);
+    if (prior_distribution == "gaussian_mixture"){
+        double sigma = 1 / gam1;
+        const std::vector<double>& group_vars = vars[group];
+        const std::vector<double>& group_probs = probs[group];
         
-        double z = group_probs[i] / sqrt(group_vars[i] + sigma) * exp(expe_sum);
-        pk = pk + z;
-        z = z / (group_vars[i] + sigma) * y;
-        pkd = pkd - z;
-        double z2 = z / (group_vars[i] + sigma) * y;
-        pkdd = pkdd - group_probs[i] / pow(group_vars[i] + sigma, 1.5) * 
-               exp(expe_sum) + z2;
-    }
+        double eta_max = *std::max_element(group_vars.begin(), group_vars.end());
+        double pk = 0, pkd = 0, pkdd = 0;
 
-    double val = (1 + sigma * (pkdd / pk - pow(pkd / pk, 2)));
-    return val;
+        if (sigma < 1e-10 && sigma > -1e-10) {
+            return 1;
+        }
+
+        for (int i = 0; i < group_probs.size(); i++) {
+            double expe_sum = -0.5 * pow(y,2) * (eta_max - group_vars[i]) / 
+                            (group_vars[i] + sigma) / (eta_max + sigma);
+            
+            double z = group_probs[i] / sqrt(group_vars[i] + sigma) * exp(expe_sum);
+            pk = pk + z;
+            z = z / (group_vars[i] + sigma) * y;
+            pkd = pkd - z;
+            double z2 = z / (group_vars[i] + sigma) * y;
+            pkdd = pkdd - group_probs[i] / pow(group_vars[i] + sigma, 1.5) * 
+                exp(expe_sum) + z2;
+        }
+
+        double val = (1 + sigma * (pkdd / pk - pow(pkd / pk, 2)));
+        return val;
+    }   
+    else if (prior_distribution == "student_t"){
+        double noise_var = 1.0 / gam1;  // variance of noise g
+    
+        // For Student-t, vars[group] contains [sigma^2] and probs[group] contains [nu]
+        double sigma2 = vars[group][0];  // scale parameter squared
+        double nu = probs[group][0];     // degrees of freedom
+        
+        if (noise_var < 1e-10) {
+            return y;  // No noise case
+        }
+        
+        // Compute integral using Gauss-Laguerre quadrature
+        // I = r * ∫ γ/(γ + u/σ²) * Gamma(u|ν/2, ν/2) du
+        double integral = 0.0;
+        if (integral_computed[group]) {
+            integral = integral_cache[group];
+        }
+        else {
+            integral = studt_integral(gam1, nu, sigma2);  
+        } 
+        return integral;
+    }
+    else {
+        std::cout << "FATAL: prior" << prior_distribution << "not implemented";
+        exit(EXIT_FAILURE);
+    }
 }
 
 double vamp::g2d_onsager(double gam2, double tau, data* dataset) { // shared between linear and binary classification model
@@ -934,6 +1141,7 @@ void vamp::updateNoisePrec(data* dataset){
 }
 
 void vamp::updatePrior(int group, int verbose = 1) {
+    if (prior_distribution == "gaussian_mixture") {
         std::vector<double> group_vars = vars[group];
         std::vector<double> group_probs = probs[group];
         
@@ -1071,7 +1279,7 @@ void vamp::updatePrior(int group, int verbose = 1) {
                 else
                     denom = 1e-7;
 
-                if ( abs(group_vars[j] - group_vars[k]) / denom < 5e-1 ){
+                if ( abs(group_vars[j] - group_vars[k]) / denom < merge_factor ){  // 5e-1 for best run on 10 groups, default is 1e-5
                     double sum2probs = group_probs[j] + group_probs[k];
                     group_vars.erase(group_vars.begin() + k);
                     group_probs.erase(group_probs.begin() + k);
@@ -1082,39 +1290,159 @@ void vamp::updatePrior(int group, int verbose = 1) {
         }
 
 
-        // Experimental, enforces fixed sparsity and renormalizes probs
-        if (!EM_parameters.empty() && group < EM_parameters.size() && !EM_parameters[group].empty()) {
-            double lambda0 = EM_parameters[group][0]; // Get the first parameter as lambda0
-            
-            if (verbose == 1 && rank == 0) {
-                std::cout << "Using lambda0 = " << lambda0 << " for group " << group << std::endl;
-            }
-            
-            // Set first entry to lambda0
-            group_probs[0] = lambda0;
-            
-            // Calculate sum of remaining probabilities
-            double remaining_sum = 0.0;
-            for (int j = 1; j < group_probs.size(); j++) {
-                remaining_sum += group_probs[j];
-            }
-            
-            // Scale remaining entries to sum to (1-lambda0)
-            if (remaining_sum > 0) {
-                double scale_factor = (1.0 - lambda0) / remaining_sum;
-                for (int j = 1; j < group_probs.size(); j++) {
-                    group_probs[j] *= scale_factor;
-                }
-            } else if (group_probs.size() > 1) {
-                // If no remaining probability, distribute evenly
-                double even_prob = (1.0 - lambda0) / (group_probs.size() - 1);
-                for (int j = 1; j < group_probs.size(); j++) {
-                    group_probs[j] = even_prob;
-                }
-            }
-        }
     vars[group] = group_vars;
     probs[group] = group_probs;
+    }
+    else if (prior_distribution == "student_t"){
+    double sigma2 = vars[group][0];  
+    double nu = probs[group][0];     
+    double noise_var = 1.0 / gam1;   
+    
+    int it;
+    for (it = 0; it < EM_max_iter; it++) {
+        double sigma2_prev = sigma2;
+        double nu_prev = nu;
+        
+        // E-step accumulators
+        double local_sum_u = 0.0;          // Sum of E[u|r]
+        double local_sum_log_u = 0.0;      // Sum of E[log u|r]  
+        double local_sum_u_x2 = 0.0;       // Sum of E[u·x²|r]
+        int local_count = 0;
+        
+        for (int i = 0; i < M; i++) {
+            if (group_assignments[i] != group)
+                continue;
+            
+            double r_i = r1[i];
+            
+            // Set up quadrature
+            int n_quad = 20;  // More points for accuracy
+            std::vector<double> nodes, weights;
+            gaussLaguerreNodesWeights(n_quad, nodes, weights);
+            
+            // Compute E[u|r], E[log u|r], and E[u·x²|r] via quadrature
+            // Change of variables: t = νu/2, so u = 2t/ν, du = 2dt/ν
+            
+            // First pass: compute normalizing constant
+            double norm = 0.0;
+            for (int k = 0; k < n_quad; k++) {
+                double t = nodes[k];
+                double u = 2.0 * t / nu;
+                
+                // p(u|r) ∝ p(r|u)·p(u)
+                // p(r|u) = N(r; 0, σ²/u + noise_var)
+                // p(u) = Gamma(u; ν/2, ν/2)
+                
+                double var_r_given_u = sigma2/u + noise_var;
+                double log_likelihood = -0.5 * log(2*M_PI*var_r_given_u) - 0.5*r_i*r_i/var_r_given_u;
+                double log_prior = (nu/2 - 1)*log(u) - nu*u/2;  // Gamma prior (unnormalized)
+                
+                norm += weights[k] * exp(log_likelihood + log_prior) * (2.0/nu);
+            }
+            
+            // Second pass: compute expectations
+            double E_u = 0.0;
+            double E_log_u = 0.0;
+            double E_u_x2 = 0.0;
+            
+            for (int k = 0; k < n_quad; k++) {
+                double t = nodes[k];
+                double u = 2.0 * t / nu;
+                
+                double var_r_given_u = sigma2/u + noise_var;
+                double log_likelihood = -0.5 * log(2*M_PI*var_r_given_u) - 0.5*r_i*r_i/var_r_given_u;
+                double log_prior = (nu/2 - 1)*log(u) - nu*u/2;
+                double posterior_weight = exp(log_likelihood + log_prior) / norm;
+                
+                // E[u|r]
+                E_u += weights[k] * posterior_weight * u * (2.0/nu);
+                
+                // E[log u|r]
+                E_log_u += weights[k] * posterior_weight * log(u) * (2.0/nu);
+                
+                // For E[u·x²|r], we need E[x²|r,u]
+                // Given r,u: x|r,u ~ N(μ, v) where:
+                double prec_x = u/sigma2;      // precision from prior
+                double prec_noise = 1/noise_var;  // precision from likelihood
+                double prec_total = prec_x + prec_noise;
+                double var_x_post = 1/prec_total;
+                double mean_x_post = var_x_post * prec_noise * r_i;
+                
+                // E[x²|r,u] = mean² + variance
+                double E_x2_given_ru = mean_x_post*mean_x_post + var_x_post;
+                
+                // E[u·x²|r] 
+                E_u_x2 += weights[k] * posterior_weight * u * E_x2_given_ru * (2.0/nu);
+            }
+            
+            local_sum_u += E_u;
+            local_sum_log_u += E_log_u;
+            local_sum_u_x2 += E_u_x2;
+            local_count++;
+        }
+        
+        // MPI reduction
+        double global_sum_u = 0.0;
+        double global_sum_log_u = 0.0;
+        double global_sum_u_x2 = 0.0;
+        int global_count = 0;
+        
+        MPI_Allreduce(&local_sum_u, &global_sum_u, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&local_sum_log_u, &global_sum_log_u, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&local_sum_u_x2, &global_sum_u_x2, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&local_count, &global_count, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        
+        // M-step for σ²
+        if (learn_vars == 1) {
+            // σ² = E[u·x²] / E[u]
+            sigma2 = global_sum_u_x2 / global_sum_u;
+        }
+        
+        // M-step for ν using Newton-Raphson
+        double nu_new = nu;
+        for (int newton_it = 0; newton_it < 20; newton_it++) {
+            // Maximize: Q(ν) = n·ν/2·log(ν/2) - n·log Γ(ν/2) + (ν-2)/2·∑E[log u] - ν/2·∑E[u]
+            
+            double nu_half = nu_new / 2.0;
+            double Q_prime = global_count/2.0 * (log(nu_half) + 1.0 - digamma(nu_half)) 
+                           + global_sum_log_u/2.0 - global_sum_u/2.0;
+            
+            double Q_double_prime = global_count/(2.0*nu_new) - global_count/4.0 * trigamma(nu_half);
+            
+            if (Q_double_prime >= 0.0) {
+                Q_double_prime = -1e-6;
+            }
+            
+            double delta = -Q_prime / Q_double_prime;
+            nu_new = nu_new + delta;
+            
+            if (nu_new < 0.1) nu_new = 0.1;
+            if (nu_new > 100.0) nu_new = 100.0;
+            
+            if (fabs(delta) < 1e-6) break;
+        }
+        nu = nu_new;
+        
+        // Convergence check
+        double dist_sigma = fabs(sigma2 - sigma2_prev) / (sigma2 + 1e-10);
+        double dist_nu = fabs(nu - nu_prev) / (nu + 1e-10);
+        
+        if (verbose == 1 && rank == 0) {
+            std::cout << "it = " << it << ": dist_sigma = " << dist_sigma 
+                      << " & dist_nu = " << dist_nu << std::endl;
+        }
+        
+        if (dist_sigma < EM_err_thr && dist_nu < EM_err_thr) break;
+    }
+    
+    if (verbose == 1 && rank == 0) {
+        std::cout << "Final number of prior EM iterations = " << std::min(it + 1, EM_max_iter) 
+                  << " / " << EM_max_iter << std::endl;
+    }
+    
+    vars[group][0] = sigma2;
+    probs[group][0] = nu;
+}
 
 }
 
@@ -1352,7 +1680,8 @@ void vamp::err_measures(data *dataset, int ind){
         double l2_pred_err = sqrt(l2_norm2(tempNest, 0) / l2_norm2(y, 0));
 
         if (rank == 0)
-            std::cout << "l2 prediction error = " << l2_pred_err << std::endl;
+            std::cout << "l2 prediction error = " << l2_pred_err << ", tempNest_l2" << l2_norm2(tempNest, 0) << ", l2_y_filt" << l2_norm2(y, 0) << std::endl;
+
 
         double R2 = 1 - l2_pred_err * l2_pred_err;
 
@@ -1385,7 +1714,7 @@ void vamp::err_measures(data *dataset, int ind){
         double l2_pred_err = sqrt(l2_norm2(tempNest, 0) / l2_norm2(y_filt, 0));
 
         if (rank == 0)
-            std::cout << "l2 prediction error = " << l2_pred_err << std::endl;
+            std::cout << "l2 prediction error = " << l2_pred_err << ", tempNest_l2 = " << l2_norm2(tempNest, 0) << ", l2_y_filt" << l2_norm2(y_filt, 0) << std::endl;
 
         double R2 = 1 - l2_pred_err * l2_pred_err;
 

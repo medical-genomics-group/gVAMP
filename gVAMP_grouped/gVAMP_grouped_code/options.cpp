@@ -132,7 +132,7 @@ void Options::read_command_line_options(int argc, char** argv) {
                 std::cout << "FATAL: could not open group file " << group_file << std::endl;
                 exit(EXIT_FAILURE);
             }
-        }    
+        } 
         else if (!strcmp(argv[i], "--vars")) {
             if (i == argc - 1) fail_if_last(argv, i);
             std::string cslist = argv[++i];
@@ -205,11 +205,11 @@ void Options::read_command_line_options(int argc, char** argv) {
                 while (getline(value_list, value, ',')) {
                     double prob = atof(value.c_str());
                     probs[group_idx].push_back(prob);
-                    sum += prob;
+                    //sum += prob;
                 }
-                for (double& prob : probs[group_idx]){ 
-                    prob /= sum;
-                }
+                // for (double& prob : probs[group_idx]){ 
+                //     prob /= sum;
+                // }
 
                 group_idx++;
             
@@ -265,6 +265,11 @@ void Options::read_command_line_options(int argc, char** argv) {
                     exit(EXIT_FAILURE);
                 }
             }
+        }
+        else if (!strcmp(argv[i], "--prior-distribution")) {
+            if (i == argc - 1) fail_if_last(argv, i);
+            prior_distribution = argv[++i];
+            ss << "--prior-distribution " << prior_distribution << "\n";
         }
         else if (!strcmp(argv[i], "--test-parameters")) {
             if (i == argc - 1) fail_if_last(argv, i);
@@ -485,10 +490,15 @@ void Options::read_command_line_options(int argc, char** argv) {
             rho = atof(argv[++i]);
             ss << "--rho " << rho << "\n";
         }
-        else if (!strcmp(argv[i], "--gamma-damp")){ // strcmp return 0 if both strings are identical
+        else if (!strcmp(argv[i], "--gamma1-damp")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
-            gamma_damp = atof(argv[++i]);
-            ss << "--gamma-damp " << gamma_damp << "\n";
+            gamma1_damp = atof(argv[++i]);
+            ss << "--gamma1-damp " << gamma1_damp << "\n";
+        }
+        else if (!strcmp(argv[i], "--gamma2-damp")){ // strcmp return 0 if both strings are identical
+            if (i == argc - 1) fail_if_last(argv, i);
+            gamma2_damp = atof(argv[++i]);
+            ss << "--gamma2-damp " << gamma2_damp << "\n";
         }
         else if (!strcmp(argv[i], "--gam1-init")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
@@ -499,6 +509,16 @@ void Options::read_command_line_options(int argc, char** argv) {
             if (i == argc - 1) fail_if_last(argv, i);
             gamw_init = atof(argv[++i]);
             ss << "--gamw-init " << gamw_init << "\n";
+        }
+        else if (!strcmp(argv[i], "--sigma-init")){
+            if (i == argc - 1) fail_if_last(argv, i);
+            sigma_init = atof(argv[++i]);
+            ss << "--sigma-init " << sigma_init << "\n";
+        }
+        else if (!strcmp(argv[i], "--merge-factor")){
+            if (i == argc - 1) fail_if_last(argv, i);
+            merge_factor = atof(argv[++i]);
+            ss << "--merger-factor " << merge_factor << "\n";
         }
         else if (!strcmp(argv[i], "--probit-var")){ // strcmp return 0 if both strings are identical
             if (i == argc - 1) fail_if_last(argv, i);
