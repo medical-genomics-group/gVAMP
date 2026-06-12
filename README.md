@@ -3,7 +3,9 @@
 * [Setup and supported options](#setup-and-supported-options)
 
 ## General info
-This repository contains a software implementation of Vector Approximate Message Passing algorithm suitable for doing inference in Genome-Wide Association Studies (GWAS).  
+This repository contains a software implementation of the Vector Approximate Message Passing (VAMP) algorithm, tailored for performing inference in Genome-Wide Association Studies (GWAS).  
+
+To help ensure convergence, the codebase incorporates several algorithmic and implementation optimizations. Many of these techniques parallel those found in established EM-VAMP implementations, most notably the [GAMPmatlab toolbox](https://sourceforge.net/projects/gampmatlab/) (P. Schniter, S. Rangan, J.T. Parker, et al., [r633], 16 March 2021).
 
 
 ## Setup and supported options
